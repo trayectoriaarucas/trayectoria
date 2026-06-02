@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Mapa Interactivo - Arucas</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .contenedor-mapa {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      max-width: 1400px; /* Ajusta el ancho máximo en pantallas muy grandes */
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    
+    .mapa-img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    .punto {
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      background-color: #e74c3c; /* Un rojo brillante y visible */
+      color: #ffffff;
+      border-radius: 50%;
+      border: 2px solid #ffffff;
+      box-shadow: 0px 2px 5px rgba(0,0,0,0.5);
+      
+      /* Centrado de los números */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+      
+      /* La magia para que la coordenada sea exactamente el centro del punto */
+      transform: translate(-50%, -50%);
+      transition: transform 0.2s, background-color 0.2s;
+    }
+    
+    /* Pequeño efecto al pasar el ratón por encima */
+    .punto:hover {
+      transform: translate(-50%, -50%) scale(1.15);
+      background-color: #c0392b;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Prueba de Ubicaciones en Arucas</h2>
+  <p>Pasa el ratón por encima (o mantén pulsado) cada número para ver el nombre del lugar.</p>
+
+  <div class="contenedor-mapa">
+    <img src="https://raw.githubusercontent.com/trayectoriaarucas/trayectoria/main/Mapa.png" alt="Mapa Arucas" class="mapa-img">
+
+    <div class="punto" style="top: 59.8%; left: 7.3%;" title="Aula">1</div>
+    <div class="punto" style="top: 53.4%; left: 20.4%;" title="Hiperdino">2</div>
+    <div class="punto" style="top: 10.6%; left: 67.7%;" title="Vivero">3</div>
+    <div class="punto" style="top: 28.4%; left: 19.7%;" title="Mantenimiento">4</div>
+    <div class="punto" style="top: 70.3%; left: 39.2%;" title="ODL">5</div>
+    <div class="punto" style="top: 64.3%; left: 76.2%;" title="Café">6</div>
+    <div class="punto" style="top: 66.2%; left: 6.1%;" title="Policía">7</div>
+    <div class="punto" style="top: 81.2%; left: 49.0%;" title="Palacio Oriental">8</div>
+    <div class="punto" style="top: 12.5%; left: 50.8%;" title="Granja">9</div>
+    <div class="punto" style="top: 40.3%; left: 9.9%;" title="Vías y Obras">10</div>
+    <div class="punto" style="top: 12.9%; left: 82.3%;" title="Igualdad">11</div>
+    <div class="punto" style="top: 37.3%; left: 34.4%;" title="Material">12</div>
+    <div class="punto" style="top: 41.5%; left: 52.3%;" title="RRHH">13</div>
+    <div class="punto" style="top: 38.0%; left: 27.6%;" title="Nikki">14</div>
+    <div class="punto" style="top: 48.6%; left: 75.9%;" title="Librería">15</div>
+    <div class="punto" style="top: 58.9%; left: 40.4%;" title="Centro de Salud">16</div>
+    <div class="punto" style="top: 33.2%; left: 83.8%;" title="Iglesia de Arucas">17</div>
+    <div class="punto" style="top: 62.7%; left: 64.7%;" title="Instituto">18</div>
+  </div>
+
+</body>
+</html>
