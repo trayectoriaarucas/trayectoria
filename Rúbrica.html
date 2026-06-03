@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rubrica de Evaluación - Sistema Avanzado</title>
+    <title>Rúbrica de Evaluación - Sistema Avanzado</title>
     
-    <!-- MEMORIA DE DATOS -->
     <script id="saved-data" type="application/json">{
         "download_time": 0,
         "data": {}
     }</script>
 
-    <!-- CONFIGURACIÓN DE LA ESTRUCTURA DEL EXAMEN -->
     <script id="exam-config" type="application/json">{
         "students": [
             "Wenceslaa", "Julia (Mª del Pino)", "Carmelo", "Lupe", "Sonia",
@@ -38,7 +36,7 @@
         ],
         "questions": [
             "1. ¿Menciona o reflexiona sobre la seguridad y los riesgos del mayor como PEATÓN?",
-            "2. ¿Trata las recomendaciones específicas para el mayor como CONDUCTOR?",
+            "2. ¿Trata las recommendations específicas para el mayor como CONDUCTOR?",
             "3. ¿Incluye pautas o precauciones para el uso seguro del TRANSPORTE PÚBLICO?",
             "4. ¿Vincula la seguridad vial con el mantenimiento de la AUTONOMÍA y la salud?",
             "5. ¿Conecta los datos del texto de apoyo con la CONCIENCIACIÓN SOCIAL solicitada?"
@@ -127,11 +125,10 @@
         <div id="students-container"></div>
     </div>
 
-    <!-- VENTANA DEL EDITOR (OCULTA) -->
     <div id="editorModal">
         <div class="editor-content">
             <h2>⚙️ Editor de la Rúbrica</h2>
-            <p>Aquí puedes modificar la estructura interna. Usa el formato indicado en los textos de ayuda.</p>
+            <p>Modifica la estructura interna. Usa el formato indicado.</p>
             
             <div class="editor-group">
                 <h4>Listado de Alumnos</h4>
@@ -176,12 +173,9 @@
         const optionLabels = ["Mucho / Excelente", "Bastante / Adecuado", "Poco / Superficial", "Nada / No lo trata"];
         const colors = ["#34495e", "#8e44ad", "#2980b9", "#c0392b", "#d35400", "#16a085", "#27ae60", "#f39c12", "#e67e22", "#e74c3c", "#9b59b6", "#8e44ad", "#2c3e50", "#f1c40f", "#1abc9c", "#2ecc71", "#3498db", "#95a5a6"];
 
-        // INICIALIZACIÓN
         function initApp() {
-            // Cargar Configuración Estructural
             config = JSON.parse(document.getElementById('exam-config').textContent);
             
-            // Cargar Datos (Notas)
             let embeddedPayload = { download_time: 0, data: {} };
             try { embeddedPayload = JSON.parse(document.getElementById('saved-data').textContent); } catch (e) {}
 
@@ -209,7 +203,7 @@
         }
 
         function borrarTodo() {
-            if(confirm("¿Seguro que quieres BORRAR TODAS LAS NOTAS?")) {
+            if(confirm("¿Seguro que quieres BORRAR TODAS LAS NOTAS del examen?")) {
                 state = {};
                 localStorage.removeItem('rubrica_examen_v7_data');
                 document.getElementById('saved-data').textContent = '{"download_time":0,"data":{}}';
@@ -227,12 +221,11 @@
             }
         }
 
-        // --- SISTEMA DE IMPRESIÓN (PDF NATIVO) ---
+        // --- MOTOR DE IMPRESIÓN SEGURO MEDIANTE IFRAME INDESTRUCTIBLE ---
         function generarHTMLInforme(sIdx) {
             const student = config.students[sIdx];
             const sData = state[sIdx] || {};
             
-            // Calcular totales
             let tA=0, tB=0, tC=0;
             config.partA.forEach((item, i) => tA += (parseFloat(sData[`a${i}`]) || 0));
             config.partB.forEach((item, i) => tB += (parseFloat(sData[`b${i}`]) || 0));
@@ -242,51 +235,54 @@
             let notaFinal = (tA + tB + tC) - penalizacion;
             if(notaFinal < 0) notaFinal = 0;
 
-            // Extraer solo las temáticas contestadas
             let temasHtml = "";
             config.questions.forEach((q, qIdx) => {
                 let ansIdx = sData[`q_${qIdx}`];
                 if (ansIdx !== undefined && ansIdx !== null && ansIdx !== "") {
-                    temasHtml += `<li style="margin-bottom:8px;"><strong>${q}</strong><br><span style="color:#2c3e50;">Respuesta: <em>${optionLabels[ansIdx]}</em></span></li>`;
+                    temasHtml += `<li style="margin-bottom:10px; border-bottom:1px dashed #eee; padding-bottom:8px;"><strong>${q}</strong><br><span style="color:#2c3e50; font-weight:bold;">Nivel registrado: ${optionLabels[ansIdx]}</span></li>`;
                 }
             });
-            if(temasHtml === "") temasHtml = "<p><em>No se evaluaron cuestiones temáticas.</em></p>";
+            if(temasHtml === "") temasHtml = "<p><em>No se han seleccionado valoraciones temáticas para este alumno.</em></p>";
 
             return `
-                <div style="font-family: Arial, sans-serif; padding: 30px; border: 2px solid #333; margin-bottom: 40px; border-radius: 10px; page-break-inside: avoid;">
-                    <h2 style="text-align: center; border-bottom: 2px solid #ccc; padding-bottom: 10px; color: #2c3e50;">Informe de Calificación</h2>
-                    <h1 style="text-align: center; color: #34495e;">Alumno/a: ${student}</h1>
+                <div style="font-family: 'Segoe UI', Arial, sans-serif; padding: 30px; border: 2px solid #2c3e50; margin-bottom: 50px; border-radius: 12px; page-break-inside: avoid; background:#fff; color:#333;">
+                    <h2 style="text-align: center; border-bottom: 3px solid #3498db; padding-bottom: 12px; color: #2c3e50; margin-top:0;">INFORME DE CALIFICACIÓN OFICIAL</h2>
+                    <h1 style="text-align: center; color: #34495e; margin: 15px 0;">Estudiante: ${student}</h1>
                     
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 1.1rem;">
-                        <tr style="background: #ecf0f1;">
-                            <th style="padding: 10px; border: 1px solid #bdc3c7; text-align: left;">Bloque</th>
-                            <th style="padding: 10px; border: 1px solid #bdc3c7; text-align: center;">Puntuación</th>
-                        </tr>
-                        <tr>
-                            <td style="padding: 10px; border: 1px solid #bdc3c7;">PARTE A: Comprensión de un texto (Max 4.0)</td>
-                            <td style="padding: 10px; border: 1px solid #bdc3c7; text-align: center; font-weight: bold;">${tA.toFixed(2)}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 10px; border: 1px solid #bdc3c7;">PARTE B: Conocimiento de Lengua (Max 3.0)</td>
-                            <td style="padding: 10px; border: 1px solid #bdc3c7; text-align: center; font-weight: bold;">${tB.toFixed(2)}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 10px; border: 1px solid #bdc3c7;">PARTE C: Redacción (Max 3.0)</td>
-                            <td style="padding: 10px; border: 1px solid #bdc3c7; text-align: center; font-weight: bold;">${tC.toFixed(2)}</td>
-                        </tr>
-                        <tr style="background: #fdf2e9; color: #c0392b;">
-                            <td style="padding: 10px; border: 1px solid #bdc3c7;">Faltas de Ortografía (${faltas} faltas registradas)</td>
-                            <td style="padding: 10px; border: 1px solid #bdc3c7; text-align: center; font-weight: bold;">- ${penalizacion.toFixed(2)}</td>
-                        </tr>
-                        <tr style="background: #eef7f2; color: #27ae60; font-size: 1.3rem;">
-                            <th style="padding: 10px; border: 1px solid #bdc3c7; text-align: right;">NOTA GLOBAL EXAMEN:</th>
-                            <th style="padding: 10px; border: 1px solid #bdc3c7; text-align: center;">${notaFinal.toFixed(2)} / 10</th>
-                        </tr>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 1.1rem;">
+                        <thead>
+                            <tr style="background: #34495e; color:white;">
+                               <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Bloque de Evaluación</th>
+                               <th style="padding: 12px; border: 1px solid #ddd; text-align: center; width:20%;">Puntuación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #ddd;">PARTE A: Comprensión de un texto (Máx 4.0)</td>
+                                <td style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold;">${tA.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #ddd;">PARTE B: Conocimiento de Lengua (Máx 3.0)</td>
+                                <td style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold;">${tB.toFixed(2)}</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px; border: 1px solid #ddd;">PARTE C: Redacción de texto (Máx 3.0)</td>
+                                <td style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold;">${tC.toFixed(2)}</td>
+                            </tr>
+                            <tr style="background: #fdf2e9; color: #c0392b;">
+                                <td style="padding: 12px; border: 1px solid #ddd;">Penalización por Ortografía (${faltas} faltas cometidas)</td>
+                                <td style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold;">- ${penalizacion.toFixed(2)}</td>
+                            </tr>
+                            <tr style="background: #eef7f2; color: #27ae60; font-size: 1.3rem;">
+                                <th style="padding: 15px; border: 1px solid #ddd; text-align: right;">NOTA FINAL GLOBAL:</th>
+                                <th style="padding: 15px; border: 1px solid #ddd; text-align: center; background:#27ae60; color:white;">${notaFinal.toFixed(2)} / 10</th>
+                            </tr>
+                        </tbody>
                     </table>
 
-                    <div style="margin-top: 30px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
-                        <h3 style="margin-top:0; color:#34495e;">Análisis Temático de la Redacción</h3>
-                        <ul style="list-style-type: none; padding-left: 0;">
+                    <div style="margin-top: 35px; background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #bdc3c7;">
+                        <h3 style="margin-top:0; color:#2c3e50; border-bottom:2px solid #ddd; padding-bottom:5px;">Extracción de Ideas del Texto de Apoyo</h3>
+                        <ul style="list-style-type: none; padding-left: 0; margin:0;">
                             ${temasHtml}
                         </ul>
                     </div>
@@ -305,34 +301,48 @@
             for(let i=0; i<config.students.length; i++) {
                 htmlContent += generarHTMLInforme(i);
             }
-            ejecutarImpresion(htmlContent, "Informe_Todos_Alumnos");
+            ejecutarImpresion(htmlContent, "Informe_Todos_Los_Alumnos");
         }
 
         function ejecutarImpresion(htmlBody, title) {
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
+            // Se crea un iframe invisible en el documento para saltarse los bloqueadores de popups
+            const iframe = document.createElement('iframe');
+            iframe.style.position = 'fixed';
+            iframe.style.right = '0';
+            iframe.style.bottom = '0';
+            iframe.style.width = '0';
+            iframe.style.height = '0';
+            iframe.style.border = '0';
+            document.body.appendChild(iframe);
+            
+            const doc = iframe.contentWindow.document;
+            doc.write(`
                 <html>
                 <head>
                     <title>${title}</title>
                     <style>
+                        body { background: white; margin: 0; padding: 20px; }
                         @media print { body { -webkit-print-color-adjust: exact; } }
                     </style>
                 </head>
                 <body>
                     ${htmlBody}
-                    <script>
-                        window.onload = function() { window.print(); setTimeout(function(){ window.close(); }, 500); }
-                    <\/script>
                 </body>
                 </html>
             `);
-            printWindow.document.close();
+            doc.close();
+            
+            // Damos un margen de 350 milisegundos para renderizar todo antes de forzar el PDF
+            setTimeout(() => {
+                iframe.contentWindow.focus();
+                iframe.contentWindow.print();
+                document.body.removeChild(iframe);
+            }, 350);
         }
 
-        // --- SISTEMA DE EXPORTACIÓN HTML ---
+        // --- EXPORTAR ARCHIVO HTML COMPLETO ---
         function exportarArchivo() {
             try {
-                // Actualizamos configuraciones y datos
                 document.getElementById('exam-config').textContent = JSON.stringify(config);
                 document.getElementById('saved-data').textContent = JSON.stringify({ download_time: Date.now(), data: state });
                 
@@ -342,14 +352,14 @@
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
-                a.download = "Examen_Personalizado_Notas.html";
+                a.download = "Examen_Configurable_Con_Notas.html";
                 document.body.appendChild(a);
                 a.click();
                 setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
             } catch(e) { alert("Error al exportar."); }
         }
 
-        // --- EDITOR MODAL LÓGICA ---
+        // --- LÓGICA DEL EDITOR DINÁMICO ---
         function arrToText(arr, isParts) {
             if(!isParts) return arr.join("\n");
             return arr.map(i => `${i.label} | ${i.max}`).join("\n");
@@ -380,14 +390,13 @@
             config.partC = textToArr(document.getElementById('edit-partC').value, true);
             config.questions = textToArr(document.getElementById('edit-questions').value, false);
             
-            // Re-inyectar config
             document.getElementById('exam-config').textContent = JSON.stringify(config);
             cerrarEditor();
-            render(); // Re-renderizar interfaz con nuevos datos
-            alert("Estructura actualizada. Las notas previas que coincidan en posición se mantendrán.");
+            render();
+            alert("Estructura del examen actualizada con éxito.");
         }
 
-        // --- VISTAS Y TABLAS ---
+        // --- SISTEMA DE VISUALIZACIÓN INTERNA ---
         function toggleView(sIdx, part) {
             const views = ['A','B','C'];
             const showing = document.getElementById(`s${sIdx}_view${part}`).style.display === 'block';
@@ -475,8 +484,8 @@
                 det.innerHTML = `
                     <summary style="background:${col};">
                         <div class="summary-left">
-                            <button class="btn-icon del" onclick="borrarAlumno(${sIdx}, event)" title="Borrar datos">🗑️</button>
-                            <button class="btn-icon" onclick="imprimirAlumnoPDF(${sIdx}, event)" title="Exportar PDF de ${student}">📄</button>
+                            <button class="btn-icon del" onclick="borrarAlumno(${sIdx}, event)" title="Borrar datos de este alumno">🗑️</button>
+                            <button class="btn-icon" onclick="imprimirAlumnoPDF(${sIdx}, event)" title="Imprimir PDF de este alumno">🖨️ PDF</button>
                             <span>${sIdx + 1}. ${student}</span>
                         </div>
                         <span class="header-score">Total: <span id="s${sIdx}_header_score">0.00</span> / 10</span>
@@ -487,9 +496,18 @@
                             <div class="part-card card-b" onclick="toggleView(${sIdx}, 'B')"><h3>PARTE B<br><small>Lengua</small></h3><div class="score-display" id="s${sIdx}_btnB_score">0.00</div></div>
                             <div class="part-card card-c" onclick="toggleView(${sIdx}, 'C')"><h3>PARTE C<br><small>Redacción</small></h3><div class="score-display" id="s${sIdx}_btnC_score">0.00</div></div>
                         </div>
-                        <div class="part-view" id="s${sIdx}_viewA"><h3>A. COMPRENSIÓN <button class="btn-back" onclick="toggleView(${sIdx}, 'A')">Volver</button></h3>${bTable(sIdx, config.partA, 'a')}</div>
-                        <div class="part-view" id="s${sIdx}_viewB"><h3>B. LENGUA <button class="btn-back" onclick="toggleView(${sIdx}, 'B')">Volver</button></h3>${bTable(sIdx, config.partB, 'b')}</div>
-                        <div class="part-view" id="s${sIdx}_viewC"><h3>C. REDACCIÓN <button class="btn-back" onclick="toggleView(${sIdx}, 'C')">Volver</button></h3>${bTable(sIdx, config.partC, 'c')}</div>
+                        <div class="part-view" id="s${sIdx}_viewA">
+                            <h3>A. COMPRENSIÓN <button class="btn-back" onclick="toggleView(${sIdx}, 'A')">Volver</button></h3>
+                            ${bTable(sIdx, config.partA, 'a')}
+                        </div>
+                        <div class="part-view" id="s${sIdx}_viewB">
+                            <h3>B. LENGUA <button class="btn-back" onclick="toggleView(${sIdx}, 'B')">Volver</button></h3>
+                            ${bTable(sIdx, config.partB, 'b')}
+                        </div>
+                        <div class="part-view" id="s${sIdx}_viewC">
+                            <h3>C. REDACCIÓN <button class="btn-back" onclick="toggleView(${sIdx}, 'C')">Volver</button></h3>
+                            ${bTable(sIdx, config.partC, 'c')}
+                        </div>
                         
                         <div class="global-section" id="s${sIdx}_global">
                             <div class="faltas-box">Faltas Ortografía (-0.1/falta): <input type="number" id="s${sIdx}_faltas" min="0" value="${sFaltas}" placeholder="0" oninput="updateScore(${sIdx})"></div>
