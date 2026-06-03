@@ -36,7 +36,7 @@
         ],
         "questions": [
             "1. ¿Menciona o reflexiona sobre la seguridad y los riesgos del mayor como PEATÓN?",
-            "2. ¿Trata las recommendations específicas para el mayor como CONDUCTOR?",
+            "2. ¿Trata las recomendaciones específicas para el mayor como CONDUCTOR?",
             "3. ¿Incluye pautas o precauciones para el uso seguro del TRANSPORTE PÚBLICO?",
             "4. ¿Vincula la seguridad vial con el mantenimiento de la AUTONOMÍA y la salud?",
             "5. ¿Conecta los datos del texto de apoyo con la CONCIENCIACIÓN SOCIAL solicitada?"
@@ -99,11 +99,19 @@
         .editor-group { margin-bottom: 20px; } .editor-group h4 { margin: 0 0 10px 0; color: #2980b9; }
         .editor-group textarea { width: 100%; box-sizing: border-box; font-family: monospace; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
         .help-text { font-size: 0.85rem; color: #7f8c8d; margin-bottom: 5px; }
+
+        /* CONFIGURACIÓN CRÍTICA PARA IMPRESIÓN ANDROID */
+        #print-section { display: none; }
+        @media print {
+            body { background: white; color: #000; padding: 0; margin: 0; }
+            .no-print { display: none !important; }
+            #print-section { display: block !important; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
+    <div class="container no-print">
         <h1>Examen: Lengua Castellana</h1>
         <h2>Evaluación de Comprensión, Lengua y Redacción</h2>
         
@@ -125,7 +133,7 @@
         <div id="students-container"></div>
     </div>
 
-    <div id="editorModal">
+    <div id="editorModal" class="no-print">
         <div class="editor-content">
             <h2>⚙️ Editor de la Rúbrica</h2>
             <p>Modifica la estructura interna. Usa el formato indicado.</p>
@@ -166,6 +174,8 @@
             </div>
         </div>
     </div>
+
+    <div id="print-section"></div>
 
     <script>
         let config = {};
@@ -221,7 +231,7 @@
             }
         }
 
-        // --- MOTOR DE IMPRESIÓN SEGURO MEDIANTE IFRAME INDESTRUCTIBLE ---
+        // --- MOTOR DE IMPRESIÓN DIRECTO SEGURO PARA ANDROID CHROME ---
         function generarHTMLInforme(sIdx) {
             const student = config.students[sIdx];
             const sData = state[sIdx] || {};
@@ -245,7 +255,7 @@
             if(temasHtml === "") temasHtml = "<p><em>No se han seleccionado valoraciones temáticas para este alumno.</em></p>";
 
             return `
-                <div style="font-family: 'Segoe UI', Arial, sans-serif; padding: 30px; border: 2px solid #2c3e50; margin-bottom: 50px; border-radius: 12px; page-break-inside: avoid; background:#fff; color:#333;">
+                <div style="font-family: 'Segoe UI', Arial, sans-serif; padding: 25px; border: 2px solid #2c3e50; margin-bottom: 40px; border-radius: 12px; page-break-inside: avoid; background:#fff; color:#333;">
                     <h2 style="text-align: center; border-bottom: 3px solid #3498db; padding-bottom: 12px; color: #2c3e50; margin-top:0;">INFORME DE CALIFICACIÓN OFICIAL</h2>
                     <h1 style="text-align: center; color: #34495e; margin: 15px 0;">Estudiante: ${student}</h1>
                     
@@ -293,7 +303,7 @@
         function imprimirAlumnoPDF(sIdx, event) {
             event.stopPropagation();
             let htmlContent = generarHTMLInforme(sIdx);
-            ejecutarImpresion(htmlContent, `Informe_${config.students[sIdx].replace(/\s+/g, '_')}`);
+            ejecutarImpresion(htmlContent);
         }
 
         function imprimirTodosPDF() {
@@ -301,44 +311,24 @@
             for(let i=0; i<config.students.length; i++) {
                 htmlContent += generarHTMLInforme(i);
             }
-            ejecutarImpresion(htmlContent, "Informe_Todos_Los_Alumnos");
+            ejecutarImpresion(htmlContent);
         }
 
-        function ejecutarImpresion(htmlBody, title) {
-            // Se crea un iframe invisible en el documento para saltarse los bloqueadores de popups
-            const iframe = document.createElement('iframe');
-            iframe.style.position = 'fixed';
-            iframe.style.right = '0';
-            iframe.style.bottom = '0';
-            iframe.style.width = '0';
-            iframe.style.height = '0';
-            iframe.style.border = '0';
-            document.body.appendChild(iframe);
+        function ejecutarImpresion(htmlBody) {
+            const printSection = document.getElementById('print-section');
+            // Inyectamos el informe limpio en el contenedor destinado a impresión
+            printSection.innerHTML = htmlBody;
             
-            const doc = iframe.contentWindow.document;
-            doc.write(`
-                <html>
-                <head>
-                    <title>${title}</title>
-                    <style>
-                        body { background: white; margin: 0; padding: 20px; }
-                        @media print { body { -webkit-print-color-adjust: exact; } }
-                    </style>
-                </head>
-                <body>
-                    ${htmlBody}
-                </body>
-                </html>
-            `);
-            doc.close();
-            
-            // Damos un margen de 350 milisegundos para renderizar todo antes de forzar el PDF
+            // Forzamos una pequeñísima espera para asegurar el renderizado en pantallas Android
             setTimeout(() => {
-                iframe.contentWindow.focus();
-                iframe.contentWindow.print();
-                document.body.removeChild(iframe);
-            }, 350);
+                window.print();
+            }, 150);
         }
+
+        // Limpiador automático post-impresión para restaurar la pantalla
+        window.onafterprint = function() {
+            document.getElementById('print-section').innerHTML = "";
+        };
 
         // --- EXPORTAR ARCHIVO HTML COMPLETO ---
         function exportarArchivo() {
