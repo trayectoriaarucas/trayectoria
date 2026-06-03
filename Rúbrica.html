@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Examen Lengua Castellana - Rúbrica Completa</title>
     
+    <!-- ESTRUCTURA DE CONTROL DE DATOS INTERNOS -->
     <script id="saved-data" type="application/json">{
         "download_time": 0,
         "data": {}
@@ -85,6 +86,31 @@
         details.student-detail > summary::-webkit-details-marker { display: none; }
         details.student-detail > summary:hover { opacity: 0.9; }
         
+        /* Contenedor del nombre y el botón de borrar individual */
+        .summary-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .btn-delete-student {
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            padding: 5px 8px;
+            font-size: 1.1rem;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .btn-delete-student:hover {
+            background-color: rgba(231, 76, 60, 0.8); /* Rojo al pasar el ratón */
+            border-color: #e74c3c;
+        }
+
         .header-score {
             background: rgba(0,0,0,0.2);
             padding: 4px 12px;
@@ -219,7 +245,7 @@
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                 <button class="btn btn-save" onclick="guardarEnNavegador(true)">1. Guardar en Navegador</button>
                 <button class="btn btn-export" onclick="exportarArchivo()">2. Descargar Archivo (.html)</button>
-                <button class="btn btn-clear" onclick="limpiarDatos()">Borrar Todo</button>
+                <button class="btn btn-clear" onclick="borrarTodo()">Borrar Todo</button>
             </div>
         </div>
 
@@ -276,7 +302,7 @@
 
         let state = {};
         
-        // Sincronización Inteligente para evitar pérdidas por F5
+        // Inicialización y sincronización
         function initData() {
             let embeddedPayload = { download_time: 0, data: {} };
             try {
@@ -285,11 +311,11 @@
 
             let localPayload = null;
             try {
-                const rawLocal = localStorage.getItem('rubrica_examen_v4_timestamped');
+                const rawLocal = localStorage.getItem('rubrica_examen_v5_timestamped');
                 if (rawLocal) localPayload = JSON.parse(rawLocal);
             } catch (e) {}
 
-            // Si los datos guardados localmente en el navegador son más recientes que la descarga del archivo, se priorizan
+            // Prioridad a datos locales si son más recientes
             if (localPayload && localPayload.last_saved > (embeddedPayload.download_time || 0)) {
                 state = localPayload.data || {};
             } else {
@@ -303,7 +329,7 @@
                     last_saved: Date.now(),
                     data: state
                 };
-                localStorage.setItem('rubrica_examen_v4_timestamped', JSON.stringify(wrapper));
+                localStorage.setItem('rubrica_examen_v5_timestamped', JSON.stringify(wrapper));
                 
                 const statusEl = document.getElementById('save-status');
                 statusEl.innerText = "✓ Notas Guardadas en el Navegador";
@@ -317,17 +343,41 @@
             }
         }
 
-        function limpiarDatos() {
-            if(confirm("¿Seguro que quieres BORRAR TODAS LAS NOTAS del navegador?")) {
-                localStorage.removeItem('rubrica_examen_v4_timestamped');
+        // --- FUNCIONES DE BORRADO ---
+        
+        function borrarTodo() {
+            if(confirm("¿Seguro que quieres BORRAR TODAS LAS NOTAS de TODOS los alumnos? Esta acción no se puede deshacer.")) {
+                state = {};
+                localStorage.removeItem('rubrica_examen_v5_timestamped');
                 document.getElementById('saved-data').textContent = '{"download_time":0,"data":{}}';
-                location.reload();
+                guardarEnNavegador(false);
+                render();
             }
         }
 
+        function borrarAlumno(sIdx, event) {
+            // Evitar que el acordeón se abra/cierre al pulsar el botón de borrar
+            event.stopPropagation();
+            event.preventDefault();
+
+            if(confirm(`¿Seguro que quieres borrar todas las notas de ${students[sIdx]}?`)) {
+                delete state[sIdx];
+                guardarEnNavegador(false);
+                render();
+                
+                const statusEl = document.getElementById('save-status');
+                statusEl.innerText = `🗑️ Datos de ${students[sIdx]} borrados`;
+                statusEl.style.color = "#e74c3c";
+                setTimeout(() => {
+                    statusEl.innerText = "✓ Notas Guardadas en el Navegador";
+                    statusEl.style.color = "#3498db";
+                }, 2500);
+            }
+        }
+
+
         function exportarArchivo() {
             try {
-                // Generar payload estructurado con marca de tiempo actual
                 const payloadToEmbed = {
                     download_time: Date.now(),
                     data: state
@@ -470,8 +520,13 @@
                 
                 const summary = document.createElement('summary');
                 summary.style.backgroundColor = color;
+                
+                // AÑADIDO: Botón de papelera 🗑️ individual
                 summary.innerHTML = `
-                    <span>${sIdx + 1}. ${student}</span>
+                    <div class="summary-left">
+                        <button class="btn-delete-student" onclick="borrarAlumno(${sIdx}, event)" title="Borrar datos de ${student}">🗑️</button>
+                        <span>${sIdx + 1}. ${student}</span>
+                    </div>
                     <span class="header-score">Total: <span id="s${sIdx}_header_score">0.00</span> / 10</span>
                 `;
                 
