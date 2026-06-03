@@ -230,7 +230,6 @@
             "Domingo", "Olegario", "Luis"
         ];
 
-        // Definición de las partes del examen
         const partA = [
             { id: 'a0', label: '1.1', max: 1.0 },
             { id: 'a1', label: '1.2', max: 1.0 },
@@ -273,13 +272,11 @@
 
         let state = {};
         
-        // Cargar datos: Primero mira si hay datos incrustados en el archivo (para cuando lo envías), sino mira el almacenamiento local
         function initData() {
             try {
                 const embeddedJSON = JSON.parse(document.getElementById('saved-data').textContent);
                 if (Object.keys(embeddedJSON).length > 0) {
                     state = embeddedJSON;
-                    // Forzar guardado local para que no se pierda al recargar F5
                     localStorage.setItem('rubrica_datos_seguros', JSON.stringify(state));
                 } else {
                     state = JSON.parse(localStorage.getItem('rubrica_datos_seguros')) || {};
@@ -295,8 +292,6 @@
                 const statusEl = document.getElementById('save-status');
                 statusEl.innerText = "✓ Guardado en memoria";
                 statusEl.style.color = "#27ae60";
-                
-                // Efecto visual para confirmar el guardado
                 setTimeout(() => { statusEl.style.color = "#2c3e50"; }, 1500);
             } catch(e) {
                 document.getElementById('save-status').innerText = "⚠ Aviso: Memoria local bloqueada por tu navegador";
@@ -311,41 +306,29 @@
             }
         }
 
-        // --- SISTEMA ROBUSTO DE EXPORTACIÓN ---
         function exportarArchivo() {
             try {
-                // 1. Guardar el estado actual dentro de la etiqueta <script id="saved-data">
                 document.getElementById('saved-data').textContent = JSON.stringify(state);
-                
-                // 2. Extraer todo el código HTML de la página tal cual está ahora
                 let htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
-                
-                // 3. Crear el archivo Blob
                 const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
-                
-                // 4. Forzar la descarga
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
                 a.download = "Rubrica_Alumnos_Evaluada.html";
                 document.body.appendChild(a);
                 a.click();
-                
-                // Limpieza
                 setTimeout(() => {
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
                 }, 100);
-                
-                alert("¡Descarga completada! Revisa tu carpeta de Descargas. Ese nuevo archivo contiene todas las notas guardadas.");
+                alert("¡Descarga completada! Revisa tu carpeta de Descargas.");
             } catch(e) {
-                alert("Hubo un error al crear el archivo. Intenta usar otro navegador como Google Chrome o Edge.");
+                alert("Hubo un error al crear el archivo.");
                 console.error(e);
             }
         }
 
-        // Lógica de Vistas (Abrir y Cerrar Partes)
         function showPart(sIdx, part) {
             document.getElementById(`s${sIdx}_cards`).style.display = 'none';
             document.getElementById(`s${sIdx}_global`).style.display = 'none';
@@ -362,20 +345,27 @@
             document.getElementById(`s${sIdx}_viewC`).style.display = 'none';
         }
 
-        // Lógica de Cálculo de Notas
         function calculatePart(sIdx, partArray, prefix) {
             let total = 0;
             partArray.forEach((item, i) => {
                 const el = document.getElementById(`s${sIdx}_${prefix}${i}`);
-                let val = parseFloat(el.value) || 0;
                 
-                if (val > item.max) { val = item.max; el.value = val; }
-                if (val < 0) { val = 0; el.value = 0; }
+                // Si la casilla está vacía, no calculamos valor, lo tratamos como 0, 
+                // pero NO ponemos "0" en la casilla visualmente.
+                let val = 0;
+                if (el.value !== "") {
+                    val = parseFloat(el.value);
+                    if (isNaN(val)) val = 0;
+                    
+                    if (val > item.max) { val = item.max; el.value = val; }
+                    if (val < 0) { val = 0; el.value = 0; }
+                }
                 
                 total += val;
                 
                 if(!state[sIdx]) state[sIdx] = {};
-                state[sIdx][`${prefix}${i}`] = val;
+                // Guardamos el valor actual (incluso si es string vacío para mantener el estado)
+                state[sIdx][`${prefix}${i}`] = el.value !== "" ? val : "";
             });
             return total;
         }
@@ -386,10 +376,13 @@
             const totalC = calculatePart(sIdx, partC, 'c');
 
             const faltasEl = document.getElementById(`s${sIdx}_faltas`);
-            let faltas = parseInt(faltasEl.value) || 0;
-            if (faltas < 0) { faltas = 0; faltasEl.value = 0; }
+            let faltas = 0;
+            if (faltasEl.value !== "") {
+                faltas = parseInt(faltasEl.value);
+                if (isNaN(faltas) || faltas < 0) { faltas = 0; faltasEl.value = 0; }
+            }
             if(!state[sIdx]) state[sIdx] = {};
-            state[sIdx]['faltas'] = faltas;
+            state[sIdx]['faltas'] = faltasEl.value !== "" ? faltas : "";
 
             document.getElementById(`s${sIdx}_btnA_score`).innerText = totalA.toFixed(2);
             document.getElementById(`s${sIdx}_btnB_score`).innerText = totalB.toFixed(2);
@@ -425,12 +418,14 @@
         function buildTable(sIdx, partArray, prefix) {
             let html = `<table><thead><tr><th style="width:75%">Criterio</th><th style="width:25%">Nota</th></tr></thead><tbody>`;
             partArray.forEach((item, i) => {
-                const val = state[sIdx] && state[sIdx][`${prefix}${i}`] !== undefined ? state[sIdx][`${prefix}${i}`] : '';
+                const savedVal = state[sIdx] && state[sIdx][`${prefix}${i}`] !== undefined ? state[sIdx][`${prefix}${i}`] : '';
+                // Si el valor guardado no es vacío ni nulo, lo mostramos; sino, lo dejamos en blanco
+                const displayVal = savedVal !== "" && savedVal !== null ? savedVal : "";
                 html += `
                     <tr>
                         <td>${item.label}</td>
                         <td>
-                            <input type="number" id="s${sIdx}_${prefix}${i}" step="0.1" min="0" max="${item.max}" value="${val}" placeholder="Máx: ${item.max}" oninput="updateScore(${sIdx})">
+                            <input type="number" id="s${sIdx}_${prefix}${i}" step="0.1" min="0" max="${item.max}" value="${displayVal}" placeholder="Máx: ${item.max}" oninput="updateScore(${sIdx})">
                         </td>
                     </tr>
                 `;
@@ -441,11 +436,12 @@
 
         function render() {
             const container = document.getElementById('students-container');
-            container.innerHTML = ""; // Limpiar antes de renderizar
+            container.innerHTML = ""; 
             
             students.forEach((student, sIdx) => {
                 const color = colors[sIdx % colors.length];
                 const savedFaltas = state[sIdx] && state[sIdx]['faltas'] !== undefined ? state[sIdx]['faltas'] : '';
+                const displayFaltas = savedFaltas !== "" && savedFaltas !== null ? savedFaltas : "";
                 
                 const details = document.createElement('details');
                 details.className = 'student-detail';
@@ -503,7 +499,7 @@
                     <div class="global-section" id="s${sIdx}_global">
                         <div class="faltas-box">
                             Faltas Totales del Examen (-0.1 pts/falta): 
-                            <input type="number" id="s${sIdx}_faltas" step="1" min="0" value="${savedFaltas}" placeholder="Cant." oninput="updateScore(${sIdx})">
+                            <input type="number" id="s${sIdx}_faltas" step="1" min="0" value="${displayFaltas}" placeholder="Cant." oninput="updateScore(${sIdx})">
                         </div>
                         <div class="total-box">
                             NOTA FINAL: <span id="s${sIdx}_total">0.00 / 10</span>
@@ -530,7 +526,6 @@
             });
         }
 
-        // INICIAR PROGRAMA
         initData();
         render();
 
