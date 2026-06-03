@@ -3,119 +3,138 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rúbrica de Evaluación - Sistema Avanzado</title>
+    <title>Plataforma de Evaluación - Multi-Examen</title>
     
-    <script id="saved-data" type="application/json">{
+    <!-- MEMORIA DE DATOS MULTI-EXAMEN -->
+    <script id="app-state" type="application/json">{
         "download_time": 0,
-        "data": {}
-    }</script>
-
-    <script id="exam-config" type="application/json">{
-        "students": [
-            "Wenceslaa", "Julia (Mª del Pino)", "Carmelo", "Lupe", "Sonia",
-            "Fela", "Francisco", "Begoña", "Araceli", "Fefi",
-            "Eugenia", "Luz", "Víctor", "Pepe", "Javier",
-            "Domingo", "Olegario", "Luis"
-        ],
-        "partA": [
-            {"label": "1.1", "max": 1.0}, {"label": "1.2", "max": 1.0},
-            {"label": "1.3", "max": 1.0}, {"label": "1.4", "max": 1.0}
-        ],
-        "partB": [
-            {"label": "1.5", "max": 0.4}, {"label": "1.6", "max": 0.6},
-            {"label": "1.7", "max": 0.5}, {"label": "1.8", "max": 0.8},
-            {"label": "1.9", "max": 0.7}
-        ],
-        "partC": [
-            {"label": "Extensión mínima de 10 líneas", "max": 0.5},
-            {"label": "Estructura (encabezado, cuerpo y despedida)", "max": 0.5},
-            {"label": "Expresión escrita clara", "max": 0.2},
-            {"label": "Normas gramaticales y ortográficas", "max": 0.6},
-            {"label": "Ajuste a la temática, org. de ideas...", "max": 1.0},
-            {"label": "Presentación y limpieza", "max": 0.2}
-        ],
-        "questions": [
-            "1. ¿Menciona o reflexiona sobre la seguridad y los riesgos del mayor como PEATÓN?",
-            "2. ¿Trata las recomendaciones específicas para el mayor como CONDUCTOR?",
-            "3. ¿Incluye pautas o precauciones para el uso seguro del TRANSPORTE PÚBLICO?",
-            "4. ¿Vincula la seguridad vial con el mantenimiento de la AUTONOMÍA y la salud?",
-            "5. ¿Conecta los datos del texto de apoyo con la CONCIENCIACIÓN SOCIAL solicitada?"
-        ]
+        "activeExam": "exam_1",
+        "exams": {
+            "exam_1": {
+                "id": "exam_1",
+                "examTitle": "Examen 1",
+                "studentsTitle": "Listado de Alumnos",
+                "students": [
+                    {"name":"Wenceslaa", "surname":"", "dob":"", "dni":""},
+                    {"name":"Julia (Mª del Pino)", "surname":"", "dob":"", "dni":""},
+                    {"name":"Carmelo", "surname":"", "dob":"", "dni":""}
+                ],
+                "sections": [
+                    {
+                        "id": "secA", "title": "A. COMPRENSIÓN DE UN TEXTO", "type": "A",
+                        "items": [ {"label": "1.1", "max": 1.0}, {"label": "1.2", "max": 1.0} ]
+                    },
+                    {
+                        "id": "secC", "title": "C. REDACCIÓN DE UN TEXTO", "type": "B",
+                        "items": [
+                            {"label": "Extensión mínima de 10 líneas", "max": 0.5},
+                            {"label": "Estructura (encabezado, cuerpo y despedida)", "max": 0.5}
+                        ]
+                    }
+                ],
+                "thematicTitle": "Extracción de Ideas del Texto",
+                "questions": [
+                    "¿Menciona o reflexiona sobre la seguridad y los riesgos del mayor como PEATÓN?",
+                    "¿Trata las recomendaciones específicas para el mayor como CONDUCTOR?"
+                ],
+                "data": {}
+            }
+        }
     }</script>
 
     <style>
         :root {
             --bg-color: #f4f7f6; --text-color: #333; --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            --color-a: #3498db; --color-b: #9b59b6; --color-c: #e67e22;
+            --primary: #3498db; --success: #27ae60; --danger: #e74c3c; --warning: #f39c12; --dark: #2c3e50;
+            --colors: #34495e, #8e44ad, #2980b9, #c0392b, #d35400, #16a085, #27ae60, #f39c12, #e67e22, #e74c3c;
         }
-        body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
-        h1, h2 { text-align: center; color: #2c3e50; } h1 { margin-bottom: 5px; } h2 { font-size: 1.1rem; margin-bottom: 25px; font-weight: normal; color: #7f8c8d; }
-        .container { max-width: 950px; margin: 0 auto; }
+        body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px; }
         
-        .actions { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #3498db; margin-bottom: 20px; }
-        .btn { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.95rem; font-weight: bold; color: white; transition: opacity 0.2s; display: inline-flex; align-items: center; gap: 5px; margin: 5px; }
-        .btn:hover { opacity: 0.85; }
-        .btn-save { background-color: #3498db; } .btn-export { background-color: #27ae60; } .btn-clear { background-color: #e74c3c; } .btn-edit { background-color: #f39c12; } .btn-pdf { background-color: #8e44ad; }
+        /* SISTEMA DE PESTAÑAS */
+        .tabs-header { display: flex; background: var(--dark); padding: 10px 20px 0 20px; gap: 5px; overflow-x: auto; }
+        .tab { background: rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; border: none; white-space: nowrap; transition: background 0.2s; }
+        .tab:hover { background: rgba(255,255,255,0.4); }
+        .tab.active { background: var(--bg-color); color: var(--dark); }
+        .tab-add { background: var(--success); } .tab-add:hover { background: #2ecc71; }
 
+        /* HEADER GLOBAL */
+        .header-actions { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        h1 { margin: 0; font-size: 1.5rem; color: var(--dark); display: flex; align-items: center; gap: 10px; }
+        .status-badge { font-size: 0.9rem; padding: 4px 10px; border-radius: 20px; background: #eef7f2; color: var(--success); font-weight: bold; }
+        
+        .btn { padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.95rem; font-weight: bold; color: white; display: inline-flex; align-items: center; gap: 5px; }
+        .btn:hover { opacity: 0.85; }
+        .bg-primary { background: var(--primary); } .bg-success { background: var(--success); } .bg-danger { background: var(--danger); } .bg-warning { background: var(--warning); } .bg-dark { background: var(--dark); }
+
+        /* VISTA ALUMNOS (ACORDEONES) */
         details.student-detail { margin-bottom: 15px; border-radius: 8px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1); background: #fff; }
         details.student-detail > summary { padding: 15px 20px; font-size: 1.1rem; font-weight: bold; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; color: #fff; }
         details.student-detail > summary::-webkit-details-marker { display: none; }
+        .student-content { padding: 20px; background: #fafafa; }
         
         .summary-left { display: flex; align-items: center; gap: 10px; }
-        .btn-icon { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); border-radius: 4px; color: white; cursor: pointer; padding: 4px 8px; font-size: 1rem; transition: background 0.2s; }
-        .btn-icon:hover { background: rgba(0,0,0,0.2); }
-        .btn-icon.del:hover { background: #e74c3c; border-color: #c0392b; }
-        
+        .btn-icon { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); border-radius: 4px; color: white; cursor: pointer; padding: 4px 8px; font-size: 1rem; }
+        .btn-icon:hover { background: rgba(0,0,0,0.2); } .btn-icon.del:hover { background: var(--danger); }
         .header-score { background: rgba(0,0,0,0.2); padding: 4px 12px; border-radius: 20px; font-size: 1.05rem; }
-        .content { padding: 20px; background: #fafafa; }
 
-        .cards-container { display: flex; gap: 15px; margin-bottom: 20px; }
-        .part-card { flex: 1; border-radius: 12px; padding: 15px 10px; text-align: center; cursor: pointer; color: white; transition: transform 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        /* TARJETAS SECCIONES */
+        .cards-container { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; }
+        .part-card { flex: 1; min-width: 150px; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; color: white; background: var(--dark); box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
         .part-card:hover { transform: translateY(-3px); }
-        .part-card.card-a { background-color: var(--color-a); } .part-card.card-b { background-color: var(--color-b); } .part-card.card-c { background-color: var(--color-c); }
-        .part-card h3 { margin: 0 0 10px 0; font-size: 1rem; } .score-display { font-size: 1.4rem; font-weight: bold; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 8px; }
+        .part-card h3 { margin: 0 0 10px 0; font-size: 0.95rem; } .score-display { font-size: 1.4rem; font-weight: bold; background: rgba(255,255,255,0.2); padding: 5px; border-radius: 8px; }
 
-        .part-view { display: none; background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #eee; }
-        .part-view h3 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 2px solid #eee; }
-        .btn-back { background: #7f8c8d; color: white; padding: 6px 15px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; }
-        
-        table { width: 100%; border-collapse: collapse; } th, td { text-align: left; padding: 10px; border-bottom: 1px solid #ddd; }
-        th { background: #f9f9f9; } input[type="number"] { width: 70px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
+        .part-view { display: none; background: #fff; border-radius: 8px; padding: 20px; border: 1px solid #eee; margin-bottom: 20px; }
+        .part-view h3 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; } th, td { padding: 10px; border-bottom: 1px solid #ddd; text-align: left; } th { background: #f9f9f9; }
+        input[type="number"] { width: 70px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
 
-        .global-section { background: #fff; border-radius: 8px; padding: 15px 20px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #e0e0e0; flex-wrap: wrap; gap: 15px; }
-        .faltas-box { font-weight: bold; color: #c0392b; } .faltas-box input { border-color: #e74c3c; color: #c0392b; font-weight: bold; }
-        .total-box { font-size: 1.2rem; font-weight: bold; color: #2c3e50; } .total-box span { font-size: 1.6rem; color: #27ae60; background: #eef7f2; padding: 5px 15px; border-radius: 8px; margin-left: 10px; }
+        .global-section { background: #fff; border-radius: 8px; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #e0e0e0; flex-wrap: wrap; gap: 15px; }
+        .faltas-box { color: var(--danger); font-weight: bold; } .faltas-box input { border-color: var(--danger); color: var(--danger); font-weight: bold; }
+        .total-box { font-size: 1.2rem; font-weight: bold; color: var(--dark); } .total-box span { font-size: 1.6rem; color: var(--success); background: #eef7f2; padding: 5px 15px; border-radius: 8px; margin-left: 10px; }
 
-        details.thematic-details { margin-top: 15px; border-radius: 6px; border: 1px solid #bdc3c7; background: #fff; }
-        details.thematic-details > summary { padding: 12px 15px; font-weight: bold; color: #2c3e50; cursor: pointer; background: #ecf0f1; }
-        .thematic-content { padding: 15px; } .question-row { margin-bottom: 15px; border-bottom: 1px dashed #eee; padding-bottom: 10px; }
-        .question-text { font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; } .options-group { display: flex; gap: 10px; flex-wrap: wrap; }
-        .opt-btn { padding: 6px 14px; border: 1px solid #ccc; background: #fff; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
-        .opt-btn.active-mucho { background: #2ecc71; color: white; border-color: #27ae60; font-weight: bold; } .opt-btn.active-bastante { background: #3498db; color: white; border-color: #2980b9; font-weight: bold; } .opt-btn.active-poco { background: #e67e22; color: white; border-color: #d35400; font-weight: bold; } .opt-btn.active-nada { background: #e74c3c; color: white; border-color: #c0392b; font-weight: bold; }
+        .thematic-details { margin-top: 15px; border-radius: 6px; border: 1px solid #bdc3c7; background: #fff; }
+        .thematic-details summary { padding: 12px 15px; font-weight: bold; color: var(--dark); cursor: pointer; background: #ecf0f1; }
+        .opt-btn { padding: 6px 14px; border: 1px solid #ccc; background: #fff; border-radius: 20px; cursor: pointer; font-size: 0.85rem; margin: 3px; }
+        .opt-btn.active-0 { background: #2ecc71; color: white; border-color: #27ae60; font-weight: bold; }
+        .opt-btn.active-1 { background: #3498db; color: white; border-color: #2980b9; font-weight: bold; }
+        .opt-btn.active-2 { background: #e67e22; color: white; border-color: #d35400; font-weight: bold; }
+        .opt-btn.active-3 { background: #e74c3c; color: white; border-color: #c0392b; font-weight: bold; }
 
-        /* EDITOR MODAL */
+        /* EDITOR MODAL (ESTILO PROFESIONAL) */
         #editorModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; overflow-y: auto; }
-        .editor-content { background: white; max-width: 800px; margin: 40px auto; padding: 25px; border-radius: 8px; }
-        .editor-group { margin-bottom: 20px; } .editor-group h4 { margin: 0 0 10px 0; color: #2980b9; }
-        .editor-group textarea { width: 100%; box-sizing: border-box; font-family: monospace; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
-        .help-text { font-size: 0.85rem; color: #7f8c8d; margin-bottom: 5px; }
+        .editor-content { background: white; max-width: 900px; margin: 40px auto; padding: 30px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .editor-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #eee; padding-bottom: 15px; margin-bottom: 20px; }
+        
+        .inline-edit-container { display: inline-flex; align-items: center; gap: 5px; }
+        .inline-edit-input { font-size: inherit; font-weight: inherit; padding: 4px 8px; border: 2px solid var(--primary); border-radius: 4px; outline: none; }
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 1.2rem; border-radius: 4px; padding: 2px 5px; transition: background 0.2s; }
+        .icon-btn:hover { background: #eee; }
 
-        /* NUEVO INTERFAZ DE PREVISUALIZACIÓN EN PANTALLA */
-        #pdfPreviewModal { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: #fff; z-index: 2000; overflow-y: auto; padding: 15px; box-sizing: border-box; 
-        }
-        .preview-top-bar { 
-            display: flex; justify-content: space-between; align-items: center; 
-            background: #2c3e50; color: white; padding: 10px 15px; border-radius: 6px; margin-bottom: 20px;
-        }
-        .preview-top-bar h3 { margin: 0; font-size: 1.1rem; }
+        .editor-box { border: 1px solid #ddd; border-radius: 8px; padding: 15px; margin-bottom: 20px; background: #fdfdfd; }
+        .editor-box-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
+        
+        .grid-row { display: grid; gap: 10px; margin-bottom: 10px; align-items: center; }
+        .grid-student { grid-template-columns: 2fr 3fr 1fr 1fr auto auto; }
+        .grid-section { grid-template-columns: 4fr 1fr auto auto; }
+        .grid-question { grid-template-columns: 1fr auto auto; }
+        
+        .grid-input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%; box-sizing: border-box; }
+        .add-btn { background: #ecf0f1; border: 1px dashed #bdc3c7; color: var(--dark); padding: 10px; text-align: center; border-radius: 4px; cursor: pointer; font-weight: bold; width: 100%; transition: background 0.2s; }
+        .add-btn:hover { background: #e2e6e8; }
+
+        /* PREVIEW PDF & PRINT RULES */
+        #pdfPreviewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 2000; overflow-y: auto; padding: 15px; box-sizing: border-box; }
+        .preview-top-bar { display: flex; justify-content: space-between; align-items: center; background: var(--dark); color: white; padding: 10px 15px; border-radius: 6px; margin-bottom: 20px; }
         #preview-modal-body { max-width: 800px; margin: 0 auto; background: white; }
+        
+        #print-section { display: none; }
+        body.android-printing-mode .container, body.android-printing-mode .tabs-header { display: none !important; }
+        body.android-printing-mode #editorModal { display: none !important; }
+        body.android-printing-mode #print-section { display: block !important; background: white; min-height: 100vh; padding: 10px; }
 
-        /* REGLAS ESTRICTAS DE IMPRESIÓN */
         @media print {
-            .container { display: none !important; }
-            #editorModal { display: none !important; }
+            .container, .tabs-header, #editorModal { display: none !important; }
             #pdfPreviewModal { display: block !important; position: relative !important; padding: 0 !important; }
             .preview-top-bar { display: none !important; }
         }
@@ -123,419 +142,521 @@
 </head>
 <body>
 
+    <!-- SISTEMA DE PESTAÑAS SUPERIOR -->
+    <div class="tabs-header" id="tabs-container"></div>
+
     <div class="container">
-        <h1>Examen: Lengua Castellana</h1>
-        <h2>Evaluación de Comprensión, Lengua y Redacción</h2>
-        
-        <div class="actions">
-            <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px;">
-                <div>
-                    <span id="save-status" style="color:#2c3e50; font-weight:bold;">Estado: Listo</span>
-                </div>
-                <button class="btn btn-edit" onclick="abrirEditor()">⚙️ Editar Configuración del Examen</button>
+        <div class="header-actions">
+            <div>
+                <h1 id="main-exam-title">Cargando...</h1>
+                <span class="status-badge" id="save-status">✓ Datos Sincronizados</span>
             </div>
-            <div style="display: flex; gap: 5px; flex-wrap: wrap; width: 100%; justify-content: center;">
-                <button class="btn btn-save" onclick="guardarEnNavegador(true)">💾 Guardar Datos</button>
-                <button class="btn btn-export" onclick="exportarArchivo()">📥 Descargar HTML (Aplicación+Notas)</button>
-                <button class="btn btn-pdf" onclick="imprimirTodosPDF()">🖨️ PDF: Todos los Alumnos</button>
-                <button class="btn btn-clear" onclick="borrarTodo()">🗑️ Borrar Todo</button>
+            <div style="display: flex; gap: 5px; flex-wrap:wrap;">
+                <button class="btn bg-warning" onclick="abrirEditor()">⚙️ Editar / Configurar</button>
+                <button class="btn bg-primary" onclick="guardarEnNavegador(true)">💾 Forzar Guardado</button>
+                <button class="btn bg-dark" onclick="imprimirTodosPDF()">🖨️ PDF General</button>
+                <button class="btn bg-success" onclick="exportarArchivo()">📥 Exportar App (.html)</button>
             </div>
         </div>
 
         <div id="students-container"></div>
     </div>
 
+    <!-- MODAL EDITOR DINÁMICO -->
     <div id="editorModal">
         <div class="editor-content">
-            <h2>⚙️ Editor de la Rúbrica</h2>
-            <p>Modifica la estructura interna del examen en tiempo real.</p>
-            
-            <div class="editor-group">
-                <h4>Listado de Alumnos</h4>
-                <div class="help-text">Escribe un nombre por línea.</div>
-                <textarea id="edit-students" rows="6"></textarea>
-            </div>
-            
-            <div class="editor-group">
-                <h4>PARTE A (Comprensión)</h4>
-                <div class="help-text">Formato: <b>NombrePregunta | PuntuaciónMáxima</b> (Ej: 1.1 | 1.0). Una por línea.</div>
-                <textarea id="edit-partA" rows="4"></textarea>
-            </div>
-            
-            <div class="editor-group">
-                <h4>PARTE B (Lengua)</h4>
-                <div class="help-text">Formato: <b>NombrePregunta | PuntuaciónMáxima</b>. Una por línea.</div>
-                <textarea id="edit-partB" rows="5"></textarea>
-            </div>
-            
-            <div class="editor-group">
-                <h4>PARTE C (Redacción)</h4>
-                <div class="help-text">Formato: <b>Criterio | PuntuaciónMáxima</b>. Una por línea.</div>
-                <textarea id="edit-partC" rows="6"></textarea>
-            </div>
-            
-            <div class="editor-group">
-                <h4>Cuestiones Temáticas (Extracción de Ideas)</h4>
-                <div class="help-text">Escribe la pregunta completa, una por línea.</div>
-                <textarea id="edit-questions" rows="5"></textarea>
+            <div class="editor-header">
+                <h2>⚙️ Constructor de Examen</h2>
+                <div>
+                    <button class="btn bg-dark" onclick="cerrarEditor()">Cancelar</button>
+                    <button class="btn bg-success" onclick="guardarEditor()">✅ Aplicar Cambios</button>
+                </div>
             </div>
 
-            <div style="text-align: right; margin-top: 20px;">
-                <button class="btn" style="background:#7f8c8d;" onclick="cerrarEditor()">Cancelar</button>
-                <button class="btn btn-export" onclick="guardarEditor()">Guardar y Aplicar Cambios</button>
-            </div>
+            <div id="editor-body"></div>
         </div>
     </div>
 
+    <!-- PREVISUALIZACIÓN PDF -->
     <div id="pdfPreviewModal">
         <div class="preview-top-bar">
-            <h3>👁️ Vista Previa del Informe antes de Guardar</h3>
+            <h3 style="margin:0;">👁️ Vista Previa de Impresión</h3>
             <div>
-                <button class="btn btn-export" onclick="window.print()">🖨️ Confirmar y Guardar PDF</button>
-                <button class="btn btn-clear" onclick="cerrarVistaPrevia()">❌ Cerrar Vista Previa</button>
+                <button class="btn bg-success" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+                <button class="btn bg-danger" onclick="cerrarVistaPrevia()">❌ Cerrar</button>
             </div>
         </div>
         <div id="preview-modal-body"></div>
     </div>
 
+    <!-- ZONA IMPRESIÓN ANDROID -->
+    <div id="print-section"></div>
+
     <script>
-        let config = {};
-        let state = {};
+        // ESTADO GLOBAL DE LA APP
+        let app = {
+            download_time: 0,
+            activeExam: null,
+            exams: {}
+        };
+
+        const colors = ["#34495e", "#8e44ad", "#2980b9", "#c0392b", "#d35400", "#16a085", "#27ae60", "#f39c12", "#e67e22"];
         const optionLabels = ["Mucho / Excelente", "Bastante / Adecuado", "Poco / Superficial", "Nada / No lo trata"];
-        const colors = ["#34495e", "#8e44ad", "#2980b9", "#c0392b", "#d35400", "#16a085", "#27ae60", "#f39c12", "#e67e22", "#e74c3c", "#9b59b6", "#8e44ad", "#2c3e50", "#f1c40f", "#1abc9c", "#2ecc71", "#3498db", "#95a5a6"];
 
+        // Plantilla para Rubrica (Tipo B)
+        const defaultRubric = [
+            {label: "Extensión mínima de 10 líneas", max: 0.5},
+            {label: "Estructura (encabezado, cuerpo y despedida)", max: 0.5},
+            {label: "Expresión escrita clara", max: 0.2},
+            {label: "Normas gramaticales y ortográficas", max: 0.6},
+            {label: "Ajuste a la temática, org. de ideas...", max: 1.0},
+            {label: "Presentación y limpieza", max: 0.2}
+        ];
+
+        // INICIALIZACIÓN
         function initApp() {
-            config = JSON.parse(document.getElementById('exam-config').textContent);
-            
-            let embeddedPayload = { download_time: 0, data: {} };
-            try { embeddedPayload = JSON.parse(document.getElementById('saved-data').textContent); } catch (e) {}
+            let embedded = JSON.parse(document.getElementById('app-state').textContent);
+            let localRaw = localStorage.getItem('rubrica_app_v8');
+            let local = localRaw ? JSON.parse(localRaw) : null;
 
-            let localPayload = null;
-            try {
-                const rawLocal = localStorage.getItem('rubrica_examen_v7_data');
-                if (rawLocal) localPayload = JSON.parse(rawLocal);
-            } catch (e) {}
-
-            if (localPayload && localPayload.last_saved > (embeddedPayload.download_time || 0)) {
-                state = localPayload.data || {};
+            if (local && local.last_saved > (embedded.download_time || 0)) {
+                app = local.data;
             } else {
-                state = embeddedPayload.data || {};
+                app = embedded;
             }
-            render();
+
+            if(Object.keys(app.exams).length === 0) createNewExam(false);
+            if(!app.exams[app.activeExam]) app.activeExam = Object.keys(app.exams)[0];
+
+            renderTabs();
+            renderMain();
         }
 
-        function guardarEnNavegador(mostrarAlerta) {
+        function guardarEnNavegador(alerta = false) {
             try {
-                localStorage.setItem('rubrica_examen_v7_data', JSON.stringify({ last_saved: Date.now(), data: state }));
-                document.getElementById('save-status').innerText = "✓ Guardado Local";
-                document.getElementById('save-status').style.color = "#3498db";
-                if (mostrarAlerta) alert("Notas guardadas localmente.");
-            } catch(e) {}
+                localStorage.setItem('rubrica_app_v8', JSON.stringify({ last_saved: Date.now(), data: app }));
+                const st = document.getElementById('save-status');
+                st.innerText = "✓ Guardado"; st.style.color = "var(--success)";
+                setTimeout(()=> { st.innerText = "✓ Datos Sincronizados"; st.style.color = "var(--dark)"; }, 1500);
+                if(alerta) alert("Datos guardados correctamente.");
+            } catch(e) { console.error("Storage error", e); }
         }
 
-        function borrarTodo() {
-            if(confirm("¿Seguro que quieres BORRAR TODAS LAS NOTAS del examen?")) {
-                state = {};
-                localStorage.removeItem('rubrica_examen_v7_data');
-                document.getElementById('saved-data').textContent = '{"download_time":0,"data":{}}';
-                guardarEnNavegador(false);
-                render();
+        // --- SISTEMA DE PESTAÑAS ---
+        function renderTabs() {
+            const tc = document.getElementById('tabs-container');
+            tc.innerHTML = "";
+            for(let key in app.exams) {
+                const ex = app.exams[key];
+                const btn = document.createElement('button');
+                btn.className = `tab ${key === app.activeExam ? 'active' : ''}`;
+                btn.innerText = ex.examTitle || "Sin Título";
+                btn.onclick = () => { app.activeExam = key; renderTabs(); renderMain(); };
+                tc.appendChild(btn);
+            }
+            const addBtn = document.createElement('button');
+            addBtn.className = "tab tab-add";
+            addBtn.innerText = "➕ Nuevo Examen";
+            addBtn.onclick = () => createNewExam(true);
+            tc.appendChild(addBtn);
+        }
+
+        function createNewExam(switchToIt) {
+            const id = "exam_" + Date.now();
+            app.exams[id] = {
+                id: id, examTitle: "Nuevo Examen", studentsTitle: "Listado de Alumnos",
+                students: [{"name":"", "surname":"", "dob":"", "dni":""}],
+                sections: [], thematicTitle: "Cuestiones Temáticas", questions: [], data: {}
+            };
+            if(switchToIt) {
+                app.activeExam = id;
+                guardarEnNavegador();
+                renderTabs();
+                renderMain();
+                abrirEditor(); // Abre editor automáticamente al crear
             }
         }
 
-        function borrarAlumno(sIdx, event) {
-            event.stopPropagation();
-            if(confirm(`¿Limpiar notas de ${config.students[sIdx]}?`)) {
-                delete state[sIdx];
-                guardarEnNavegador(false);
-                render();
+        function eliminarExamenActual() {
+            if(Object.keys(app.exams).length <= 1) return alert("Debe quedar al menos un examen.");
+            if(confirm(`¿Seguro que deseas eliminar el examen "${app.exams[app.activeExam].examTitle}" y todas sus notas?`)) {
+                delete app.exams[app.activeExam];
+                app.activeExam = Object.keys(app.exams)[0];
+                guardarEnNavegador();
+                cerrarEditor();
+                renderTabs();
+                renderMain();
             }
         }
 
-        // --- GENERADOR DE INFORME SELECCIONABLE ---
-        function generarHTMLInforme(sIdx) {
-            const student = config.students[sIdx];
-            const sData = state[sIdx] || {};
+        // --- RENDERIZADO VISTA PRINCIPAL ---
+        function formatStudentName(s) {
+            let parts = [];
+            if(s.surname) parts.push(s.surname);
+            if(s.name) parts.push(s.name);
+            let nameStr = parts.length > 0 ? parts.join(", ") : "Alumno Sin Nombre";
+            if(s.dni) nameStr += ` (${s.dni})`;
+            return nameStr;
+        }
+
+        function renderMain() {
+            const ex = app.exams[app.activeExam];
+            document.getElementById('main-exam-title').innerText = ex.examTitle;
             
-            let tA=0, tB=0, tC=0;
-            config.partA.forEach((item, i) => tA += (parseFloat(sData[`a${i}`]) || 0));
-            config.partB.forEach((item, i) => tB += (parseFloat(sData[`b${i}`]) || 0));
-            config.partC.forEach((item, i) => tC += (parseFloat(sData[`c${i}`]) || 0));
-            let faltas = parseInt(sData['faltas']) || 0;
-            let penalizacion = faltas * 0.1;
-            let notaFinal = (tA + tB + tC) - penalizacion;
-            if(notaFinal < 0) notaFinal = 0;
+            const cont = document.getElementById('students-container');
+            cont.innerHTML = "";
 
-            let temasHtml = "";
-            config.questions.forEach((q, qIdx) => {
-                let ansIdx = sData[`q_${qIdx}`];
-                if (ansIdx !== undefined && ansIdx !== null && ansIdx !== "") {
-                    temasHtml += `<li style="margin-bottom:10px; border-bottom:1px dashed #eee; padding-bottom:8px;"><strong>${q}</strong><br><span style="color:#2c3e50; font-weight:bold;">Nivel registrado: ${optionLabels[ansIdx]}</span></li>`;
-                }
-            });
-            if(temasHtml === "") temasHtml = "<p><em>No se han seleccionado valoraciones temáticas para este alumno.</em></p>";
-
-            return `
-                <div style="font-family: 'Segoe UI', Arial, sans-serif; padding: 25px; border: 2px solid #2c3e50; margin-bottom: 40px; border-radius: 12px; page-break-inside: avoid; background:#fff; color:#333;">
-                    <h2 style="text-align: center; border-bottom: 3px solid #3498db; padding-bottom: 12px; color: #2c3e50; margin-top:0;">INFORME DE CALIFICACIÓN OFICIAL</h2>
-                    <h1 style="text-align: center; color: #34495e; margin: 15px 0;">Estudiante: ${student}</h1>
-                    
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 25px; font-size: 1.1rem;">
-                        <thead>
-                            <tr style="background: #34495e; color:white;">
-                               <th style="padding: 12px; border: 1px solid #ddd; text-align: left;">Bloque de Evaluación</th>
-                               <th style="padding: 12px; border: 1px solid #ddd; text-align: center; width:20%;">Puntuación</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td style="padding: 12px; border: 1px solid #ddd;">PARTE A: Comprensión de un texto (Máx 4.0)</td>
-                                <td style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold;">${tA.toFixed(2)}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 12px; border: 1px solid #ddd;">PARTE B: Conocimiento de Lengua (Máx 3.0)</td>
-                                <td style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold;">${tB.toFixed(2)}</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 12px; border: 1px solid #ddd;">PARTE C: Redacción de texto (Máx 3.0)</td>
-                                <td style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold;">${tC.toFixed(2)}</td>
-                            </tr>
-                            <tr style="background: #fdf2e9; color: #c0392b;">
-                                <td style="padding: 12px; border: 1px solid #ddd;">Penalización por Ortografía (${faltas} faltas cometidas)</td>
-                                <td style="padding: 12px; border: 1px solid #ddd; text-align: center; font-weight: bold;">- ${penalizacion.toFixed(2)}</td>
-                            </tr>
-                            <tr style="background: #eef7f2; color: #27ae60; font-size: 1.3rem;">
-                                <th style="padding: 15px; border: 1px solid #ddd; text-align: right;">NOTA FINAL GLOBAL:</th>
-                                <th style="padding: 15px; border: 1px solid #ddd; text-align: center; background:#27ae60; color:white;">${notaFinal.toFixed(2)} / 10</th>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <div style="margin-top: 35px; background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #bdc3c7;">
-                        <h3 style="margin-top:0; color:#2c3e50; border-bottom:2px solid #ddd; padding-bottom:5px;">Extracción de Ideas del Texto de Apoyo</h3>
-                        <ul style="list-style-type: none; padding-left: 0; margin:0;">
-                            ${temasHtml}
-                        </ul>
-                    </div>
-                </div>
-            `;
-        }
-
-        function imprimirAlumnoPDF(sIdx, event) {
-            event.stopPropagation();
-            let htmlContent = generarHTMLInforme(sIdx);
-            abrirPrevisualizacion(htmlContent);
-        }
-
-        function imprimirTodosPDF() {
-            let htmlContent = "";
-            for(let i=0; i<config.students.length; i++) {
-                htmlContent += generarHTMLInforme(i);
-            }
-            abrirPrevisualizacion(htmlContent);
-        }
-
-        // --- PANEL DE CONTROL DE VISTA PREVIA INTERNA ---
-        function abrirPrevisualizacion(htmlBody) {
-            const previewModal = document.getElementById('pdfPreviewModal');
-            const previewBody = document.getElementById('preview-modal-body');
-            
-            previewBody.innerHTML = htmlBody;
-            previewModal.style.display = 'block';
-            previewModal.scrollTop = 0; // Desplazar arriba
-        }
-
-        function cerrarVistaPrevia() {
-            document.getElementById('pdfPreviewModal').style.display = 'none';
-            document.getElementById('preview-modal-body').innerHTML = "";
-        }
-
-        // --- EXPORTAR ARCHIVO HTML COMPLETO ---
-        function exportarArchivo() {
-            try {
-                document.getElementById('exam-config').textContent = JSON.stringify(config);
-                document.getElementById('saved-data').textContent = JSON.stringify({ download_time: Date.now(), data: state });
-                
-                let htmlStr = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
-                const blob = new Blob([htmlStr], { type: 'text/html;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = "Examen_Configurable_Con_Notas.html";
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
-            } catch(e) { alert("Error al exportar."); }
-        }
-
-        // --- LÓGICA DEL EDITOR DINÁMICO ---
-        function arrToText(arr, isParts) {
-            if(!isParts) return arr.join("\n");
-            return arr.map(i => `${i.label} | ${i.max}`).join("\n");
-        }
-        function textToArr(text, isParts) {
-            const lines = text.trim().split("\n").filter(l => l.trim() !== "");
-            if(!isParts) return lines;
-            return lines.map(l => {
-                let p = l.split("|");
-                return { label: p[0] ? p[0].trim() : "Pregunta", max: parseFloat(p[1]) || 1.0 };
-            });
-        }
-
-        function abrirEditor() {
-            document.getElementById('edit-students').value = arrToText(config.students, false);
-            document.getElementById('edit-partA').value = arrToText(config.partA, true);
-            document.getElementById('edit-partB').value = arrToText(config.partB, true);
-            document.getElementById('edit-partC').value = arrToText(config.partC, true);
-            document.getElementById('edit-questions').value = arrToText(config.questions, false);
-            document.getElementById('editorModal').style.display = 'block';
-        }
-        function cerrarEditor() { document.getElementById('editorModal').style.display = 'none'; }
-        
-        function guardarEditor() {
-            config.students = textToArr(document.getElementById('edit-students').value, false);
-            config.partA = textToArr(document.getElementById('edit-partA').value, true);
-            config.partB = textToArr(document.getElementById('edit-partB').value, true);
-            config.partC = textToArr(document.getElementById('edit-partC').value, true);
-            config.questions = textToArr(document.getElementById('edit-questions').value, false);
-            
-            document.getElementById('exam-config').textContent = JSON.stringify(config);
-            cerrarEditor();
-            render();
-            alert("Estructura del examen actualizada con éxito.");
-        }
-
-        // --- SISTEMA DE VISUALIZACIÓN INTERNA ---
-        function toggleView(sIdx, part) {
-            const views = ['A','B','C'];
-            const showing = document.getElementById(`s${sIdx}_view${part}`).style.display === 'block';
-            views.forEach(v => document.getElementById(`s${sIdx}_view${v}`).style.display = 'none');
-            document.getElementById(`s${sIdx}_cards`).style.display = showing ? 'flex' : 'none';
-            document.getElementById(`s${sIdx}_global`).style.display = showing ? 'flex' : 'none';
-            if(!showing) document.getElementById(`s${sIdx}_view${part}`).style.display = 'block';
-        }
-
-        function calc(sIdx, arr, pref) {
-            let tot = 0;
-            arr.forEach((item, i) => {
-                const el = document.getElementById(`s${sIdx}_${pref}${i}`);
-                let v = 0;
-                if(el && el.value !== "") {
-                    v = parseFloat(el.value) || 0;
-                    if(v > item.max) { v = item.max; el.value = v; }
-                    if(v < 0) { v = 0; el.value = 0; }
-                }
-                tot += v;
-                if(!state[sIdx]) state[sIdx] = {};
-                state[sIdx][`${pref}${i}`] = (el && el.value !== "") ? v : "";
-            });
-            return tot;
-        }
-
-        function updateScore(sIdx) {
-            const tA = calc(sIdx, config.partA, 'a');
-            const tB = calc(sIdx, config.partB, 'b');
-            const tC = calc(sIdx, config.partC, 'c');
-            
-            const fel = document.getElementById(`s${sIdx}_faltas`);
-            let f = 0;
-            if(fel && fel.value !== "") { f = parseInt(fel.value) || 0; if(f<0){f=0;fel.value=0;} }
-            if(!state[sIdx]) state[sIdx] = {};
-            state[sIdx]['faltas'] = (fel && fel.value !== "") ? f : "";
-
-            if(document.getElementById(`s${sIdx}_btnA_score`)) document.getElementById(`s${sIdx}_btnA_score`).innerText = tA.toFixed(2);
-            if(document.getElementById(`s${sIdx}_btnB_score`)) document.getElementById(`s${sIdx}_btnB_score`).innerText = tB.toFixed(2);
-            if(document.getElementById(`s${sIdx}_btnC_score`)) document.getElementById(`s${sIdx}_btnC_score`).innerText = tC.toFixed(2);
-
-            let fin = (tA + tB + tC) - (f * 0.1); if(fin < 0) fin = 0;
-            if(document.getElementById(`s${sIdx}_total`)) document.getElementById(`s${sIdx}_total`).innerText = fin.toFixed(2) + " / 10";
-            if(document.getElementById(`s${sIdx}_header_score`)) document.getElementById(`s${sIdx}_header_score`).innerText = fin.toFixed(2);
-            guardarEnNavegador(false);
-        }
-
-        function selThem(sIdx, qIdx, oIdx) {
-            if(!state[sIdx]) state[sIdx] = {}; state[sIdx][`q_${qIdx}`] = oIdx; guardarEnNavegador(false);
-            for(let i=0; i<4; i++) {
-                let b = document.getElementById(`s${sIdx}_q${qIdx}_o${i}`);
-                if(b) {
-                    b.className = 'opt-btn';
-                    if(i===oIdx) {
-                        if(i===0) b.classList.add('active-mucho'); if(i===1) b.classList.add('active-bastante');
-                        if(i===2) b.classList.add('active-poco'); if(i===3) b.classList.add('active-nada');
-                    }
-                }
-            }
-        }
-
-        function bTable(sIdx, arr, pref) {
-            let html = `<table><thead><tr><th>Criterio</th><th>Nota</th></tr></thead><tbody>`;
-            arr.forEach((item, i) => {
-                const val = (state[sIdx] && state[sIdx][`${pref}${i}`] !== undefined && state[sIdx][`${pref}${i}`] !== "") ? state[sIdx][`${pref}${i}`] : "";
-                html += `<tr><td>${item.label}</td><td><input type="number" id="s${sIdx}_${pref}${i}" step="0.1" min="0" max="${item.max}" value="${val}" placeholder="Máx:${item.max}" oninput="updateScore(${sIdx})"></td></tr>`;
-            });
-            return html + `</tbody></table>`;
-        }
-
-        function render() {
-            const cont = document.getElementById('students-container'); cont.innerHTML = "";
-            config.students.forEach((student, sIdx) => {
+            ex.students.forEach((s, sIdx) => {
                 const col = colors[sIdx % colors.length];
-                const sFaltas = (state[sIdx] && state[sIdx]['faltas'] !== undefined && state[sIdx]['faltas'] !== "") ? state[sIdx]['faltas'] : "";
-                
+                const sData = ex.data[sIdx] || {};
+                const sFaltas = sData['faltas'] !== undefined ? sData['faltas'] : "";
+
                 let thHtml = '';
-                config.questions.forEach((q, qIdx) => {
-                    thHtml += `<div class="question-row"><div class="question-text">${q}</div><div class="options-group">`;
-                    optionLabels.forEach((ol, oIdx) => { thHtml += `<button type="button" class="opt-btn" id="s${sIdx}_q${qIdx}_o${oIdx}" onclick="selThem(${sIdx}, ${qIdx}, ${oIdx})">${ol}</button>`; });
+                ex.questions.forEach((q, qIdx) => {
+                    thHtml += `<div class="question-row" style="margin-bottom:10px; border-bottom:1px dashed #ccc; padding-bottom:5px;">
+                                 <div style="font-weight:bold; margin-bottom:5px;">${qIdx+1}. ${q}</div>
+                                 <div style="display:flex; gap:5px; flex-wrap:wrap;">`;
+                    for(let i=0; i<4; i++) {
+                        let active = sData[`q_${qIdx}`] === i ? `active-${i}` : '';
+                        thHtml += `<button class="opt-btn ${active}" onclick="selThem(${sIdx}, ${qIdx}, ${i})">${optionLabels[i]}</button>`;
+                    }
                     thHtml += `</div></div>`;
+                });
+
+                let cardsHtml = '';
+                let viewsHtml = '';
+                
+                ex.sections.forEach((sec, secIdx) => {
+                    cardsHtml += `<div class="part-card" style="background:${col};" onclick="toggleView(${sIdx}, '${sec.id}')">
+                                    <h3>${sec.title}</h3>
+                                    <div class="score-display" id="s${sIdx}_card_${sec.id}">0.00</div>
+                                  </div>`;
+                    
+                    let rows = '';
+                    sec.items.forEach((item, i) => {
+                        let val = sData[`${sec.id}_${i}`] !== undefined ? sData[`${sec.id}_${i}`] : "";
+                        rows += `<tr><td>${item.label}</td><td><input type="number" step="0.1" min="0" max="${item.max}" value="${val}" placeholder="Máx:${item.max}" oninput="updScore(${sIdx})"></td></tr>`;
+                    });
+
+                    viewsHtml += `<div class="part-view" id="s${sIdx}_view_${sec.id}">
+                                    <h3>${sec.title} <button class="btn bg-dark" onclick="toggleView(${sIdx}, '${sec.id}')">Volver</button></h3>
+                                    <table id="tbl_${sIdx}_${sec.id}"><thead><tr><th>Criterio</th><th>Nota</th></tr></thead><tbody>${rows}</tbody></table>
+                                  </div>`;
                 });
 
                 const det = document.createElement('details'); det.className = 'student-detail';
                 det.innerHTML = `
                     <summary style="background:${col};">
                         <div class="summary-left">
-                            <button class="btn-icon del" onclick="borrarAlumno(${sIdx}, event)" title="Borrar datos de este alumno">🗑️</button>
-                            <button class="btn-icon" onclick="imprimirAlumnoPDF(${sIdx}, event)" title="Previsualizar e imprimir PDF">👁️ PDF</button>
-                            <span>${sIdx + 1}. ${student}</span>
+                            <button class="btn-icon del" onclick="borrarNotasAlumno(${sIdx}, event)" title="Borrar Notas">🗑️</button>
+                            <button class="btn-icon" onclick="imprimirAlumnoPDF(${sIdx}, event)" title="PDF">🖨️</button>
+                            <span>${sIdx + 1}. ${formatStudentName(s)}</span>
                         </div>
-                        <span class="header-score">Total: <span id="s${sIdx}_header_score">0.00</span> / 10</span>
+                        <span class="header-score">Total: <span id="s${sIdx}_h_score">0.00</span> / 10</span>
                     </summary>
-                    <div class="content">
-                        <div style="text-align: right; margin-bottom: 10px; border-bottom: 1px solid #ddd; padding-bottom: 5px;">
-                             <small style="color:#aaa;">Acción interna:</small> 
-                             <button type="button" style="background:#e74c3c; color:white; border:none; padding:3px 8px; border-radius:4px; cursor:pointer; font-size:0.8rem; font-weight:bold;" onclick="borrarAlumno(${sIdx}, event)">🗑️ Limpiar este alumno</button>
-                        </div>
-
-                        <div class="cards-container" id="s${sIdx}_cards">
-                            <div class="part-card card-a" onclick="toggleView(${sIdx}, 'A')"><h3>PARTE A<br><small>Comprensión</small></h3><div class="score-display" id="s${sIdx}_btnA_score">0.00</div></div>
-                            <div class="part-card card-b" onclick="toggleView(${sIdx}, 'B')"><h3>PARTE B<br><small>Lengua</small></h3><div class="score-display" id="s${sIdx}_btnB_score">0.00</div></div>
-                            <div class="part-card card-c" onclick="toggleView(${sIdx}, 'C')"><h3>PARTE C<br><small>Redacción</small></h3><div class="score-display" id="s${sIdx}_btnC_score">0.00</div></div>
-                        </div>
-                        <div class="part-view" id="s${sIdx}_viewA">
-                            <h3>A. COMPRENSIÓN <button class="btn-back" onclick="toggleView(${sIdx}, 'A')">Volver</button></h3>
-                            ${bTable(sIdx, config.partA, 'a')}
-                        </div>
-                        <div class="part-view" id="s${sIdx}_viewB">
-                            <h3>B. LENGUA <button class="btn-back" onclick="toggleView(${sIdx}, 'B')">Volver</button></h3>
-                            ${bTable(sIdx, config.partB, 'b')}
-                        </div>
-                        <div class="part-view" id="s${sIdx}_viewC">
-                            <h3>C. REDACCIÓN <button class="btn-back" onclick="toggleView(${sIdx}, 'C')">Volver</button></h3>
-                            ${bTable(sIdx, config.partC, 'c')}
-                        </div>
-                        
+                    <div class="student-content">
+                        <div class="cards-container" id="s${sIdx}_cards">${cardsHtml}</div>
+                        ${viewsHtml}
                         <div class="global-section" id="s${sIdx}_global">
-                            <div class="faltas-box">Faltas Ortografía (-0.1/falta): <input type="number" id="s${sIdx}_faltas" min="0" value="${sFaltas}" placeholder="0" oninput="updateScore(${sIdx})"></div>
+                            <div class="faltas-box">Faltas (-0.1/falta): <input type="number" id="s${sIdx}_faltas" min="0" value="${sFaltas}" placeholder="0" oninput="updScore(${sIdx})"></div>
                             <div class="total-box">NOTA FINAL: <span id="s${sIdx}_total">0.00 / 10</span></div>
                         </div>
-                        
-                        <details class="thematic-details"><summary>Análisis Temático (No altera nota)</summary><div class="thematic-content">${thHtml}</div></details>
+                        <details class="thematic-details"><summary>${ex.thematicTitle || "Cuestiones"}</summary><div style="padding:15px;">${thHtml}</div></details>
                     </div>`;
+                
                 cont.appendChild(det);
-                updateScore(sIdx);
-                config.questions.forEach((_, qIdx) => { if (state[sIdx] && state[sIdx][`q_${qIdx}`] !== undefined) selThem(sIdx, qIdx, state[sIdx][`q_${qIdx}`]); });
+                updScore(sIdx);
             });
         }
+
+        function toggleView(sIdx, viewId) {
+            const ex = app.exams[app.activeExam];
+            const isShowing = document.getElementById(`s${sIdx}_view_${viewId}`).style.display === 'block';
+            ex.sections.forEach(sec => document.getElementById(`s${sIdx}_view_${sec.id}`).style.display = 'none');
+            document.getElementById(`s${sIdx}_cards`).style.display = isShowing ? 'flex' : 'none';
+            document.getElementById(`s${sIdx}_global`).style.display = isShowing ? 'flex' : 'none';
+            if(!isShowing) document.getElementById(`s${sIdx}_view_${viewId}`).style.display = 'block';
+        }
+
+        function updScore(sIdx) {
+            const ex = app.exams[app.activeExam];
+            if(!ex.data[sIdx]) ex.data[sIdx] = {};
+            let globalTotal = 0;
+
+            ex.sections.forEach((sec) => {
+                let secTotal = 0;
+                const tbl = document.getElementById(`tbl_${sIdx}_${sec.id}`);
+                const inputs = tbl.querySelectorAll('input[type="number"]');
+                inputs.forEach((inp, i) => {
+                    let v = 0;
+                    if(inp.value !== "") {
+                        v = parseFloat(inp.value) || 0;
+                        if(v > sec.items[i].max) { v = sec.items[i].max; inp.value = v; }
+                        if(v < 0) { v = 0; inp.value = 0; }
+                    }
+                    secTotal += v;
+                    ex.data[sIdx][`${sec.id}_${i}`] = inp.value !== "" ? v : "";
+                });
+                globalTotal += secTotal;
+                if(document.getElementById(`s${sIdx}_card_${sec.id}`)) document.getElementById(`s${sIdx}_card_${sec.id}`).innerText = secTotal.toFixed(2);
+            });
+
+            const fel = document.getElementById(`s${sIdx}_faltas`);
+            let f = 0;
+            if(fel && fel.value !== "") { f = parseInt(fel.value) || 0; if(f<0){f=0;fel.value=0;} }
+            ex.data[sIdx]['faltas'] = (fel && fel.value !== "") ? f : "";
+
+            let fin = globalTotal - (f * 0.1); if(fin < 0) fin = 0;
+            if(document.getElementById(`s${sIdx}_total`)) document.getElementById(`s${sIdx}_total`).innerText = fin.toFixed(2) + " / 10";
+            if(document.getElementById(`s${sIdx}_h_score`)) document.getElementById(`s${sIdx}_h_score`).innerText = fin.toFixed(2);
+            guardarEnNavegador(false);
+        }
+
+        function selThem(sIdx, qIdx, oIdx) {
+            const ex = app.exams[app.activeExam];
+            if(!ex.data[sIdx]) ex.data[sIdx] = {};
+            ex.data[sIdx][`q_${qIdx}`] = oIdx;
+            guardarEnNavegador(false);
+            renderMain(); // Simple re-render to update buttons
+        }
+
+        function borrarNotasAlumno(sIdx, e) {
+            e.stopPropagation();
+            if(confirm("¿Limpiar notas de este alumno?")) {
+                app.exams[app.activeExam].data[sIdx] = {};
+                guardarEnNavegador(false);
+                renderMain();
+            }
+        }
+
+        // --- SISTEMA DE EDITOR COMPLEJO ---
+        let editDraft = null;
+        let editingField = null; // Trackea qué campo inline se está editando
+
+        function abrirEditor() {
+            // Hacemos una copia profunda del examen actual para editar sin afectar hasta guardar
+            editDraft = JSON.parse(JSON.stringify(app.exams[app.activeExam]));
+            editingField = null;
+            renderEditorObj();
+            document.getElementById('editorModal').style.display = 'block';
+        }
+        function cerrarEditor() { document.getElementById('editorModal').style.display = 'none'; editDraft = null; }
+
+        function InlineEdit(key, value, placeholder) {
+            if(editingField === key) {
+                return `<div class="inline-edit-container">
+                            <input type="text" class="inline-edit-input" id="inp_${key}" value="${value}" placeholder="${placeholder}">
+                            <button class="icon-btn" onclick="saveInline('${key}')" title="Guardar">✅</button>
+                            <button class="icon-btn" onclick="cancelInline()" title="Cancelar">❌</button>
+                        </div>`;
+            }
+            return `<span style="font-weight:bold; margin-right:10px;">${value || placeholder}</span>
+                    <button class="icon-btn" onclick="startInline('${key}')" title="Editar Nombre">✏️</button>`;
+        }
+
+        function startInline(key) { editingField = key; renderEditorObj(); }
+        function cancelInline() { editingField = null; renderEditorObj(); }
+        function saveInline(key) {
+            const v = document.getElementById(`inp_${key}`).value;
+            if(key === 'examTitle') editDraft.examTitle = v;
+            else if(key === 'studentsTitle') editDraft.studentsTitle = v;
+            else if(key === 'thematicTitle') editDraft.thematicTitle = v;
+            else if(key.startsWith('sec_')) {
+                const sId = key.split('_')[1];
+                let sec = editDraft.sections.find(s=>s.id === sId);
+                if(sec) sec.title = v;
+            }
+            editingField = null;
+            renderEditorObj();
+        }
+
+        function renderEditorObj() {
+            let html = `
+                <div class="editor-box" style="background:#e8f4f8;">
+                    ${InlineEdit('examTitle', editDraft.examTitle, 'Nombre del Examen')}
+                    <button class="btn bg-danger" style="float:right;" onclick="eliminarExamenActual()">🗑️ Eliminar Todo el Examen</button>
+                </div>
+            `;
+
+            // ALUMNOS
+            let studentsHtml = '';
+            editDraft.students.forEach((s, i) => {
+                studentsHtml += `
+                    <div class="grid-row grid-student">
+                        <input type="text" class="grid-input" value="${s.name}" placeholder="Nombre" onchange="editDraft.students[${i}].name=this.value">
+                        <input type="text" class="grid-input" value="${s.surname}" placeholder="Apellidos" onchange="editDraft.students[${i}].surname=this.value">
+                        <input type="text" class="grid-input" value="${s.dob}" placeholder="Nacimiento" onchange="editDraft.students[${i}].dob=this.value">
+                        <input type="text" class="grid-input" value="${s.dni}" placeholder="DNI" onchange="editDraft.students[${i}].dni=this.value">
+                        <button class="icon-btn" onclick="addStudent(${i})" title="Añadir debajo">➕</button>
+                        <button class="icon-btn" style="color:var(--danger);" onclick="delStudent(${i})" title="Eliminar">❌</button>
+                    </div>`;
+            });
+            html += `<div class="editor-box">
+                        <div class="editor-box-header">
+                            <div>${InlineEdit('studentsTitle', editDraft.studentsTitle, 'Título Listado')}</div>
+                        </div>
+                        ${studentsHtml}
+                        <div class="add-btn" onclick="addStudent(editDraft.students.length-1)">+ Añadir Alumno al Final</div>
+                     </div>`;
+
+            // SECCIONES
+            editDraft.sections.forEach((sec, sIdx) => {
+                let itemsHtml = '';
+                sec.items.forEach((item, iIdx) => {
+                    itemsHtml += `
+                        <div class="grid-row grid-section">
+                            <input type="text" class="grid-input" value="${item.label}" placeholder="Criterio / Pregunta" onchange="editDraft.sections[${sIdx}].items[${iIdx}].label=this.value">
+                            <input type="number" class="grid-input" step="0.1" value="${item.max}" placeholder="Máx" onchange="editDraft.sections[${sIdx}].items[${iIdx}].max=parseFloat(this.value)||0">
+                            <button class="icon-btn" onclick="addSecItem(${sIdx}, ${iIdx})">➕</button>
+                            <button class="icon-btn" style="color:var(--danger);" onclick="delSecItem(${sIdx}, ${iIdx})">❌</button>
+                        </div>`;
+                });
+                
+                html += `
+                    <div class="editor-box">
+                        <div class="editor-box-header">
+                            <div><span class="status-badge" style="background:#ddd; color:#333; margin-right:10px;">Tipo ${sec.type}</span> ${InlineEdit('sec_'+sec.id, sec.title, 'Título Sección')}</div>
+                            <button class="btn bg-danger" onclick="delSection('${sec.id}')">🗑️ Borrar Sección</button>
+                        </div>
+                        ${itemsHtml}
+                        <div class="add-btn" onclick="addSecItem(${sIdx}, sec.items.length-1)">+ Añadir Criterio/Pregunta</div>
+                    </div>`;
+            });
+
+            html += `<div style="display:flex; gap:10px; margin-bottom:20px;">
+                        <button class="btn bg-primary" onclick="addSection('A')">➕ Añadir Sección Tipo A (Normal)</button>
+                        <button class="btn bg-warning" onclick="addSection('B')">➕ Añadir Sección Tipo B (Rúbrica)</button>
+                     </div>`;
+
+            // CUESTIONES TEMÁTICAS
+            let questionsHtml = '';
+            editDraft.questions.forEach((q, i) => {
+                questionsHtml += `
+                    <div class="grid-row grid-question">
+                        <input type="text" class="grid-input" value="${q}" placeholder="Pregunta temática" onchange="editDraft.questions[${i}]=this.value">
+                        <button class="icon-btn" onclick="addQuestion(${i})">➕</button>
+                        <button class="icon-btn" style="color:var(--danger);" onclick="delQuestion(${i})">❌</button>
+                    </div>`;
+            });
+            html += `<div class="editor-box">
+                        <div class="editor-box-header">
+                            <div>${InlineEdit('thematicTitle', editDraft.thematicTitle, 'Título Cuestiones')}</div>
+                        </div>
+                        ${questionsHtml}
+                        <div class="add-btn" onclick="addQuestion(editDraft.questions.length-1)">+ Añadir Pregunta Temática</div>
+                     </div>`;
+
+            document.getElementById('editor-body').innerHTML = html;
+        }
+
+        // Acciones del Editor
+        function addStudent(idx) { editDraft.students.splice(idx+1, 0, {name:"", surname:"", dob:"", dni:""}); renderEditorObj(); }
+        function delStudent(idx) { if(confirm("¿Borrar alumno?")) { editDraft.students.splice(idx, 1); renderEditorObj(); } }
+        
+        function addSection(type) {
+            const id = 'sec_' + Date.now();
+            let items = type === 'A' ? [{label: "Pregunta 1", max: 1.0}] : JSON.parse(JSON.stringify(defaultRubric));
+            editDraft.sections.push({ id: id, type: type, title: type === 'A' ? "Nueva Sección" : "Criterios de Redacción", items: items });
+            renderEditorObj();
+        }
+        function delSection(id) { if(confirm("¿Borrar sección completa?")) { editDraft.sections = editDraft.sections.filter(s=>s.id !== id); renderEditorObj(); } }
+        
+        function addSecItem(sIdx, iIdx) { editDraft.sections[sIdx].items.splice(iIdx+1, 0, {label:"", max: 1.0}); renderEditorObj(); }
+        function delSecItem(sIdx, iIdx) { editDraft.sections[sIdx].items.splice(iIdx, 1); renderEditorObj(); }
+        
+        function addQuestion(idx) { editDraft.questions.splice(idx+1, 0, ""); renderEditorObj(); }
+        function delQuestion(idx) { editDraft.questions.splice(idx, 1); renderEditorObj(); }
+
+        function guardarEditor() {
+            app.exams[app.activeExam] = editDraft;
+            guardarEnNavegador(false);
+            cerrarEditor();
+            renderTabs();
+            renderMain();
+        }
+
+        // --- SISTEMA PDF NATIVO ---
+        function genHTML(sIdx) {
+            const ex = app.exams[app.activeExam];
+            const s = ex.students[sIdx];
+            const sData = ex.data[sIdx] || {};
+            
+            let gTot=0;
+            let rowsHtml = '';
+            ex.sections.forEach(sec => {
+                let st = 0;
+                sec.items.forEach((item, i) => st += (parseFloat(sData[`${sec.id}_${i}`]) || 0));
+                gTot += st;
+                rowsHtml += `<tr><td style="padding:10px; border:1px solid #ddd;">${sec.title}</td><td style="padding:10px; border:1px solid #ddd; text-align:center; font-weight:bold;">${st.toFixed(2)}</td></tr>`;
+            });
+
+            let f = parseInt(sData['faltas']) || 0; let pen = f * 0.1;
+            let fin = gTot - pen; if(fin<0) fin=0;
+
+            let tHtml = "";
+            ex.questions.forEach((q, qi) => {
+                let a = sData[`q_${qi}`];
+                if(a !== undefined && a !== "") tHtml += `<li style="margin-bottom:10px; border-bottom:1px dashed #eee; padding-bottom:8px;"><strong>${qi+1}. ${q}</strong><br><span style="color:#2c3e50;">Respuesta: ${optionLabels[a]}</span></li>`;
+            });
+            if(tHtml==="") tHtml = "<em>No se evaluó.</em>";
+
+            return `
+                <div style="font-family: Arial, sans-serif; padding: 25px; border: 2px solid #2c3e50; margin-bottom: 40px; border-radius: 12px; page-break-inside: avoid; background:#fff; color:#333;">
+                    <h2 style="text-align: center; border-bottom: 3px solid #3498db; padding-bottom: 12px; color: #2c3e50; margin-top:0;">${ex.examTitle.toUpperCase()}</h2>
+                    <h1 style="text-align: center; color: #34495e; margin: 15px 0;">${formatStudentName(s)}</h1>
+                    
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 25px;">
+                        <tr style="background: #34495e; color:white;">
+                            <th style="padding:12px; border:1px solid #ddd; text-align:left;">Bloque</th>
+                            <th style="padding:12px; border:1px solid #ddd; text-align:center;">Nota</th>
+                        </tr>
+                        ${rowsHtml}
+                        <tr style="background:#fdf2e9; color:#c0392b;">
+                            <td style="padding:10px; border:1px solid #ddd;">Penalización Ortografía (${f} faltas)</td>
+                            <td style="padding:10px; border:1px solid #ddd; text-align:center; font-weight:bold;">- ${pen.toFixed(2)}</td>
+                        </tr>
+                        <tr style="background:#eef7f2; color:#27ae60; font-size:1.3rem;">
+                            <th style="padding:15px; border:1px solid #ddd; text-align:right;">NOTA GLOBAL:</th>
+                            <th style="padding:15px; border:1px solid #ddd; text-align:center; background:#27ae60; color:white;">${fin.toFixed(2)} / 10</th>
+                        </tr>
+                    </table>
+
+                    <div style="margin-top: 30px; background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #bdc3c7;">
+                        <h3 style="margin-top:0; color:#2c3e50; border-bottom:2px solid #ddd; padding-bottom:5px;">${ex.thematicTitle}</h3>
+                        <ul style="list-style-type: none; padding-left: 0; margin:0;">${tHtml}</ul>
+                    </div>
+                </div>`;
+        }
+
+        function imprimirAlumnoPDF(sIdx, e) {
+            e.stopPropagation();
+            abrirPrevisualizacion(genHTML(sIdx));
+        }
+
+        function imprimirTodosPDF() {
+            let html = "";
+            app.exams[app.activeExam].students.forEach((_, i) => html += genHTML(i));
+            abrirPrevisualizacion(html);
+        }
+
+        function abrirPrevisualizacion(html) {
+            document.getElementById('preview-modal-body').innerHTML = html;
+            document.getElementById('pdfPreviewModal').style.display = 'block';
+        }
+        function cerrarVistaPrevia() {
+            document.getElementById('pdfPreviewModal').style.display = 'none';
+        }
+
+        function exportarArchivo() {
+            document.getElementById('app-state').textContent = JSON.stringify({ download_time: Date.now(), ...app });
+            let html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a'); a.style.display = 'none'; a.href = url; a.download = "Plataforma_Evaluacion.html";
+            document.body.appendChild(a); a.click();
+            setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+        }
+
         initApp();
     </script>
 </body>
