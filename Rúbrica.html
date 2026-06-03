@@ -1,4 +1,4 @@
-html_content = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -218,9 +218,23 @@ html_content = """<!DOCTYPE html>
 
         function updateScore(studentIdx) {
             let total = 0;
-            // Sum criteria
+            
+            // Sum criteria with strict validation
             for(let i=0; i<criteria.length; i++) {
-                const val = parseFloat(document.getElementById(`s${studentIdx}_c${i}`).value) || 0;
+                const inputEl = document.getElementById(`s${studentIdx}_c${i}`);
+                let val = parseFloat(inputEl.value) || 0;
+                const maxAllowed = criteria[i].max;
+
+                // Control: No puede exceder el máximo del criterio
+                if (val > maxAllowed) {
+                    val = maxAllowed;
+                    inputEl.value = maxAllowed; // Fuerza visualmente el valor al máximo
+                }
+                if (val < 0) {
+                    val = 0;
+                    inputEl.value = 0;
+                }
+
                 total += val;
                 
                 // update state
@@ -229,7 +243,13 @@ html_content = """<!DOCTYPE html>
             }
 
             // Deduct spelling mistakes
-            const faltas = parseInt(document.getElementById(`s${studentIdx}_faltas`).value) || 0;
+            const faltasEl = document.getElementById(`s${studentIdx}_faltas`);
+            let faltas = parseInt(faltasEl.value) || 0;
+            if (faltas < 0) {
+                faltas = 0;
+                faltasEl.value = 0;
+            }
+
             if(!state[studentIdx]) state[studentIdx] = {};
             state[studentIdx]['faltas'] = faltas;
             
@@ -314,10 +334,3 @@ html_content = """<!DOCTYPE html>
     </script>
 </body>
 </html>
-"""
-
-with open("rubrica_redaccion_alumnos.html", "w", encoding="utf-8") as f:
-    f.write(html_content)
-
-print("File generated: rubrica_redaccion_alumnos.html")
-
