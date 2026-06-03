@@ -1,0 +1,323 @@
+html_content = """<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rúbrica de Redacción - 18 Alumnos</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .info-panel {
+            background: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            border-left: 5px solid #3498db;
+        }
+        .info-panel h3 {
+            margin-top: 0;
+        }
+        
+        /* Accordion Styles */
+        details {
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            background: #fff;
+        }
+        summary {
+            padding: 18px 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #fff;
+            transition: opacity 0.2s;
+        }
+        summary::-webkit-details-marker {
+            display: none;
+        }
+        summary:hover {
+            opacity: 0.9;
+        }
+        summary::after {
+            content: '▼';
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+        }
+        details[open] summary::after {
+            transform: rotate(180deg);
+        }
+        
+        .content {
+            padding: 20px;
+            background: #fafafa;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #eee;
+            font-weight: 600;
+        }
+        input[type="number"] {
+            width: 70px;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+        
+        .deduction-row {
+            background-color: #ffeeee;
+        }
+        
+        .total-box {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-top: 15px;
+            padding: 15px;
+            background: #eef7f2;
+            border-radius: 6px;
+            border: 1px solid #cce5d6;
+        }
+        .total-box span {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #27ae60;
+            margin-left: 10px;
+        }
+        
+        /* Utility */
+        .header-score {
+            background: rgba(255,255,255,0.2);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 1rem;
+        }
+        
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        .btn:hover {
+            background-color: #c0392b;
+        }
+
+        /* Responsive */
+        @media(max-width: 600px) {
+            th, td { padding: 8px; font-size: 0.9rem; }
+            input[type="number"] { width: 60px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Evaluación: Redacción de un texto</h1>
+        
+        <div class="info-panel">
+            <h3>C. REDACCIÓN DE UN TEXTO EN LENGUA CASTELLANA (3 puntos)</h3>
+            <p>Quien cumpla la totalidad de estos criterios tendrá 3 puntos, se irá descontando puntuación a medida que no se contemplen los mismos.</p>
+            <ul>
+                <li>* Con respecto a la ortografía del total de la prueba, cada falta resta un 0,1 de la puntuación final.</li>
+            </ul>
+        </div>
+
+        <div class="actions">
+            <div><em>Los datos se guardan automáticamente en tu navegador al escribirlos.</em></div>
+            <button class="btn" onclick="limpiarDatos()">Borrar todos los datos</button>
+        </div>
+
+        <div id="students-container"></div>
+    </div>
+
+    <script>
+        const students = [
+            "Wenceslaa", "Julia (Mª del Pino)", "Carmelo", "Lupe", "Sonia",
+            "Fela", "Francisco", "Begoña", "Araceli", "Fefi",
+            "Eugenia", "Luz", "Víctor", "Pepe", "Javier",
+            "Domingo", "Olegario", "Luis"
+        ];
+
+        const criteria = [
+            { id: 'c1', label: 'Extensión mínima de 10 líneas', max: 0.5 },
+            { id: 'c2', label: 'Estructura (encabezado, cuerpo de texto y despedida)', max: 0.5 },
+            { id: 'c3', label: 'Expresión escrita clara', max: 0.2 },
+            { id: 'c4', label: 'Normas gramaticales y ortográficas', max: 0.6 },
+            { id: 'c5', label: 'Ajuste a la temática, organización de ideas, claridad, coherencia y vocabulario', max: 1.0 },
+            { id: 'c6', label: 'Presentación y limpieza', max: 0.2 }
+        ];
+
+        // 18 distinct soft colors for headers
+        const colors = [
+            "#e57373", "#f06292", "#ba68c8", "#9575cd", "#7986cb",
+            "#64b5f6", "#4fc3f7", "#4dd0e1", "#4db6ac", "#81c784",
+            "#aed581", "#dce775", "#ffd54f", "#ffb74d", "#ff8a65",
+            "#a1887f", "#90a4ae", "#546e7a"
+        ];
+
+        const container = document.getElementById('students-container');
+
+        // Initialize state
+        let state = JSON.parse(localStorage.getItem('rubrica_redaccion_state')) || {};
+
+        function saveState() {
+            localStorage.setItem('rubrica_redaccion_state', JSON.stringify(state));
+        }
+
+        function limpiarDatos() {
+            if(confirm("¿Estás seguro de que quieres borrar todos los datos de calificación? Esta acción no se puede deshacer.")) {
+                localStorage.removeItem('rubrica_redaccion_state');
+                location.reload();
+            }
+        }
+
+        function updateScore(studentIdx) {
+            let total = 0;
+            // Sum criteria
+            for(let i=0; i<criteria.length; i++) {
+                const val = parseFloat(document.getElementById(`s${studentIdx}_c${i}`).value) || 0;
+                total += val;
+                
+                // update state
+                if(!state[studentIdx]) state[studentIdx] = {};
+                state[studentIdx][`c${i}`] = val;
+            }
+
+            // Deduct spelling mistakes
+            const faltas = parseInt(document.getElementById(`s${studentIdx}_faltas`).value) || 0;
+            if(!state[studentIdx]) state[studentIdx] = {};
+            state[studentIdx]['faltas'] = faltas;
+            
+            total -= (faltas * 0.1);
+            
+            // Limit minimum to 0
+            if (total < 0) total = 0;
+
+            const finalScore = total.toFixed(2);
+            document.getElementById(`s${studentIdx}_total`).innerText = finalScore + " / 3.00";
+            document.getElementById(`s${studentIdx}_header_score`).innerText = finalScore;
+            
+            saveState();
+        }
+
+        function render() {
+            students.forEach((student, idx) => {
+                const color = colors[idx % colors.length];
+                
+                const details = document.createElement('details');
+                const summary = document.createElement('summary');
+                summary.style.backgroundColor = color;
+                
+                summary.innerHTML = `
+                    <span>${idx + 1}. ${student}</span>
+                    <span class="header-score">Nota: <span id="s${idx}_header_score">0.00</span></span>
+                `;
+                
+                const content = document.createElement('div');
+                content.className = 'content';
+
+                let tbodyHtml = '';
+                criteria.forEach((crit, cIdx) => {
+                    const savedVal = state[idx] && state[idx][`c${cIdx}`] !== undefined ? state[idx][`c${cIdx}`] : '';
+                    tbodyHtml += `
+                        <tr>
+                            <td>${crit.label} <strong>(Máx: ${crit.max})</strong></td>
+                            <td>
+                                <input type="number" id="s${idx}_c${cIdx}" step="0.1" min="0" max="${crit.max}" value="${savedVal}" oninput="updateScore(${idx})">
+                            </td>
+                        </tr>
+                    `;
+                });
+
+                const savedFaltas = state[idx] && state[idx]['faltas'] !== undefined ? state[idx]['faltas'] : '';
+
+                content.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Criterio</th>
+                                <th>Puntuación</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${tbodyHtml}
+                            <tr class="deduction-row">
+                                <td><strong>Faltas de ortografía</strong> (Cada falta resta 0.1 del total)</td>
+                                <td>
+                                    <input type="number" id="s${idx}_faltas" step="1" min="0" value="${savedFaltas}" oninput="updateScore(${idx})">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="total-box">
+                        Puntuación Total Final: <span id="s${idx}_total">0.00 / 3.00</span>
+                    </div>
+                `;
+
+                details.appendChild(summary);
+                details.appendChild(content);
+                container.appendChild(details);
+
+                // Initial calculation to load saved scores
+                updateScore(idx);
+            });
+        }
+
+        // Run on load
+        render();
+
+    </script>
+</body>
+</html>
+"""
+
+with open("rubrica_redaccion_alumnos.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+print("File generated: rubrica_redaccion_alumnos.html")
+
