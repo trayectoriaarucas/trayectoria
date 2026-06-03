@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rúbrica de Redacción - Con Texto de Apoyo</title>
+    <title>Examen Lengua Castellana - Rúbrica Completa</title>
     <style>
         :root {
             --bg-color: #f4f7f6;
             --text-color: #333;
             --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --color-a: #3498db;
+            --color-b: #9b59b6;
+            --color-c: #e67e22;
         }
         body {
             font-family: var(--font-family);
@@ -18,48 +21,49 @@
             padding: 20px;
             box-sizing: border-box;
         }
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-        h2 {
-            text-align: center;
-            color: #7f8c8d;
-            font-size: 1.1rem;
-            margin-bottom: 30px;
-            font-weight: normal;
-        }
-        .container {
-            max-width: 950px;
-            margin: 0 auto;
-        }
-        .info-panel {
+        h1, h2 { text-align: center; color: #2c3e50; }
+        h1 { margin-bottom: 5px; }
+        h2 { font-size: 1.1rem; margin-bottom: 25px; font-weight: normal; color: #7f8c8d; }
+        
+        .container { max-width: 950px; margin: 0 auto; }
+        
+        /* Controles Globales */
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
             background: #fff;
-            padding: 15px 20px;
+            padding: 15px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
-            border-left: 5px solid #3498db;
+            border-left: 5px solid #2ecc71;
+            flex-wrap: wrap;
+            gap: 10px;
         }
-        .info-panel h3 {
-            margin-top: 0;
-            color: #2c3e50;
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            transition: opacity 0.2s;
         }
-        .info-panel p {
-            margin: 5px 0;
-            line-height: 1.5;
-        }
-        
-        /* Accordion / Desplegables */
-        details {
+        .btn:hover { opacity: 0.85; }
+        .btn-export { background-color: #27ae60; }
+        .btn-clear { background-color: #e74c3c; }
+
+        /* Estilos del Desplegable Principal */
+        details.student-detail {
             margin-bottom: 15px;
             border-radius: 8px;
             overflow: hidden;
             box-shadow: 0 3px 10px rgba(0,0,0,0.1);
             background: #fff;
         }
-        summary {
+        details.student-detail > summary {
             padding: 18px 20px;
             font-size: 1.2rem;
             font-weight: bold;
@@ -71,181 +75,149 @@
             color: #fff;
             transition: opacity 0.2s;
         }
-        summary::-webkit-details-marker {
-            display: none;
-        }
-        summary:hover {
-            opacity: 0.9;
-        }
-        summary::after {
-            content: '▼';
-            font-size: 0.9rem;
-            transition: transform 0.3s ease;
-        }
-        details[open] summary::after {
-            transform: rotate(180deg);
-        }
+        details.student-detail > summary::-webkit-details-marker { display: none; }
+        details.student-detail > summary:hover { opacity: 0.9; }
         
-        .content {
-            padding: 20px;
-            background: #fafafa;
+        .header-score {
+            background: rgba(0,0,0,0.2);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 1.1rem;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
+
+        .content { padding: 20px; background: #fafafa; }
+
+        /* Botones de las 3 Partes */
+        .cards-container {
+            display: flex;
+            gap: 15px;
             margin-bottom: 20px;
         }
-        th, td {
-            text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid #ddd;
+        .part-card {
+            flex: 1;
+            border-radius: 12px;
+            padding: 20px 10px;
+            text-align: center;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
-        th {
-            background-color: #eee;
-            font-weight: 600;
-            color: #333;
+        .part-card:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+        .part-card.card-a { background-color: var(--color-a); }
+        .part-card.card-b { background-color: var(--color-b); }
+        .part-card.card-c { background-color: var(--color-c); }
+        
+        .part-card h3 { margin: 0 0 10px 0; font-size: 1.1rem; }
+        .part-card .score-display { font-size: 1.5rem; font-weight: bold; background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 8px; }
+
+        /* Vistas interiores de las Partes */
+        .part-view {
+            display: none;
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border: 1px solid #eee;
         }
+        .part-view h3 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 2px solid #eee; }
+        .btn-back { background: #7f8c8d; color: white; padding: 6px 15px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
+        .btn-back:hover { background: #95a5a6; }
+
+        /* Tablas */
+        table { width: 100%; border-collapse: collapse; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+        th { font-weight: 600; color: #333; background: #f9f9f9; }
         input[type="number"] {
-            width: 75px;
+            width: 80px;
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 1rem;
             text-align: center;
         }
-        
-        .deduction-row {
-            background-color: #ffeeee;
-        }
-        
-        /* Bloque de Cuestiones Temáticas vinculadas al texto */
-        .thematic-section {
+        input[type="number"]::placeholder { color: #aaa; font-size: 0.85rem; }
+
+        /* Faltas y Total */
+        .global-section {
             background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
+            border-radius: 8px;
             padding: 15px 20px;
-            margin-top: 15px;
-            margin-bottom: 15px;
-        }
-        .thematic-section h4 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            color: #2c3e50;
-            border-bottom: 2px solid #ecf0f1;
-            padding-bottom: 5px;
-            font-size: 1.05rem;
-        }
-        .question-row {
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 1px dashed #eee;
-        }
-        .question-row:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        .question-text {
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 0.95rem;
-            color: #444;
-        }
-        .options-group {
+            margin-top: 10px;
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid #e0e0e0;
             flex-wrap: wrap;
+            gap: 15px;
         }
-        .opt-btn {
-            padding: 6px 14px;
-            border: 1px solid #ccc;
-            background: #fff;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #666;
-            transition: all 0.2s ease;
-        }
-        .opt-btn:hover {
-            background: #f0f0f0;
-            color: #333;
-        }
+        .faltas-box { display: flex; align-items: center; gap: 10px; font-weight: bold; color: #c0392b; }
+        .faltas-box input { border-color: #e74c3c; color: #c0392b; font-weight: bold; }
         
-        /* Estados activos */
+        .total-box { font-size: 1.2rem; font-weight: bold; color: #2c3e50; }
+        .total-box span { font-size: 1.6rem; color: #27ae60; background: #eef7f2; padding: 5px 15px; border-radius: 8px; margin-left: 10px; border: 1px solid #cce5d6; }
+
+        /* Acordeón Temático */
+        details.thematic-details {
+            margin-top: 15px;
+            border-radius: 6px;
+            border: 1px solid #bdc3c7;
+            background: #fff;
+        }
+        details.thematic-details > summary {
+            padding: 12px 15px;
+            font-weight: bold;
+            color: #2c3e50;
+            cursor: pointer;
+            background: #ecf0f1;
+        }
+        .thematic-content { padding: 15px; }
+        .question-row { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #eee; }
+        .question-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .question-text { font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; color: #444; }
+        .options-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .opt-btn {
+            padding: 6px 14px; border: 1px solid #ccc; background: #fff;
+            border-radius: 20px; cursor: pointer; font-size: 0.85rem; color: #666;
+        }
         .opt-btn.active-mucho { background-color: #2ecc71 !important; color: white !important; border-color: #27ae60 !important; font-weight: bold; }
         .opt-btn.active-bastante { background-color: #3498db !important; color: white !important; border-color: #2980b9 !important; font-weight: bold; }
         .opt-btn.active-poco { background-color: #e67e22 !important; color: white !important; border-color: #d35400 !important; font-weight: bold; }
         .opt-btn.active-nada { background-color: #e74c3c !important; color: white !important; border-color: #c0392b !important; font-weight: bold; }
 
-        .total-box {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-top: 15px;
-            padding: 15px;
-            background: #eef7f2;
-            border-radius: 6px;
-            border: 1px solid #cce5d6;
-        }
-        .total-box span {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: #27ae60;
-            margin-left: 10px;
-        }
-        
-        .header-score {
-            background: rgba(255,255,255,0.2);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 1rem;
-        }
-        
-        .actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            background: #ebf0f1;
-            padding: 10px 15px;
-            border-radius: 6px;
-        }
-        .btn {
-            padding: 10px 20px;
-            background-color: #e74c3c;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-        }
-        .btn:hover {
-            background-color: #c0392b;
-        }
-
         @media(max-width: 768px) {
-            .options-group { flex-direction: column; gap: 5px; }
-            .opt-btn { width: 100%; text-align: left; }
+            .cards-container { flex-direction: column; }
+            .global-section { flex-direction: column; align-items: stretch; }
+            .total-box { text-align: center; margin-top: 10px; }
+            .options-group { flex-direction: column; }
         }
     </style>
+    
+    <!-- Este script guarda el estado incrustado cuando exportamos el archivo -->
+    <script id="embedded-state">
+        window.INITIAL_STATE = {};
+    </script>
 </head>
 <body>
 
     <div class="container">
-        <h1>Evaluación de Redacción de Texto</h1>
-        <h2>Tema: Concienciación sobre los mayores y su seguridad (Basado en el texto "Mayores, activos y seguros")</h2>
+        <h1>Examen: Lengua Castellana</h1>
+        <h2>Evaluación de Comprensión, Lengua y Redacción</h2>
         
-        <div class="info-panel">
-            <h3>C. REDACCIÓN DE UN TEXTO EN LENGUA CASTELLANA (3 puntos)</h3>
-            <p><strong>Criterio general:</strong> Quien cumpla la totalidad de estos criterios tendrá 3 puntos, se irá descontando puntuación a medida que no se contemplen los mismos.</p>
-            <p><strong>Penalización por Ortografía:</strong> Con respecto a la ortografía del total de la prueba, cada falta resta un 0,1 de la puntuación final.</p>
-        </div>
-
         <div class="actions">
-            <div><strong style="color: #2c3e50;">✔ Guardado automático activo:</strong> Las notas y los botones temáticos quedan salvados de forma permanente en este navegador.</div>
-            <button class="btn" onclick="limpiarDatos()">Borrar todos los datos</button>
+            <div>
+                <p style="margin: 0 0 5px 0;"><strong>💾 Guarda para ti:</strong> Los datos se guardan en tu navegador automáticamente.</p>
+                <p style="margin: 0; color: #27ae60;"><strong>📤 Para enviar:</strong> Usa el botón verde para descargar el archivo con las notas guardadas y envíalo.</p>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-export" onclick="exportarArchivo()">Guardar y Descargar Archivo</button>
+                <button class="btn btn-clear" onclick="limpiarDatos()">Borrar Todo</button>
+            </div>
         </div>
 
         <div id="students-container"></div>
@@ -259,97 +231,167 @@
             "Domingo", "Olegario", "Luis"
         ];
 
-        const criteria = [
-            { id: 'c1', label: 'Extensión mínima de 10 líneas', max: 0.5 },
-            { id: 'c2', label: 'Estructura (encabezado, cuerpo de texto y despedida)', max: 0.5 },
-            { id: 'c3', label: 'Expresión escrita clara', max: 0.2 },
-            { id: 'c4', label: 'Normas gramaticales y ortográficas', max: 0.6 },
-            { id: 'c5', label: 'Ajuste a la temática, organización de ideas, claridad, coherencia y vocabulario', max: 1.0 },
-            { id: 'c6', label: 'Presentación y limpieza', max: 0.2 }
+        // Definición de las partes del examen
+        const partA = [
+            { id: 'a0', label: '1.1', max: 1.0 },
+            { id: 'a1', label: '1.2', max: 1.0 },
+            { id: 'a2', label: '1.3', max: 1.0 },
+            { id: 'a3', label: '1.4', max: 1.0 }
         ];
 
-        // NUEVAS PREGUNTAS REFERENCIADAS AL TEXTO SUMINISTRADO EN LA IMAGEN
+        const partB = [
+            { id: 'b0', label: '1.5', max: 0.4 },
+            { id: 'b1', label: '1.6', max: 0.6 },
+            { id: 'b2', label: '1.7', max: 0.5 },
+            { id: 'b3', label: '1.8', max: 0.8 },
+            { id: 'b4', label: '1.9', max: 0.7 }
+        ];
+
+        const partC = [
+            { id: 'c0', label: 'Extensión mínima de 10 líneas', max: 0.5 },
+            { id: 'c1', label: 'Estructura (encabezado, cuerpo y despedida)', max: 0.5 },
+            { id: 'c2', label: 'Expresión escrita clara', max: 0.2 },
+            { id: 'c3', label: 'Normas gramaticales y ortográficas', max: 0.6 },
+            { id: 'c4', label: 'Ajuste a la temática, org. de ideas, coherencia y vocabulario', max: 1.0 },
+            { id: 'c5', label: 'Presentación y limpieza', max: 0.2 }
+        ];
+
         const thematicQuestions = [
-            "1. ¿Menciona o reflexiona sobre la seguridad y los riesgos del mayor como PEATÓN (ej. hacerse ver, prioridad en pasos de peatones, evitar obstáculos)?",
-            "2. ¿Trata las recomendaciones específicas para el mayor como CONDUCTOR (ej. evitar lluvia/horas punta, actualización de normas, no perder la calma, evitar móvil)?",
-            "3. ¿Incluye pautas o precauciones para el uso seguro del TRANSPORTE PÚBLICO (ej. esperar en la acera, ceder el paso al salir, evitar aglomeraciones)?",
-            "4. ¿Vincula la seguridad vial con el mantenimiento de la AUTONOMÍA y la necesidad de revisar la salud frecuentemente?",
-            "5. ¿Conecta los datos del texto de apoyo con el problema central de la CONCIENCIACIÓN SOCIAL solicitado en el examen?"
+            "1. ¿Menciona o reflexiona sobre la seguridad y los riesgos del mayor como PEATÓN?",
+            "2. ¿Trata las recomendaciones específicas para el mayor como CONDUCTOR?",
+            "3. ¿Incluye pautas o precauciones para el uso seguro del TRANSPORTE PÚBLICO?",
+            "4. ¿Vincula la seguridad vial con el mantenimiento de la AUTONOMÍA y la salud?",
+            "5. ¿Conecta los datos del texto de apoyo con la CONCIENCIACIÓN SOCIAL solicitada?"
         ];
-
         const optionLabels = ["Mucho / Excelente", "Bastante / Adecuado", "Poco / Superficial", "Nada / No lo trata"];
 
         const colors = [
-            "#e57373", "#f06292", "#ba68c8", "#9575cd", "#7986cb",
-            "#64b5f6", "#4fc3f7", "#4dd0e1", "#4db6ac", "#81c784",
-            "#aed581", "#dce775", "#ffd54f", "#ffb74d", "#ff8a65",
-            "#a1887f", "#90a4ae", "#546e7a"
+            "#34495e", "#8e44ad", "#2980b9", "#c0392b", "#d35400",
+            "#16a085", "#27ae60", "#f39c12", "#e67e22", "#e74c3c",
+            "#9b59b6", "#8e44ad", "#2c3e50", "#f1c40f", "#1abc9c",
+            "#2ecc71", "#3498db", "#95a5a6"
         ];
 
         const container = document.getElementById('students-container');
-        let state = JSON.parse(localStorage.getItem('rubrica_redaccion_doc_state')) || {};
+        
+        // Priorizar el estado incrustado (cuando envías el archivo) sobre el localStorage
+        let state = {};
+        if (Object.keys(window.INITIAL_STATE).length > 0) {
+            state = window.INITIAL_STATE;
+        } else {
+            state = JSON.parse(localStorage.getItem('rubrica_examen_full_state')) || {};
+        }
 
         function saveState() {
-            localStorage.setItem('rubrica_redaccion_doc_state', JSON.stringify(state));
+            localStorage.setItem('rubrica_examen_full_state', JSON.stringify(state));
         }
 
         function limpiarDatos() {
-            if(confirm("¿Estás seguro de que deseas restablecer la rúbrica completa? Se borrarán de forma irreversible las notas de los 18 alumnos.")) {
-                localStorage.removeItem('rubrica_redaccion_doc_state');
+            if(confirm("¿Seguro que quieres borrar todas las notas de todos los alumnos?")) {
+                localStorage.removeItem('rubrica_examen_full_state');
+                window.INITIAL_STATE = {};
                 location.reload();
             }
         }
 
-        function updateScore(studentIdx) {
-            let total = 0;
+        // --- SISTEMA PARA EXPORTAR EL HTML CON LOS DATOS GUARDADOS ---
+        function exportarArchivo() {
+            const stateStr = JSON.stringify(state);
+            let htmlContent = document.documentElement.outerHTML;
             
-            for(let i=0; i<criteria.length; i++) {
-                const inputEl = document.getElementById(`s${studentIdx}_c${i}`);
-                let val = parseFloat(inputEl.value) || 0;
-                const maxAllowed = criteria[i].max;
+            // Reemplazar el INITIAL_STATE vacío por el actual
+            const regex = /window\.INITIAL_STATE\s*=\s*\{.*?\};/s;
+            htmlContent = htmlContent.replace(regex, `window.INITIAL_STATE = ${stateStr};`);
+            
+            const blob = new Blob(["<!DOCTYPE html>\n" + htmlContent], { type: 'text/html;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            
+            // Generar fecha para el nombre del archivo
+            const date = new Date();
+            const fechaStr = `${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}`;
+            a.download = `Rubrica_Notas_${fechaStr}.html`;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert("Archivo descargado. Este nuevo archivo .html contiene todas las notas guardadas y se lo puedes enviar a otra persona.");
+        }
 
-                if (val > maxAllowed) {
-                    val = maxAllowed;
-                    inputEl.value = maxAllowed;
-                }
-                if (val < 0) {
-                    val = 0;
-                    inputEl.value = 0;
-                }
+        // Lógica de Vistas (Abrir y Cerrar Partes)
+        function showPart(sIdx, part) {
+            document.getElementById(`s${sIdx}_cards`).style.display = 'none';
+            document.getElementById(`s${sIdx}_global`).style.display = 'none';
+            document.getElementById(`s${sIdx}_viewA`).style.display = part === 'A' ? 'block' : 'none';
+            document.getElementById(`s${sIdx}_viewB`).style.display = part === 'B' ? 'block' : 'none';
+            document.getElementById(`s${sIdx}_viewC`).style.display = part === 'C' ? 'block' : 'none';
+        }
 
+        function showCards(sIdx) {
+            document.getElementById(`s${sIdx}_cards`).style.display = 'flex';
+            document.getElementById(`s${sIdx}_global`).style.display = 'flex';
+            document.getElementById(`s${sIdx}_viewA`).style.display = 'none';
+            document.getElementById(`s${sIdx}_viewB`).style.display = 'none';
+            document.getElementById(`s${sIdx}_viewC`).style.display = 'none';
+        }
+
+        // Lógica de Cálculo de Notas
+        function calculatePart(sIdx, partArray, prefix) {
+            let total = 0;
+            partArray.forEach((item, i) => {
+                const el = document.getElementById(`s${sIdx}_${prefix}${i}`);
+                let val = parseFloat(el.value) || 0;
+                
+                if (val > item.max) { val = item.max; el.value = val; }
+                if (val < 0) { val = 0; el.value = 0; }
+                
                 total += val;
                 
-                if(!state[studentIdx]) state[studentIdx] = {};
-                state[studentIdx][`c${i}`] = val;
-            }
+                if(!state[sIdx]) state[sIdx] = {};
+                state[sIdx][`${prefix}${i}`] = val;
+            });
+            return total;
+        }
 
-            const faltasEl = document.getElementById(`s${studentIdx}_faltas`);
+        function updateScore(sIdx) {
+            const totalA = calculatePart(sIdx, partA, 'a');
+            const totalB = calculatePart(sIdx, partB, 'b');
+            const totalC = calculatePart(sIdx, partC, 'c');
+
+            // Faltas totales
+            const faltasEl = document.getElementById(`s${sIdx}_faltas`);
             let faltas = parseInt(faltasEl.value) || 0;
-            if (faltas < 0) {
-                faltas = 0;
-                faltasEl.value = 0;
-            }
+            if (faltas < 0) { faltas = 0; faltasEl.value = 0; }
+            if(!state[sIdx]) state[sIdx] = {};
+            state[sIdx]['faltas'] = faltas;
 
-            if(!state[studentIdx]) state[studentIdx] = {};
-            state[studentIdx]['faltas'] = faltas;
-            
-            total -= (faltas * 0.1);
-            if (total < 0) total = 0;
+            // Actualizar textos en los botones
+            document.getElementById(`s${sIdx}_btnA_score`).innerText = totalA.toFixed(2);
+            document.getElementById(`s${sIdx}_btnB_score`).innerText = totalB.toFixed(2);
+            document.getElementById(`s${sIdx}_btnC_score`).innerText = totalC.toFixed(2);
 
-            const finalScore = total.toFixed(2);
-            document.getElementById(`s${studentIdx}_total`).innerText = finalScore + " / 3.00";
-            document.getElementById(`s${studentIdx}_header_score`).innerText = finalScore;
-            
+            // Total General
+            let notaFinal = (totalA + totalB + totalC) - (faltas * 0.1);
+            if (notaFinal < 0) notaFinal = 0;
+
+            const finalStr = notaFinal.toFixed(2);
+            document.getElementById(`s${sIdx}_total`).innerText = finalStr + " / 10";
+            document.getElementById(`s${sIdx}_header_score`).innerText = finalStr;
+
             saveState();
         }
 
-        function selectThematic(studentIdx, qIdx, optIdx) {
-            if(!state[studentIdx]) state[studentIdx] = {};
-            state[studentIdx][`q_${qIdx}`] = optIdx;
+        function selectThematic(sIdx, qIdx, optIdx) {
+            if(!state[sIdx]) state[sIdx] = {};
+            state[sIdx][`q_${qIdx}`] = optIdx;
             saveState();
             
             for(let i=0; i<4; i++) {
-                const btn = document.getElementById(`s${studentIdx}_q${qIdx}_o${i}`);
+                const btn = document.getElementById(`s${sIdx}_q${qIdx}_o${i}`);
                 btn.className = 'opt-btn'; 
                 if(i === optIdx) {
                     if(i === 0) btn.classList.add('active-mucho');
@@ -360,96 +402,111 @@
             }
         }
 
+        // Generador de tablas HTML para cada parte
+        function buildTable(sIdx, partArray, prefix) {
+            let html = `<table><thead><tr><th style="width:75%">Criterio</th><th style="width:25%">Nota</th></tr></thead><tbody>`;
+            partArray.forEach((item, i) => {
+                const val = state[sIdx] && state[sIdx][`${prefix}${i}`] !== undefined ? state[sIdx][`${prefix}${i}`] : '';
+                html += `
+                    <tr>
+                        <td>${item.label}</td>
+                        <td>
+                            <input type="number" id="s${sIdx}_${prefix}${i}" step="0.1" min="0" max="${item.max}" value="${val}" placeholder="Máx: ${item.max}" oninput="updateScore(${sIdx})">
+                        </td>
+                    </tr>
+                `;
+            });
+            html += `</tbody></table>`;
+            return html;
+        }
+
         function render() {
-            students.forEach((student, idx) => {
-                const color = colors[idx % colors.length];
+            students.forEach((student, sIdx) => {
+                const color = colors[sIdx % colors.length];
+                const savedFaltas = state[sIdx] && state[sIdx]['faltas'] !== undefined ? state[sIdx]['faltas'] : '';
                 
                 const details = document.createElement('details');
+                details.className = 'student-detail';
+                
                 const summary = document.createElement('summary');
                 summary.style.backgroundColor = color;
-                
                 summary.innerHTML = `
-                    <span>${idx + 1}. ${student}</span>
-                    <span class="header-score">Nota: <span id="s${idx}_header_score">0.00</span></span>
+                    <span>${sIdx + 1}. ${student}</span>
+                    <span class="header-score">Total: <span id="s${sIdx}_header_score">0.00</span> / 10</span>
                 `;
                 
                 const content = document.createElement('div');
                 content.className = 'content';
 
-                let tbodyHtml = '';
-                criteria.forEach((crit, cIdx) => {
-                    const savedVal = state[idx] && state[idx][`c${cIdx}`] !== undefined ? state[idx][`c${cIdx}`] : '';
-                    tbodyHtml += `
-                        <tr>
-                            <td>${crit.label} <strong>(Máx: ${crit.max})</strong></td>
-                            <td>
-                                <input type="number" id="s${idx}_c${cIdx}" step="0.1" min="0" max="${crit.max}" value="${savedVal}" oninput="updateScore(${idx})">
-                            </td>
-                        </tr>
-                    `;
-                });
-
-                const savedFaltas = state[idx] && state[idx]['faltas'] !== undefined ? state[idx]['faltas'] : '';
-
                 let thematicHtml = '';
                 thematicQuestions.forEach((qText, qIdx) => {
-                    thematicHtml += `
-                        <div class="question-row">
-                            <div class="question-text">${qText}</div>
-                            <div class="options-group">
-                    `;
-                    optionLabels.forEach((optLabel, optIdx) => {
-                        thematicHtml += `
-                            <button type="button" class="opt-btn" id="s${idx}_q${qIdx}_o${optIdx}" onclick="selectThematic(${idx}, ${qIdx}, ${optIdx})">
-                                ${optLabel}
-                            </button>
-                        `;
+                    thematicHtml += `<div class="question-row"><div class="question-text">${qText}</div><div class="options-group">`;
+                    optionLabels.forEach((optLabel, oIdx) => {
+                        thematicHtml += `<button type="button" class="opt-btn" id="s${sIdx}_q${qIdx}_o${oIdx}" onclick="selectThematic(${sIdx}, ${qIdx}, ${oIdx})">${optLabel}</button>`;
                     });
-                    thematicHtml += `
-                            </div>
-                        </div>
-                    `;
+                    thematicHtml += `</div></div>`;
                 });
 
                 content.innerHTML = `
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 75%;">Criterio de Evaluación de Redacción</th>
-                                <th style="width: 25%;">Puntuación</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${tbodyHtml}
-                            <tr class="deduction-row">
-                                <td><strong>Faltas de ortografía detectadas</strong> (Cada una resta 0.1 de la nota final)</td>
-                                <td>
-                                    <input type="number" id="s${idx}_faltas" step="1" min="0" value="${savedFaltas}" oninput="updateScore(${idx})">
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    
-                    <div class="thematic-section">
-                        <h4>Extracción de Ideas del Texto de Apoyo (Informativo, no altera la nota numérica)</h4>
-                        ${thematicHtml}
+                    <!-- VISTA PRINCIPAL (Tarjetas) -->
+                    <div class="cards-container" id="s${sIdx}_cards">
+                        <div class="part-card card-a" onclick="showPart(${sIdx}, 'A')">
+                            <h3>PARTE A<br><small>Comprensión (4 ptos)</small></h3>
+                            <div class="score-display" id="s${sIdx}_btnA_score">0.00</div>
+                        </div>
+                        <div class="part-card card-b" onclick="showPart(${sIdx}, 'B')">
+                            <h3>PARTE B<br><small>Lengua (3 ptos)</small></h3>
+                            <div class="score-display" id="s${sIdx}_btnB_score">0.00</div>
+                        </div>
+                        <div class="part-card card-c" onclick="showPart(${sIdx}, 'C')">
+                            <h3>PARTE C<br><small>Redacción (3 ptos)</small></h3>
+                            <div class="score-display" id="s${sIdx}_btnC_score">0.00</div>
+                        </div>
                     </div>
 
-                    <div class="total-box">
-                        Puntuación Total Redacción: <span id="s${idx}_total">0.00 / 3.00</span>
+                    <!-- VISTAS DETALLADAS -->
+                    <div class="part-view" id="s${sIdx}_viewA">
+                        <h3>A. COMPRENSIÓN DE UN TEXTO (4 PUNTOS) <button class="btn-back" onclick="showCards(${sIdx})">Volver</button></h3>
+                        ${buildTable(sIdx, partA, 'a')}
                     </div>
+
+                    <div class="part-view" id="s${sIdx}_viewB">
+                        <h3>B. CONOCIMIENTO DE LENGUA (3 PUNTOS) <button class="btn-back" onclick="showCards(${sIdx})">Volver</button></h3>
+                        ${buildTable(sIdx, partB, 'b')}
+                    </div>
+
+                    <div class="part-view" id="s${sIdx}_viewC">
+                        <h3>C. REDACCIÓN DE UN TEXTO EN LENGUA CASTELLANA (3 PUNTOS) <button class="btn-back" onclick="showCards(${sIdx})">Volver</button></h3>
+                        ${buildTable(sIdx, partC, 'c')}
+                    </div>
+
+                    <!-- FALTAS Y TOTAL (Global) -->
+                    <div class="global-section" id="s${sIdx}_global">
+                        <div class="faltas-box">
+                            Faltas Totales del Examen (-0.1 pts/falta): 
+                            <input type="number" id="s${sIdx}_faltas" step="1" min="0" value="${savedFaltas}" placeholder="Cant." oninput="updateScore(${sIdx})">
+                        </div>
+                        <div class="total-box">
+                            NOTA FINAL: <span id="s${sIdx}_total">0.00 / 10</span>
+                        </div>
+                    </div>
+
+                    <!-- EXTRACCIÓN DE IDEAS -->
+                    <details class="thematic-details">
+                        <summary>Extracción de Ideas del Texto de Apoyo (Informativo, no altera la nota numérica)</summary>
+                        <div class="thematic-content">${thematicHtml}</div>
+                    </details>
                 `;
 
                 details.appendChild(summary);
                 details.appendChild(content);
                 container.appendChild(details);
 
-                updateScore(idx);
+                updateScore(sIdx);
 
                 thematicQuestions.forEach((_, qIdx) => {
-                    if (state[idx] && state[idx][`q_${qIdx}`] !== undefined) {
-                        const savedOptIdx = state[idx][`q_${qIdx}`];
-                        selectThematic(idx, qIdx, savedOptIdx);
+                    if (state[sIdx] && state[sIdx][`q_${qIdx}`] !== undefined) {
+                        selectThematic(sIdx, qIdx, state[sIdx][`q_${qIdx}`]);
                     }
                 });
             });
