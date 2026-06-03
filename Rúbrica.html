@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Examen Lengua Castellana - Rúbrica Completa</title>
     
-    <!-- AQUÍ SE GUARDARÁN LOS DATOS AL EXPORTAR -->
-    <script id="saved-data" type="application/json">{}</script>
+    <script id="saved-data" type="application/json">{
+        "download_time": 0,
+        "data": {}
+    }</script>
 
     <style>
         :root {
@@ -41,7 +43,7 @@
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border-left: 5px solid #2ecc71;
+            border-left: 5px solid #3498db;
             flex-wrap: wrap;
             gap: 10px;
         }
@@ -56,6 +58,7 @@
             transition: opacity 0.2s;
         }
         .btn:hover { opacity: 0.85; }
+        .btn-save { background-color: #3498db; }
         .btn-export { background-color: #27ae60; }
         .btn-clear { background-color: #e74c3c; }
 
@@ -210,11 +213,12 @@
         
         <div class="actions">
             <div>
-                <p style="margin: 0 0 5px 0;"><strong>💾 Estado:</strong> <span id="save-status" style="color:#27ae60; font-weight:bold;">Listo para evaluar</span></p>
-                <p style="margin: 0; color: #2c3e50;"><strong>📤 Para enviar/guardar:</strong> Haz clic en el botón verde para descargar el archivo con todas las notas.</p>
+                <p style="margin: 0 0 5px 0;"><strong>💾 Estado Actual:</strong> <span id="save-status" style="color:#2c3e50; font-weight:bold;">Listo para evaluar</span></p>
+                <p style="margin: 0; font-size:0.9rem; color: #555;">Pulsa el botón azul para asegurar tus notas localmente antes de recargar la pestaña.</p>
             </div>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn btn-export" onclick="exportarArchivo()">Descargar Archivo con Notas</button>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-save" onclick="guardarEnNavegador(true)">1. Guardar en Navegador</button>
+                <button class="btn btn-export" onclick="exportarArchivo()">2. Descargar Archivo (.html)</button>
                 <button class="btn btn-clear" onclick="limpiarDatos()">Borrar Todo</button>
             </div>
         </div>
@@ -272,60 +276,85 @@
 
         let state = {};
         
+        // Sincronización Inteligente para evitar pérdidas por F5
         function initData() {
+            let embeddedPayload = { download_time: 0, data: {} };
             try {
-                const embeddedJSON = JSON.parse(document.getElementById('saved-data').textContent);
-                if (Object.keys(embeddedJSON).length > 0) {
-                    state = embeddedJSON;
-                    localStorage.setItem('rubrica_datos_seguros', JSON.stringify(state));
-                } else {
-                    state = JSON.parse(localStorage.getItem('rubrica_datos_seguros')) || {};
-                }
-            } catch (e) {
-                state = JSON.parse(localStorage.getItem('rubrica_datos_seguros')) || {};
+                embeddedPayload = JSON.parse(document.getElementById('saved-data').textContent);
+            } catch (e) {}
+
+            let localPayload = null;
+            try {
+                const rawLocal = localStorage.getItem('rubrica_examen_v4_timestamped');
+                if (rawLocal) localPayload = JSON.parse(rawLocal);
+            } catch (e) {}
+
+            // Si los datos guardados localmente en el navegador son más recientes que la descarga del archivo, se priorizan
+            if (localPayload && localPayload.last_saved > (embeddedPayload.download_time || 0)) {
+                state = localPayload.data || {};
+            } else {
+                state = embeddedPayload.data || {};
             }
         }
 
-        function saveState() {
+        function guardarEnNavegador(mostrarAlerta) {
             try {
-                localStorage.setItem('rubrica_datos_seguros', JSON.stringify(state));
+                const wrapper = {
+                    last_saved: Date.now(),
+                    data: state
+                };
+                localStorage.setItem('rubrica_examen_v4_timestamped', JSON.stringify(wrapper));
+                
                 const statusEl = document.getElementById('save-status');
-                statusEl.innerText = "✓ Guardado en memoria";
-                statusEl.style.color = "#27ae60";
-                setTimeout(() => { statusEl.style.color = "#2c3e50"; }, 1500);
+                statusEl.innerText = "✓ Notas Guardadas en el Navegador";
+                statusEl.style.color = "#3498db";
+                
+                if (mostrarAlerta) {
+                    alert("¡Notas guardadas localmente! Ya puedes recargar la página de forma segura sin perder los datos.");
+                }
             } catch(e) {
-                document.getElementById('save-status').innerText = "⚠ Aviso: Memoria local bloqueada por tu navegador";
+                document.getElementById('save-status').innerText = "⚠ Memoria local no disponible";
             }
         }
 
         function limpiarDatos() {
-            if(confirm("¿Seguro que quieres BORRAR TODAS LAS NOTAS? Esta acción no se puede deshacer.")) {
-                localStorage.removeItem('rubrica_datos_seguros');
-                document.getElementById('saved-data').textContent = "{}";
+            if(confirm("¿Seguro que quieres BORRAR TODAS LAS NOTAS del navegador?")) {
+                localStorage.removeItem('rubrica_examen_v4_timestamped');
+                document.getElementById('saved-data').textContent = '{"download_time":0,"data":{}}';
                 location.reload();
             }
         }
 
         function exportarArchivo() {
             try {
-                document.getElementById('saved-data').textContent = JSON.stringify(state);
+                // Generar payload estructurado con marca de tiempo actual
+                const payloadToEmbed = {
+                    download_time: Date.now(),
+                    data: state
+                };
+                
+                document.getElementById('saved-data').textContent = JSON.stringify(payloadToEmbed);
+                
                 let htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
                 const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
+                
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
-                a.download = "Rubrica_Alumnos_Evaluada.html";
+                a.download = "Rubrica_Examen_Notas_Fijadas.html";
                 document.body.appendChild(a);
                 a.click();
+                
                 setTimeout(() => {
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
                 }, 100);
-                alert("¡Descarga completada! Revisa tu carpeta de Descargas.");
+                
+                document.getElementById('save-status').innerText = "✓ Nuevo archivo exportado correctamente";
+                document.getElementById('save-status').style.color = "#27ae60";
             } catch(e) {
-                alert("Hubo un error al crear el archivo.");
-                console.error(e);
+                alert("Hubo un error al descargar el archivo.");
             }
         }
 
@@ -349,22 +378,15 @@
             let total = 0;
             partArray.forEach((item, i) => {
                 const el = document.getElementById(`s${sIdx}_${prefix}${i}`);
-                
-                // Si la casilla está vacía, no calculamos valor, lo tratamos como 0, 
-                // pero NO ponemos "0" en la casilla visualmente.
                 let val = 0;
                 if (el.value !== "") {
                     val = parseFloat(el.value);
                     if (isNaN(val)) val = 0;
-                    
                     if (val > item.max) { val = item.max; el.value = val; }
                     if (val < 0) { val = 0; el.value = 0; }
                 }
-                
                 total += val;
-                
                 if(!state[sIdx]) state[sIdx] = {};
-                // Guardamos el valor actual (incluso si es string vacío para mantener el estado)
                 state[sIdx][`${prefix}${i}`] = el.value !== "" ? val : "";
             });
             return total;
@@ -395,13 +417,14 @@
             document.getElementById(`s${sIdx}_total`).innerText = finalStr + " / 10";
             document.getElementById(`s${sIdx}_header_score`).innerText = finalStr;
 
-            saveState();
+            // Auto-guardado de fondo para máxima seguridad
+            guardarEnNavegador(false);
         }
 
         function selectThematic(sIdx, qIdx, optIdx) {
             if(!state[sIdx]) state[sIdx] = {};
             state[sIdx][`q_${qIdx}`] = optIdx;
-            saveState();
+            guardarEnNavegador(false);
             
             for(let i=0; i<4; i++) {
                 const btn = document.getElementById(`s${sIdx}_q${qIdx}_o${i}`);
@@ -419,7 +442,6 @@
             let html = `<table><thead><tr><th style="width:75%">Criterio</th><th style="width:25%">Nota</th></tr></thead><tbody>`;
             partArray.forEach((item, i) => {
                 const savedVal = state[sIdx] && state[sIdx][`${prefix}${i}`] !== undefined ? state[sIdx][`${prefix}${i}`] : '';
-                // Si el valor guardado no es vacío ni nulo, lo mostramos; sino, lo dejamos en blanco
                 const displayVal = savedVal !== "" && savedVal !== null ? savedVal : "";
                 html += `
                     <tr>
@@ -528,7 +550,6 @@
 
         initData();
         render();
-
     </script>
 </body>
 </html>
