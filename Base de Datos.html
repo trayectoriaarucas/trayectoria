@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión - Base de Datos</title>
+    
+    <script id="app-state" type="application/json">{
+        "download_time": 0,
+        "config": {
+            "mainTitle": "Base de Datos",
+            "tabTitle": "Alumnos",
+            "listTitle": "Listado de Alumnos",
+            "globalTags": ["Grupo 1", "Grupo 2", "Vivero", "Vías y Obras", "Educación", "Aprendiz", "Maestro/a"]
+        },
+        "displaySettings": {
+            "nameFormat": "name-surname",
+            "ageFormat": "age"
+        },
+        "students": []
+    }</script>
+
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --orange-main: #e67e22;
+            --primary: #3498db;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --dark-blue: #2c3e50;
+            --light-gray: #ecf0f1;
+        }
+        body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; box-sizing: border-box; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        /* Título Principal Naranja */
+        .main-header { text-align: center; margin-bottom: 25px; }
+        .main-header h1 { color: var(--orange-main); font-size: 2.5rem; margin: 0; font-weight: bold; }
+        
+        /* Sistema de Pestañas */
+        .tabs-container { display: flex; border-bottom: 3px solid var(--dark-blue); margin-bottom: 20px; padding-left: 10px; align-items: flex-end; }
+        .tab { background: #dcdde1; color: #2f3640; padding: 10px 25px; border-radius: 8px 8px 0 0; font-weight: bold; border: none; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
+        .tab.active { background: var(--dark-blue); color: white; }
+
+        /* Barra de Acciones y Configuración */
+        .top-bar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .top-bar-left { display: flex; align-items: center; gap: 15px; }
+        .top-bar-left h2 { margin: 0; font-size: 1.4rem; color: var(--dark-blue); }
+        
+        /* Botones Estilizados */
+        .btn { padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.95rem; font-weight: bold; color: white; display: inline-flex; align-items: center; gap: 6px; }
+        .btn:hover { opacity: 0.85; }
+        .btn-primary { background-color: var(--primary); }
+        .btn-success { background-color: var(--success); }
+        .btn-danger { background-color: var(--danger); }
+        .btn-dark { background-color: var(--dark-blue); }
+        .btn-orange { background-color: var(--orange-main); }
+
+        /* Edición Inline */
+        .inline-edit-box { display: inline-flex; align-items: center; gap: 5px; }
+        .inline-edit-input { font-size: inherit; font-weight: inherit; color: #333; padding: 4px 8px; border: 2px solid var(--primary); border-radius: 4px; outline: none; }
+        .icon-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 2px 6px; border-radius: 4px; }
+        .icon-btn:hover { background: rgba(0,0,0,0.05); }
+
+        /* Matriz de Filtros Superior */
+        .filter-panel { background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; border-top: 4px solid var(--primary); }
+        .filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 15px; }
+        .filter-group { display: flex; flex-direction: column; gap: 4px; }
+        .filter-group label { font-size: 0.85rem; font-weight: bold; color: #7f8c8d; }
+        .filter-input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; width: 100%; box-sizing: border-box; }
+        
+        .tag-filter-container { display: flex; flex-wrap: wrap; gap: 6px; padding: 5px 0; }
+        .tag-pill { padding: 4px 12px; background: #e1b12c; color: white; border-radius: 15px; font-size: 0.8rem; font-weight: bold; cursor: pointer; border: 2px solid transparent; opacity: 0.6; }
+        .tag-pill.active { opacity: 1; border-color: #2c3e50; box-shadow: 0 2px 4px rgba(0,0,0,0.15); }
+
+        /* Desplegables de Alumnos */
+        details.student-card { background: white; margin-bottom: 12px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.08); overflow: hidden; border-left: 5px solid var(--dark-blue); }
+        details.student-card > summary { padding: 15px 20px; font-size: 1.15rem; font-weight: bold; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; background: #fff; }
+        details.student-card > summary::-webkit-details-marker { display: none; }
+        details.student-card[open] { border-left-color: var(--orange-main); }
+        
+        .student-body { padding: 20px; background: #fafafa; border-top: 1px solid #eee; }
+        .student-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .data-field { display: flex; flex-direction: column; gap: 4px; }
+        .data-field label { font-size: 0.85rem; color: #7f8c8d; font-weight: bold; }
+        .data-field span { font-size: 1.05rem; font-weight: 500; background: #fff; padding: 8px; border-radius: 4px; border: 1px solid #e1b12c; min-height: 20px; }
+        .data-field input, .data-field select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; width: 100%; box-sizing: border-box; }
+
+        /* Contactos Cercanos y Asignación de Filtros */
+        .sub-section { background: white; border: 1px solid #ddd; border-radius: 6px; padding: 15px; margin-top: 15px; }
+        .sub-section h4 { margin: 0 0 12px 0; color: var(--dark-blue); border-bottom: 2px solid var(--light-gray); padding-bottom: 5px; }
+        
+        .relationship-selector { display: flex; flex-wrap: wrap; gap: 6px; margin: 5px 0; }
+        .rel-chip { padding: 6px 14px; border: 1px solid #ccc; background: #fff; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: bold; color: #555; }
+        .rel-chip.active-pareja { background: #ef5350 !important; color: white !important; border-color: #d32f2f !important; }
+        .rel-chip.active-hermano { background: #26a69a !important; color: white !important; border-color: #00796b !important; }
+        .rel-chip.active-amigo { background: #ab47bc !important; color: white !important; border-color: #7b1fa2 !important; }
+        .rel-chip.active-padre { background: #42a5f5 !important; color: white !important; border-color: #1976d2 !important; }
+        .rel-chip.active-hijo { background: #66bb6a !important; color: white !important; border-color: #388e3c !important; }
+        .rel-chip.active-tio { background: #ffa726 !important; color: white !important; border-color: #f57c00 !important; }
+
+        /* MODAL CONFIGURACIÓN (GEAR) */
+        #configModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 3000; justify-content: center; align-items: center; }
+        .modal-content { background: white; padding: 25px; border-radius: 8px; max-width: 500px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+        .tag-manager-list { display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; margin: 15px 0; padding-right: 5px; }
+        .tag-manager-item { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 8px 12px; border-radius: 4px; border-left: 4px solid #e1b12c; }
+
+        /* Estilos de Impresión */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; padding: 0; }
+            details.student-card { border: 1px solid #333 !important; margin-bottom: 20px; page-break-inside: avoid; }
+            details.student-card > summary { background: #eee !important; color: black !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="main-header no-print">
+            <div id="wrapper-mainTitle"></div>
+        </div>
+
+        <div class="tabs-container no-print">
+            <div id="wrapper-tabTitle"></div>
+        </div>
+
+        <div class="top-bar no-print">
+            <div class="top-bar-left">
+                <div id="wrapper-listTitle"></div>
+            </div>
+            <div>
+                <button class="btn btn-dark" onclick="abrirConfiguracion()" title="Configurar Filtros del Sistema">⚙️ Configurar Filtros</button>
+                <button class="btn btn-success" onclick="exportarBaseDatosHTML()" title="Descargar copia del archivo">📥 Exportar Todo</button>
+            </div>
+        </div>
+
+        <div class="filter-panel no-print">
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label>Género</label>
+                    <select id="f-gender" class="filter-input" onchange="filtrarYRenderizar()">
+                        <option value="">Todos</option>
+                        <option value="Hombre">Hombres</option>
+                        <option value="Mujer">Mujeres</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>Municipio</label>
+                    <input type="text" id="f-municipality" class="filter-input" placeholder="Ej: Madrid" oninput="filtrarYRenderizar()">
+                </div>
+                <div class="filter-group">
+                    <label>Código Postal</label>
+                    <input type="text" id="f-pc" class="filter-input" placeholder="Ej: 28001" oninput="filtrarYRenderizar()">
+                </div>
+                <div class="filter-group">
+                    <label>Rango de Edad Mínima</label>
+                    <input type="number" id="f-age-min" class="filter-input" placeholder="Mínima" oninput="filtrarYRenderizar()">
+                </div>
+            </div>
+            
+            <div class="filter-group" style="margin-bottom: 15px;">
+                <label>Filtrar por Grupo / Categoría Designada</label>
+                <div id="filter-tags-render" class="tag-filter-container"></div>
+            </div>
+
+            <div style="border-top: 1px solid #eee; padding-top: 12px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <button class="btn btn-dark" id="btn-toggle-name" onclick="toggleFormatoNombre()">Formato: Nombre, Apellido</button>
+                <button class="btn btn-dark" id="btn-toggle-age" onclick="toggleFormatoEdad()">Formato: Ver Edad</button>
+            </div>
+        </div>
+
+        <div id="students-list-container"></div>
+
+        <div style="text-align: center; margin-top: 20px;" class="no-print">
+            <button class="btn btn-orange" style="padding: 12px 30px; font-size: 1.1rem;" onclick="crearFichaNuevoAlumno()">➕ Añadir Nuevo Alumno al Listado</button>
+        </div>
+    </div>
+
+    <div id="configModal" class="no-print">
+        <div class="modal-content">
+            <h3 style="margin-top:0; color:var(--dark-blue);">⚙️ Gestor de Grupos y Categorías</h3>
+            <p style="font-size:0.85rem; color:#666;">Añade o elimina los filtros globales que luego podrás asignar a las fichas de los alumnos.</p>
+            
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="new-tag-input" class="filter-input" placeholder="Nombre del grupo (Ej: Vivero)">
+                <button class="btn btn-primary" onclick="crearNuevaEtiquetaGlobal()">Añadir</button>
+            </div>
+
+            <div id="tag-manager-list-render" class="tag-manager-list"></div>
+
+            <div style="text-align: right; margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
+                <button class="btn btn-dark" onclick="cerrarConfiguracion()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let app = { config: {}, displaySettings: {}, students: [] };
+        let activeSelectedTags = []; // Filtros por etiqueta activos
+        let inlineEditingKey = null;
+
+        const parentescosValidos = ["pareja", "hermano", "amigo", "padre", "hijo", "tio"];
+
+        // INICIALIZACIÓN DE LA APLICACIÓN
+        function init() {
+            let embedded = JSON.parse(document.getElementById('app-state').textContent);
+            let localRaw = localStorage.getItem('rubrica_database_v1');
+            
+            if (localRaw) {
+                let local = JSON.parse(localRaw);
+                if (local.last_saved > (embedded.download_time || 0)) {
+                    app = local.data;
+                } else { app = embedded; }
+            } else { app = embedded; }
+
+            filtrarYRenderizar();
+        }
+
+        function salvarMemoria() {
+            localStorage.setItem('rubrica_database_v1', JSON.stringify({ last_saved: Date.now(), data: app }));
+        }
+
+        // CÁLCULO DINÁMICO DE EDAD
+        function obtenerEdad(fechaString) {
+            if(!fechaString) return "";
+            const hoy = new Date();
+            const cumple = new Date(fechaString);
+            let edad = hoy.getFullYear() - cumple.getFullYear();
+            const m = hoy.getMonth() - cumple.getMonth();
+            if (m < 0 || (m === 0 && hoy.getDate() < cumple.getDate())) { edad--; }
+            return isNaN(edad) || edad < 0 ? "" : `(${edad} años)`;
+        }
+
+        // INTERCAMBIADORES DE FORMATO VISUAL
+        function toggleFormatoNombre() {
+            app.displaySettings.nameFormat = app.displaySettings.nameFormat === 'name-surname' ? 'surname-name' : 'name-surname';
+            salvarMemoria();
+            filtrarYRenderizar();
+        }
+
+        function toggleFormatoEdad() {
+            app.displaySettings.ageFormat = app.displaySettings.ageFormat === 'age' ? 'dob' : 'age';
+            salvarMemoria();
+            filtrarYRenderizar();
+        }
+
+        // SISTEMA DE EDICIÓN INLINE (✏️)
+        function renderEdicionInline(idContenedor, keyConfig, textoDefecto, tipoH) {
+            const wrapper = document.getElementById(idContenedor);
+            const valorActual = app.config[keyConfig] || textoDefecto;
+
+            if (inlineEditingKey === keyConfig) {
+                wrapper.innerHTML = `
+                    <div class="inline-edit-box">
+                        <input type="text" id="input-${keyConfig}" class="inline-edit-input" value="${valorActual}">
+                        <button class="icon-btn" onclick="confirmarEdicionInline('${idContenedor}', '${keyConfig}')">✅</button>
+                        <button class="icon-btn" onclick="cancelarEdicionInline()">❌</button>
+                    </div>`;
+            } else {
+                let contenidoH = valorActual;
+                if(tipoH === 'h1') contenidoH = `<h1>${valorActual} <button class="icon-btn" onclick="activarEdicionInline('${keyConfig}')">✏️</button></h1>`;
+                if(tipoH === 'tab') contenidoH = `<button class="tab active">${valorActual} <button class="icon-btn" style="color:white;" onclick="activarEdicionInline('${keyConfig}')">✏️</button></button>`;
+                if(tipoH === 'h2') contenidoH = `<h2>${valorActual} <button class="icon-btn" onclick="activarEdicionInline('${keyConfig}')">✏️</button></h2>`;
+                wrapper.innerHTML = contenidoH;
+            }
+        }
+
+        function activarEdicionInline(key) { inlineEditingKey = key; filtrarYRenderizar(); }
+        function cancelarEdicionInline() { inlineEditingKey = null; filtrarYRenderizar(); }
+        function confirmarEdicionInline(idContenedor, key) {
+            const v = document.getElementById(`input-${key}`).value.trim();
+            if(v) app.config[key] = v;
+            inlineEditingKey = null;
+            salvarMemoria();
+            filtrarYRenderizar();
+        }
+
+        // GESTIÓN DEL MODAL DE FILTROS (GEAR)
+        function abrirConfiguracion() {
+            document.getElementById('configModal').style.display = 'flex';
+            renderListaGestorEtiquetas();
+        }
+        function cerrarConfiguracion() {
+            document.getElementById('configModal').style.display = 'none';
+            filtrarYRenderizar();
+        }
+        function renderListaGestorEtiquetas() {
+            const cont = document.getElementById('tag-manager-list-render');
+            cont.innerHTML = "";
+            app.config.globalTags.forEach((tag, index) => {
+                const item = document.createElement('div');
+                item.className = 'tag-manager-item';
+                item.innerHTML = `<span>${tag}</span><button class="icon-btn" style="color:var(--danger);" onclick="eliminarEtiquetaGlobal(${index})">🗑️</button>`;
+                cont.appendChild(item);
+            });
+        }
+        function crearNuevaEtiquetaGlobal() {
+            const inp = document.getElementById('new-tag-input');
+            const v = inp.value.trim();
+            if(v && !app.config.globalTags.includes(v)) {
+                app.config.globalTags.push(v);
+                inp.value = "";
+                salvarMemoria();
+                renderListaGestorEtiquetas();
+            }
+        }
+        function eliminarEtiquetaGlobal(index) {
+            if(confirm("¿Seguro que deseas eliminar este filtro global? Se desvinculará de los alumnos.")) {
+                app.config.globalTags.splice(index, 1);
+                salvarMemoria();
+                renderListaGestorEtiquetas();
+            }
+        }
+
+        // ACCIONES DE FICHA DE ALUMNO
+        function crearFichaNuevoAlumno() {
+            const nuevo = {
+                name: "", surname: "", dob: "", dni: "", email: "",
+                address: "", pc: "", municipality: "", phone: "", gender: "Hombre",
+                assignedTags: [], contacts: []
+            };
+            app.students.push(nuevo);
+            salvarMemoria();
+            filtrarYRenderizar();
+            
+            // Abrir automáticamente el último desplegable creado
+            const cards = document.getElementsByClassName('student-card');
+            if(cards.length > 0) cards[cards.length - 1].open = true;
+        }
+
+        function eliminarAlumno(index, event) {
+            event.stopPropagation();
+            event.preventDefault();
+            if(confirm("¿Estás completamente seguro de que deseas eliminar permanentemente a este alumno de la base de datos?")) {
+                app.students.splice(index, 1);
+                salvarMemoria();
+                filtrarYRenderizar();
+            }
+        }
+
+        function actualizarCampoAlumno(index, campo, valor) {
+            app.students[index][campo] = valor;
+            salvarMemoria();
+            // Actualizar la cabecera dinámica del alumno sin renderizar todo
+            const hScore = document.getElementById(`h-score-${index}`);
+            const hText = document.getElementById(`h-text-${index}`);
+            if(hScore && hText) {
+                hText.innerText = app.displaySettings.nameFormat === 'name-surname' ? 
+                    `${app.students[index].name} ${app.students[index].surname || ''}` : 
+                    `${app.students[index].surname || ''}, ${app.students[index].name}`;
+                hScore.innerText = app.displaySettings.ageFormat === 'age' ? 
+                    obtenerEdad(app.students[index].dob) : app.students[index].dob;
+            }
+        }
+
+        function conmutarEtiquetaAlumno(sIdx, tag) {
+            if(!app.students[sIdx].assignedTags) app.students[sIdx].assignedTags = [];
+            const index = app.students[sIdx].assignedTags.indexOf(tag);
+            if(index > -1) app.students[sIdx].assignedTags.splice(index, 1);
+            else app.students[sIdx].assignedTags.push(tag);
+            salvarMemoria();
+            
+            // Refrescar visualmente los botones de etiquetas de ese alumno
+            app.config.globalTags.forEach(t => {
+                const btn = document.getElementById(`s-${sIdx}-tag-${t}`);
+                if(btn) {
+                    if(app.students[sIdx].assignedTags.includes(t)) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                }
+            });
+        }
+
+        // GESTIÓN DE CONTACTOS CERCANOS INTRA-ALUMNO
+        function añadirContactoCercano(sIdx) {
+            if(!app.students[sIdx].contacts) app.students[sIdx].contacts = [];
+            app.students[sIdx].contacts.push({ name: "", surname: "", rel: "amigo", phone: "" });
+            salvarMemoria();
+            renderContactosCercanos(sIdx);
+        }
+
+        function eliminarContactoCercano(sIdx, cIdx) {
+            app.students[sIdx].contacts.splice(cIdx, 1);
+            salvarMemoria();
+            renderContactosCercanos(sIdx);
+        }
+
+        function cambiarParentescoContacto(sIdx, cIdx, rel) {
+            app.students[sIdx].contacts[cIdx].rel = rel;
+            salvarMemoria();
+            parentescosValidos.forEach(p => {
+                const btn = document.getElementById(`s-${sIdx}-c-${cIdx}-r-${p}`);
+                if(btn) {
+                    if(p === rel) btn.classList.add(`active-${p}`);
+                    else btn.classList.remove(`active-${p}`);
+                }
+            });
+        }
+
+        function renderContactosCercanos(sIdx) {
+            const cont = document.getElementById(`contacts-render-container-${sIdx}`);
+            cont.innerHTML = "";
+            const list = app.students[sIdx].contacts || [];
+
+            list.forEach((c, cIdx) => {
+                const row = document.createElement('div');
+                row.style.cssText = "display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)) auto; gap:10px; margin-bottom:15px; background:#fff; padding:10px; border-radius:6px; border:1px solid #ddd;";
+                
+                let relButtons = "";
+                parentescosValidos.forEach(p => {
+                    const activeClass = c.rel === p ? `active-${p}` : '';
+                    relButtons += `<button type="button" id="s-${sIdx}-c-${cIdx}-r-${p}" class="rel-chip ${activeClass}" onclick="cambiarParentescoContacto(${sIdx},${cIdx},'${p}')">${p.toUpperCase()}</button>`;
+                });
+
+                row.innerHTML = `
+                    <div class="data-field"><label>Nombre</label><input type="text" value="${c.name}" oninput="app.students[${sIdx}].contacts[${cIdx}].name=this.value; salvarMemoria();"></div>
+                    <div class="data-field"><label>Apellidos</label><input type="text" value="${c.surname}" oninput="app.students[${sIdx}].contacts[${cIdx}].surname=this.value; salvarMemoria();"></div>
+                    <div class="data-field"><label>Teléfono</label><input type="text" value="${c.phone}" oninput="app.students[${sIdx}].contacts[${cIdx}].phone=this.value; salvarMemoria();"></div>
+                    <div style="grid-column: span 3; min-width: 100%;"><label style="font-size:0.8rem; font-weight:bold; color:#7f8c8d;">Relación de Parentesco:</label><div class="relationship-selector">${relButtons}</div></div>
+                    <div style="display:flex; align-items:center; justify-content:center;"><button class="btn btn-danger" onclick="eliminarContactoCercano(${sIdx}, ${cIdx})">❌</button></div>
+                `;
+                cont.appendChild(row);
+            });
+        }
+
+        // MOTOR DE FILTRADO Y RENDERIZADO GENERAL
+        function conmutarFiltroTagGlobal(tag) {
+            const idx = activeSelectedTags.indexOf(tag);
+            if(idx > -1) activeSelectedTags.splice(idx, 1);
+            else activeSelectedTags.push(tag);
+            filtrarYRenderizar();
+        }
+
+        function filtrarYRenderizar() {
+            // 1. Renderizar títulos Editables Inline
+            renderEdicionInline('wrapper-mainTitle', 'mainTitle', 'Base de Datos', 'h1');
+            renderEdicionInline('wrapper-tabTitle', 'tabTitle', 'Alumnos', 'tab');
+            renderEdicionInline('wrapper-listTitle', 'listTitle', 'Listado de Alumnos', 'h2');
+
+            // 2. Renderizar Píldoras de Filtro Superior
+            const tagsFilterCont = document.getElementById('filter-tags-render');
+            tagsFilterCont.innerHTML = "";
+            app.config.globalTags.forEach(tag => {
+                const pill = document.createElement('span');
+                pill.className = `tag-pill ${activeSelectedTags.includes(tag) ? 'active' : ''}`;
+                pill.innerText = tag;
+                pill.onclick = () => { conmutarFiltroTagGlobal(tag); };
+                tagsFilterCont.appendChild(pill);
+            });
+
+            // 3. Actualizar Textos de los Botones de Formato
+            document.getElementById('btn-toggle-name').innerText = app.displaySettings.nameFormat === 'name-surname' ? "Formato: Nombre, Apellido" : "Formato: Apellido, Nombre";
+            document.getElementById('btn-toggle-age').innerText = app.displaySettings.ageFormat === 'age' ? "Formato: Ver Edad" : "Formato: Ver Nacimiento";
+
+            // 4. Capturar Valores de Filtros
+            const selGender = document.getElementById('f-gender').value;
+            const selMuni = document.getElementById('f-municipality').value.trim().toLowerCase();
+            const selPc = document.getElementById('f-pc').value.trim();
+            const selAgeMin = parseInt(document.getElementById('f-age-min').value) || 0;
+
+            const listContainer = document.getElementById('students-list-container');
+            listContainer.innerHTML = "";
+
+            // 5. Filtrar Alumnos
+            app.students.forEach((s, index) => {
+                // Cálculo de edad numérico para el filtro
+                let edadNum = 0;
+                if (s.dob) {
+                    let diff = Date.now() - new Date(s.dob).getTime();
+                    edadNum = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+                }
+
+                // Match de filtros básicos
+                if (selGender && s.gender !== selGender) return;
+                if (selMuni && (!s.municipality || !s.municipality.toLowerCase().includes(selMuni))) return;
+                if (selPc && (!s.pc || !s.pc.includes(selPc))) return;
+                if (selAgeMin && edadNum < selAgeMin) return;
+
+                // Match de etiquetas múltiples
+                if (activeSelectedTags.length > 0) {
+                    const sTags = s.assignedTags || [];
+                    const tieneTodosLosTags = activeSelectedTags.every(t => sTags.includes(t));
+                    if (!tieneTodosLosTags) return;
+                }
+
+                // 6. Construir Ficha de Alumno que pasa el filtro
+                const card = document.createElement('details');
+                card.className = 'student-card';
+                
+                const formatName = app.displaySettings.nameFormat === 'name-surname' ? 
+                    `${s.name || 'Sin nombre'} ${s.surname || ''}` : `${s.surname || ''}, ${s.name || 'Sin nombre'}`;
+                
+                const formatAgeText = app.displaySettings.ageFormat === 'age' ? obtenerEdad(s.dob) : (s.dob || "");
+
+                const summary = document.createElement('summary');
+                summary.innerHTML = `
+                    <div class="summary-left">
+                        <button class="btn-icon del" onclick="eliminarAlumno(${index}, event)" title="Eliminar Alumno">🗑️</button>
+                        <span id="h-text-${index}">${formatName}</span>
+                    </div>
+                    <span class="header-score" id="h-score-${index}">${formatAgeText}</span>
+                `;
+
+                // Construcción de píldoras internas del Alumno
+                let internalTagsHtml = "";
+                app.config.globalTags.forEach(t => {
+                    const sTags = s.assignedTags || [];
+                    const isActive = sTags.includes(t) ? 'active' : '';
+                    internalTagsHtml += `<span class="tag-pill ${isActive}" id="s-${index}-tag-${t}" onclick="conmutarEtiquetaAlumno(${index},'${t}')">${t}</span>`;
+                });
+
+                const body = document.createElement('div');
+                body.className = 'student-body';
+                body.innerHTML = `
+                    <div class="student-grid">
+                        <div class="data-field"><label>Nombre</label><input type="text" value="${s.name}" oninput="actualizarCampoAlumno(${index}, 'name', this.value)"></div>
+                        <div class="data-field"><label>Apellidos</label><input type="text" value="${s.surname}" oninput="actualizarCampoAlumno(${index}, 'surname', this.value)"></div>
+                        <div class="data-field"><label>DNI</label><input type="text" value="${s.dni}" oninput="actualizarCampoAlumno(${index}, 'dni', this.value)"></div>
+                        <div class="data-field"><label>Fecha Nacimiento</label><input type="date" value="${s.dob}" oninput="actualizarCampoAlumno(${index}, 'dob', this.value)"></div>
+                        <div class="data-field">
+                            <label>Género</label>
+                            <select onchange="actualizarCampoAlumno(${index}, 'gender', this.value)">
+                                <option value="Hombre" ${s.gender === 'Hombre' ? 'selected':''}>Hombre</option>
+                                <option value="Mujer" ${s.gender === 'Mujer' ? 'selected':''}>Mujer</option>
+                            </select>
+                        </div>
+                        <div class="data-field"><label>Teléfono de Contacto</label><input type="text" value="${s.phone}" oninput="actualizarCampoAlumno(${index}, 'phone', this.value)"></div>
+                        <div class="data-field"><label>Correo Electrónico</label><input type="email" value="${s.email}" oninput="actualizarCampoAlumno(${index}, 'email', this.value)"></div>
+                        <div class="data-field"><label>Dirección</label><input type="text" value="${s.address}" oninput="actualizarCampoAlumno(${index}, 'address', this.value)"></div>
+                        <div class="data-field"><label>Código Postal</label><input type="text" value="${s.pc}" oninput="actualizarCampoAlumno(${index}, 'pc', this.value)"></div>
+                        <div class="data-field"><label>Municipio</label><input type="text" value="${s.municipality}" oninput="actualizarCampoAlumno(${index}, 'municipality', this.value)"></div>
+                    </div>
+
+                    <div class="sub-section">
+                        <h4>Asignación de Filtros y Grupos</h4>
+                        <div class="tag-filter-container">${internalTagsHtml}</div>
+                    </div>
+
+                    <div class="sub-section">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                            <h4 style="margin:0; border:0; padding:0;">Contactos Cercanos (Familiares / Tutores)</h4>
+                            <button class="btn btn-primary" style="padding:4px 10px; font-size:0.85rem;" onclick="añadirContactoCercano(${index})">➕ Añadir Contacto</button>
+                        </div>
+                        <div id="contacts-render-container-${index}"></div>
+                    </div>
+                `;
+
+                card.appendChild(summary);
+                card.appendChild(body);
+                listContainer.appendChild(card);
+
+                // Renderizar los contactos de este alumno concreto
+                renderContactosCercanos(index);
+            });
+        }
+
+        // EXPORTACIÓN INTEGRADORA COMPLETA DEL ARCHIVO HTML
+        function exportarBaseDatosHTML() {
+            try {
+                document.getElementById('app-state').textContent = JSON.stringify({ download_time: Date.now(), ...app });
+                let htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+                const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = "BaseDatos_Alumnos_Sincronizada.html";
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+            } catch(e) { alert("Error al exportar la base de datos."); }
+        }
+
+        // EJECUCIÓN INICIAL DEL SISTEMA
+        init();
+    </script>
+</body>
+</html>
