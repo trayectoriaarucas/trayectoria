@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Examen Lengua Castellana - Rúbrica Completa</title>
+    
+    <!-- AQUÍ SE GUARDARÁN LOS DATOS AL EXPORTAR -->
+    <script id="saved-data" type="application/json">{}</script>
+
     <style>
         :root {
             --bg-color: #f4f7f6;
@@ -197,11 +201,6 @@
             .options-group { flex-direction: column; }
         }
     </style>
-    
-    <!-- Este script guarda el estado incrustado cuando exportamos el archivo -->
-    <script id="embedded-state">
-        window.INITIAL_STATE = {};
-    </script>
 </head>
 <body>
 
@@ -211,11 +210,11 @@
         
         <div class="actions">
             <div>
-                <p style="margin: 0 0 5px 0;"><strong>💾 Guarda para ti:</strong> Los datos se guardan en tu navegador automáticamente.</p>
-                <p style="margin: 0; color: #27ae60;"><strong>📤 Para enviar:</strong> Usa el botón verde para descargar el archivo con las notas guardadas y envíalo.</p>
+                <p style="margin: 0 0 5px 0;"><strong>💾 Estado:</strong> <span id="save-status" style="color:#27ae60; font-weight:bold;">Listo para evaluar</span></p>
+                <p style="margin: 0; color: #2c3e50;"><strong>📤 Para enviar/guardar:</strong> Haz clic en el botón verde para descargar el archivo con todas las notas.</p>
             </div>
             <div style="display: flex; gap: 10px;">
-                <button class="btn btn-export" onclick="exportarArchivo()">Guardar y Descargar Archivo</button>
+                <button class="btn btn-export" onclick="exportarArchivo()">Descargar Archivo con Notas</button>
                 <button class="btn btn-clear" onclick="limpiarDatos()">Borrar Todo</button>
             </div>
         </div>
@@ -272,54 +271,78 @@
             "#2ecc71", "#3498db", "#95a5a6"
         ];
 
-        const container = document.getElementById('students-container');
-        
-        // Priorizar el estado incrustado (cuando envías el archivo) sobre el localStorage
         let state = {};
-        if (Object.keys(window.INITIAL_STATE).length > 0) {
-            state = window.INITIAL_STATE;
-        } else {
-            state = JSON.parse(localStorage.getItem('rubrica_examen_full_state')) || {};
+        
+        // Cargar datos: Primero mira si hay datos incrustados en el archivo (para cuando lo envías), sino mira el almacenamiento local
+        function initData() {
+            try {
+                const embeddedJSON = JSON.parse(document.getElementById('saved-data').textContent);
+                if (Object.keys(embeddedJSON).length > 0) {
+                    state = embeddedJSON;
+                    // Forzar guardado local para que no se pierda al recargar F5
+                    localStorage.setItem('rubrica_datos_seguros', JSON.stringify(state));
+                } else {
+                    state = JSON.parse(localStorage.getItem('rubrica_datos_seguros')) || {};
+                }
+            } catch (e) {
+                state = JSON.parse(localStorage.getItem('rubrica_datos_seguros')) || {};
+            }
         }
 
         function saveState() {
-            localStorage.setItem('rubrica_examen_full_state', JSON.stringify(state));
+            try {
+                localStorage.setItem('rubrica_datos_seguros', JSON.stringify(state));
+                const statusEl = document.getElementById('save-status');
+                statusEl.innerText = "✓ Guardado en memoria";
+                statusEl.style.color = "#27ae60";
+                
+                // Efecto visual para confirmar el guardado
+                setTimeout(() => { statusEl.style.color = "#2c3e50"; }, 1500);
+            } catch(e) {
+                document.getElementById('save-status').innerText = "⚠ Aviso: Memoria local bloqueada por tu navegador";
+            }
         }
 
         function limpiarDatos() {
-            if(confirm("¿Seguro que quieres borrar todas las notas de todos los alumnos?")) {
-                localStorage.removeItem('rubrica_examen_full_state');
-                window.INITIAL_STATE = {};
+            if(confirm("¿Seguro que quieres BORRAR TODAS LAS NOTAS? Esta acción no se puede deshacer.")) {
+                localStorage.removeItem('rubrica_datos_seguros');
+                document.getElementById('saved-data').textContent = "{}";
                 location.reload();
             }
         }
 
-        // --- SISTEMA PARA EXPORTAR EL HTML CON LOS DATOS GUARDADOS ---
+        // --- SISTEMA ROBUSTO DE EXPORTACIÓN ---
         function exportarArchivo() {
-            const stateStr = JSON.stringify(state);
-            let htmlContent = document.documentElement.outerHTML;
-            
-            // Reemplazar el INITIAL_STATE vacío por el actual
-            const regex = /window\.INITIAL_STATE\s*=\s*\{.*?\};/s;
-            htmlContent = htmlContent.replace(regex, `window.INITIAL_STATE = ${stateStr};`);
-            
-            const blob = new Blob(["<!DOCTYPE html>\n" + htmlContent], { type: 'text/html;charset=utf-8' });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement('a');
-            a.href = url;
-            
-            // Generar fecha para el nombre del archivo
-            const date = new Date();
-            const fechaStr = `${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}`;
-            a.download = `Rubrica_Notas_${fechaStr}.html`;
-            
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            alert("Archivo descargado. Este nuevo archivo .html contiene todas las notas guardadas y se lo puedes enviar a otra persona.");
+            try {
+                // 1. Guardar el estado actual dentro de la etiqueta <script id="saved-data">
+                document.getElementById('saved-data').textContent = JSON.stringify(state);
+                
+                // 2. Extraer todo el código HTML de la página tal cual está ahora
+                let htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+                
+                // 3. Crear el archivo Blob
+                const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                
+                // 4. Forzar la descarga
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = "Rubrica_Alumnos_Evaluada.html";
+                document.body.appendChild(a);
+                a.click();
+                
+                // Limpieza
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+                
+                alert("¡Descarga completada! Revisa tu carpeta de Descargas. Ese nuevo archivo contiene todas las notas guardadas.");
+            } catch(e) {
+                alert("Hubo un error al crear el archivo. Intenta usar otro navegador como Google Chrome o Edge.");
+                console.error(e);
+            }
         }
 
         // Lógica de Vistas (Abrir y Cerrar Partes)
@@ -362,19 +385,16 @@
             const totalB = calculatePart(sIdx, partB, 'b');
             const totalC = calculatePart(sIdx, partC, 'c');
 
-            // Faltas totales
             const faltasEl = document.getElementById(`s${sIdx}_faltas`);
             let faltas = parseInt(faltasEl.value) || 0;
             if (faltas < 0) { faltas = 0; faltasEl.value = 0; }
             if(!state[sIdx]) state[sIdx] = {};
             state[sIdx]['faltas'] = faltas;
 
-            // Actualizar textos en los botones
             document.getElementById(`s${sIdx}_btnA_score`).innerText = totalA.toFixed(2);
             document.getElementById(`s${sIdx}_btnB_score`).innerText = totalB.toFixed(2);
             document.getElementById(`s${sIdx}_btnC_score`).innerText = totalC.toFixed(2);
 
-            // Total General
             let notaFinal = (totalA + totalB + totalC) - (faltas * 0.1);
             if (notaFinal < 0) notaFinal = 0;
 
@@ -402,7 +422,6 @@
             }
         }
 
-        // Generador de tablas HTML para cada parte
         function buildTable(sIdx, partArray, prefix) {
             let html = `<table><thead><tr><th style="width:75%">Criterio</th><th style="width:25%">Nota</th></tr></thead><tbody>`;
             partArray.forEach((item, i) => {
@@ -421,6 +440,9 @@
         }
 
         function render() {
+            const container = document.getElementById('students-container');
+            container.innerHTML = ""; // Limpiar antes de renderizar
+            
             students.forEach((student, sIdx) => {
                 const color = colors[sIdx % colors.length];
                 const savedFaltas = state[sIdx] && state[sIdx]['faltas'] !== undefined ? state[sIdx]['faltas'] : '';
@@ -448,7 +470,6 @@
                 });
 
                 content.innerHTML = `
-                    <!-- VISTA PRINCIPAL (Tarjetas) -->
                     <div class="cards-container" id="s${sIdx}_cards">
                         <div class="part-card card-a" onclick="showPart(${sIdx}, 'A')">
                             <h3>PARTE A<br><small>Comprensión (4 ptos)</small></h3>
@@ -464,7 +485,6 @@
                         </div>
                     </div>
 
-                    <!-- VISTAS DETALLADAS -->
                     <div class="part-view" id="s${sIdx}_viewA">
                         <h3>A. COMPRENSIÓN DE UN TEXTO (4 PUNTOS) <button class="btn-back" onclick="showCards(${sIdx})">Volver</button></h3>
                         ${buildTable(sIdx, partA, 'a')}
@@ -480,7 +500,6 @@
                         ${buildTable(sIdx, partC, 'c')}
                     </div>
 
-                    <!-- FALTAS Y TOTAL (Global) -->
                     <div class="global-section" id="s${sIdx}_global">
                         <div class="faltas-box">
                             Faltas Totales del Examen (-0.1 pts/falta): 
@@ -491,7 +510,6 @@
                         </div>
                     </div>
 
-                    <!-- EXTRACCIÓN DE IDEAS -->
                     <details class="thematic-details">
                         <summary>Extracción de Ideas del Texto de Apoyo (Informativo, no altera la nota numérica)</summary>
                         <div class="thematic-content">${thematicHtml}</div>
@@ -512,7 +530,10 @@
             });
         }
 
+        // INICIAR PROGRAMA
+        initData();
         render();
+
     </script>
 </body>
 </html>
