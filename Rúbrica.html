@@ -3,232 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Examen Lengua Castellana - Rúbrica Completa</title>
+    <title>Rubrica de Evaluación - Sistema Avanzado</title>
     
-    <!-- ESTRUCTURA DE CONTROL DE DATOS INTERNOS -->
+    <!-- MEMORIA DE DATOS -->
     <script id="saved-data" type="application/json">{
         "download_time": 0,
         "data": {}
     }</script>
 
+    <!-- CONFIGURACIÓN DE LA ESTRUCTURA DEL EXAMEN -->
+    <script id="exam-config" type="application/json">{
+        "students": [
+            "Wenceslaa", "Julia (Mª del Pino)", "Carmelo", "Lupe", "Sonia",
+            "Fela", "Francisco", "Begoña", "Araceli", "Fefi",
+            "Eugenia", "Luz", "Víctor", "Pepe", "Javier",
+            "Domingo", "Olegario", "Luis"
+        ],
+        "partA": [
+            {"label": "1.1", "max": 1.0}, {"label": "1.2", "max": 1.0},
+            {"label": "1.3", "max": 1.0}, {"label": "1.4", "max": 1.0}
+        ],
+        "partB": [
+            {"label": "1.5", "max": 0.4}, {"label": "1.6", "max": 0.6},
+            {"label": "1.7", "max": 0.5}, {"label": "1.8", "max": 0.8},
+            {"label": "1.9", "max": 0.7}
+        ],
+        "partC": [
+            {"label": "Extensión mínima de 10 líneas", "max": 0.5},
+            {"label": "Estructura (encabezado, cuerpo y despedida)", "max": 0.5},
+            {"label": "Expresión escrita clara", "max": 0.2},
+            {"label": "Normas gramaticales y ortográficas", "max": 0.6},
+            {"label": "Ajuste a la temática, org. de ideas...", "max": 1.0},
+            {"label": "Presentación y limpieza", "max": 0.2}
+        ],
+        "questions": [
+            "1. ¿Menciona o reflexiona sobre la seguridad y los riesgos del mayor como PEATÓN?",
+            "2. ¿Trata las recomendaciones específicas para el mayor como CONDUCTOR?",
+            "3. ¿Incluye pautas o precauciones para el uso seguro del TRANSPORTE PÚBLICO?",
+            "4. ¿Vincula la seguridad vial con el mantenimiento de la AUTONOMÍA y la salud?",
+            "5. ¿Conecta los datos del texto de apoyo con la CONCIENCIACIÓN SOCIAL solicitada?"
+        ]
+    }</script>
+
     <style>
         :root {
-            --bg-color: #f4f7f6;
-            --text-color: #333;
-            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            --color-a: #3498db;
-            --color-b: #9b59b6;
-            --color-c: #e67e22;
+            --bg-color: #f4f7f6; --text-color: #333; --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --color-a: #3498db; --color-b: #9b59b6; --color-c: #e67e22;
         }
-        body {
-            font-family: var(--font-family);
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-        h1, h2 { text-align: center; color: #2c3e50; }
-        h1 { margin-bottom: 5px; }
-        h2 { font-size: 1.1rem; margin-bottom: 25px; font-weight: normal; color: #7f8c8d; }
-        
+        body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; }
+        h1, h2 { text-align: center; color: #2c3e50; } h1 { margin-bottom: 5px; } h2 { font-size: 1.1rem; margin-bottom: 25px; font-weight: normal; color: #7f8c8d; }
         .container { max-width: 950px; margin: 0 auto; }
         
-        /* Controles Globales */
-        .actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            background: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border-left: 5px solid #3498db;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-            color: white;
-            transition: opacity 0.2s;
-        }
+        .actions { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #3498db; margin-bottom: 20px; }
+        .btn { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.95rem; font-weight: bold; color: white; transition: opacity 0.2s; display: inline-flex; align-items: center; gap: 5px; margin: 5px; }
         .btn:hover { opacity: 0.85; }
-        .btn-save { background-color: #3498db; }
-        .btn-export { background-color: #27ae60; }
-        .btn-clear { background-color: #e74c3c; }
+        .btn-save { background-color: #3498db; } .btn-export { background-color: #27ae60; } .btn-clear { background-color: #e74c3c; } .btn-edit { background-color: #f39c12; } .btn-pdf { background-color: #8e44ad; }
 
-        /* Estilos del Desplegable Principal */
-        details.student-detail {
-            margin-bottom: 15px;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            background: #fff;
-        }
-        details.student-detail > summary {
-            padding: 18px 20px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            list-style: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            color: #fff;
-            transition: opacity 0.2s;
-        }
+        details.student-detail { margin-bottom: 15px; border-radius: 8px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1); background: #fff; }
+        details.student-detail > summary { padding: 15px 20px; font-size: 1.1rem; font-weight: bold; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; color: #fff; }
         details.student-detail > summary::-webkit-details-marker { display: none; }
-        details.student-detail > summary:hover { opacity: 0.9; }
         
-        /* Contenedor del nombre y el botón de borrar individual */
-        .summary-left {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
+        .summary-left { display: flex; align-items: center; gap: 10px; }
+        .btn-icon { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); border-radius: 4px; color: white; cursor: pointer; padding: 4px 8px; font-size: 1rem; transition: background 0.2s; }
+        .btn-icon:hover { background: rgba(0,0,0,0.2); }
+        .btn-icon.del:hover { background: #e74c3c; border-color: #c0392b; }
         
-        .btn-delete-student {
-            background-color: rgba(255, 255, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            border-radius: 4px;
-            color: white;
-            cursor: pointer;
-            padding: 5px 8px;
-            font-size: 1.1rem;
-            transition: background-color 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .btn-delete-student:hover {
-            background-color: rgba(231, 76, 60, 0.8); /* Rojo al pasar el ratón */
-            border-color: #e74c3c;
-        }
-
-        .header-score {
-            background: rgba(0,0,0,0.2);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 1.1rem;
-        }
-
+        .header-score { background: rgba(0,0,0,0.2); padding: 4px 12px; border-radius: 20px; font-size: 1.05rem; }
         .content { padding: 20px; background: #fafafa; }
 
-        /* Botones de las 3 Partes */
-        .cards-container {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        .part-card {
-            flex: 1;
-            border-radius: 12px;
-            padding: 20px 10px;
-            text-align: center;
-            cursor: pointer;
-            color: white;
-            transition: transform 0.2s, box-shadow 0.2s;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        .part-card:hover { transform: translateY(-3px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
-        .part-card.card-a { background-color: var(--color-a); }
-        .part-card.card-b { background-color: var(--color-b); }
-        .part-card.card-c { background-color: var(--color-c); }
-        
-        .part-card h3 { margin: 0 0 10px 0; font-size: 1.1rem; }
-        .part-card .score-display { font-size: 1.5rem; font-weight: bold; background: rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 8px; }
+        .cards-container { display: flex; gap: 15px; margin-bottom: 20px; }
+        .part-card { flex: 1; border-radius: 12px; padding: 15px 10px; text-align: center; cursor: pointer; color: white; transition: transform 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .part-card:hover { transform: translateY(-3px); }
+        .part-card.card-a { background-color: var(--color-a); } .part-card.card-b { background-color: var(--color-b); } .part-card.card-c { background-color: var(--color-c); }
+        .part-card h3 { margin: 0 0 10px 0; font-size: 1rem; } .score-display { font-size: 1.4rem; font-weight: bold; background: rgba(255,255,255,0.2); padding: 5px 10px; border-radius: 8px; }
 
-        /* Vistas interiores de las Partes */
-        .part-view {
-            display: none;
-            background: #fff;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-            border: 1px solid #eee;
-        }
+        .part-view { display: none; background: #fff; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #eee; }
         .part-view h3 { margin-top: 0; display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; border-bottom: 2px solid #eee; }
-        .btn-back { background: #7f8c8d; color: white; padding: 6px 15px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; font-size: 0.9rem; }
-        .btn-back:hover { background: #95a5a6; }
-
-        /* Tablas */
-        table { width: 100%; border-collapse: collapse; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
-        th { font-weight: 600; color: #333; background: #f9f9f9; }
-        input[type="number"] {
-            width: 80px;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 1rem;
-            text-align: center;
-        }
-        input[type="number"]::placeholder { color: #aaa; font-size: 0.85rem; }
-
-        /* Faltas y Total */
-        .global-section {
-            background: #fff;
-            border-radius: 8px;
-            padding: 15px 20px;
-            margin-top: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border: 1px solid #e0e0e0;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        .faltas-box { display: flex; align-items: center; gap: 10px; font-weight: bold; color: #c0392b; }
-        .faltas-box input { border-color: #e74c3c; color: #c0392b; font-weight: bold; }
+        .btn-back { background: #7f8c8d; color: white; padding: 6px 15px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; }
         
-        .total-box { font-size: 1.2rem; font-weight: bold; color: #2c3e50; }
-        .total-box span { font-size: 1.6rem; color: #27ae60; background: #eef7f2; padding: 5px 15px; border-radius: 8px; margin-left: 10px; border: 1px solid #cce5d6; }
+        table { width: 100%; border-collapse: collapse; } th, td { text-align: left; padding: 10px; border-bottom: 1px solid #ddd; }
+        th { background: #f9f9f9; } input[type="number"] { width: 70px; padding: 6px; border: 1px solid #ccc; border-radius: 4px; text-align: center; }
 
-        /* Acordeón Temático */
-        details.thematic-details {
-            margin-top: 15px;
-            border-radius: 6px;
-            border: 1px solid #bdc3c7;
-            background: #fff;
-        }
-        details.thematic-details > summary {
-            padding: 12px 15px;
-            font-weight: bold;
-            color: #2c3e50;
-            cursor: pointer;
-            background: #ecf0f1;
-        }
-        .thematic-content { padding: 15px; }
-        .question-row { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dashed #eee; }
-        .question-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-        .question-text { font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; color: #444; }
-        .options-group { display: flex; gap: 10px; flex-wrap: wrap; }
-        .opt-btn {
-            padding: 6px 14px; border: 1px solid #ccc; background: #fff;
-            border-radius: 20px; cursor: pointer; font-size: 0.85rem; color: #666;
-        }
-        .opt-btn.active-mucho { background-color: #2ecc71 !important; color: white !important; border-color: #27ae60 !important; font-weight: bold; }
-        .opt-btn.active-bastante { background-color: #3498db !important; color: white !important; border-color: #2980b9 !important; font-weight: bold; }
-        .opt-btn.active-poco { background-color: #e67e22 !important; color: white !important; border-color: #d35400 !important; font-weight: bold; }
-        .opt-btn.active-nada { background-color: #e74c3c !important; color: white !important; border-color: #c0392b !important; font-weight: bold; }
+        .global-section { background: #fff; border-radius: 8px; padding: 15px 20px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #e0e0e0; flex-wrap: wrap; gap: 15px; }
+        .faltas-box { font-weight: bold; color: #c0392b; } .faltas-box input { border-color: #e74c3c; color: #c0392b; font-weight: bold; }
+        .total-box { font-size: 1.2rem; font-weight: bold; color: #2c3e50; } .total-box span { font-size: 1.6rem; color: #27ae60; background: #eef7f2; padding: 5px 15px; border-radius: 8px; margin-left: 10px; }
 
-        @media(max-width: 768px) {
-            .cards-container { flex-direction: column; }
-            .global-section { flex-direction: column; align-items: stretch; }
-            .total-box { text-align: center; margin-top: 10px; }
-            .options-group { flex-direction: column; }
-        }
+        details.thematic-details { margin-top: 15px; border-radius: 6px; border: 1px solid #bdc3c7; background: #fff; }
+        details.thematic-details > summary { padding: 12px 15px; font-weight: bold; color: #2c3e50; cursor: pointer; background: #ecf0f1; }
+        .thematic-content { padding: 15px; } .question-row { margin-bottom: 15px; border-bottom: 1px dashed #eee; padding-bottom: 10px; }
+        .question-text { font-weight: 600; margin-bottom: 8px; font-size: 0.95rem; } .options-group { display: flex; gap: 10px; flex-wrap: wrap; }
+        .opt-btn { padding: 6px 14px; border: 1px solid #ccc; background: #fff; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
+        .opt-btn.active-mucho { background: #2ecc71; color: white; border-color: #27ae60; font-weight: bold; } .opt-btn.active-bastante { background: #3498db; color: white; border-color: #2980b9; font-weight: bold; } .opt-btn.active-poco { background: #e67e22; color: white; border-color: #d35400; font-weight: bold; } .opt-btn.active-nada { background: #e74c3c; color: white; border-color: #c0392b; font-weight: bold; }
+
+        /* EDITOR MODAL */
+        #editorModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1000; overflow-y: auto; }
+        .editor-content { background: white; max-width: 800px; margin: 40px auto; padding: 25px; border-radius: 8px; }
+        .editor-group { margin-bottom: 20px; } .editor-group h4 { margin: 0 0 10px 0; color: #2980b9; }
+        .editor-group textarea { width: 100%; box-sizing: border-box; font-family: monospace; padding: 10px; border: 1px solid #ccc; border-radius: 4px; }
+        .help-text { font-size: 0.85rem; color: #7f8c8d; margin-bottom: 5px; }
     </style>
 </head>
 <body>
@@ -238,117 +110,108 @@
         <h2>Evaluación de Comprensión, Lengua y Redacción</h2>
         
         <div class="actions">
-            <div>
-                <p style="margin: 0 0 5px 0;"><strong>💾 Estado Actual:</strong> <span id="save-status" style="color:#2c3e50; font-weight:bold;">Listo para evaluar</span></p>
-                <p style="margin: 0; font-size:0.9rem; color: #555;">Pulsa el botón azul para asegurar tus notas localmente antes de recargar la pestaña.</p>
+            <div style="width: 100%; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 10px;">
+                <div>
+                    <span id="save-status" style="color:#2c3e50; font-weight:bold;">Estado: Listo</span>
+                </div>
+                <button class="btn btn-edit" onclick="abrirEditor()">⚙️ Editar Configuración del Examen</button>
             </div>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="btn btn-save" onclick="guardarEnNavegador(true)">1. Guardar en Navegador</button>
-                <button class="btn btn-export" onclick="exportarArchivo()">2. Descargar Archivo (.html)</button>
-                <button class="btn btn-clear" onclick="borrarTodo()">Borrar Todo</button>
+            <div style="display: flex; gap: 5px; flex-wrap: wrap; width: 100%; justify-content: center;">
+                <button class="btn btn-save" onclick="guardarEnNavegador(true)">💾 Guardar Datos</button>
+                <button class="btn btn-export" onclick="exportarArchivo()">📥 Descargar HTML (Aplicación+Notas)</button>
+                <button class="btn btn-pdf" onclick="imprimirTodosPDF()">🖨️ PDF: Todos los Alumnos</button>
+                <button class="btn btn-clear" onclick="borrarTodo()">🗑️ Borrar Todo</button>
             </div>
         </div>
 
         <div id="students-container"></div>
     </div>
 
+    <!-- VENTANA DEL EDITOR (OCULTA) -->
+    <div id="editorModal">
+        <div class="editor-content">
+            <h2>⚙️ Editor de la Rúbrica</h2>
+            <p>Aquí puedes modificar la estructura interna. Usa el formato indicado en los textos de ayuda.</p>
+            
+            <div class="editor-group">
+                <h4>Listado de Alumnos</h4>
+                <div class="help-text">Escribe un nombre por línea.</div>
+                <textarea id="edit-students" rows="6"></textarea>
+            </div>
+            
+            <div class="editor-group">
+                <h4>PARTE A (Comprensión)</h4>
+                <div class="help-text">Formato: <b>NombrePregunta | PuntuaciónMáxima</b> (Ej: 1.1 | 1.0). Una por línea.</div>
+                <textarea id="edit-partA" rows="4"></textarea>
+            </div>
+            
+            <div class="editor-group">
+                <h4>PARTE B (Lengua)</h4>
+                <div class="help-text">Formato: <b>NombrePregunta | PuntuaciónMáxima</b>. Una por línea.</div>
+                <textarea id="edit-partB" rows="5"></textarea>
+            </div>
+            
+            <div class="editor-group">
+                <h4>PARTE C (Redacción)</h4>
+                <div class="help-text">Formato: <b>Criterio | PuntuaciónMáxima</b>. Una por línea.</div>
+                <textarea id="edit-partC" rows="6"></textarea>
+            </div>
+            
+            <div class="editor-group">
+                <h4>Cuestiones Temáticas (Extracción de Ideas)</h4>
+                <div class="help-text">Escribe la pregunta completa, una por línea.</div>
+                <textarea id="edit-questions" rows="5"></textarea>
+            </div>
+
+            <div style="text-align: right; margin-top: 20px;">
+                <button class="btn" style="background:#7f8c8d;" onclick="cerrarEditor()">Cancelar</button>
+                <button class="btn btn-export" onclick="guardarEditor()">Guardar y Aplicar Cambios</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        const students = [
-            "Wenceslaa", "Julia (Mª del Pino)", "Carmelo", "Lupe", "Sonia",
-            "Fela", "Francisco", "Begoña", "Araceli", "Fefi",
-            "Eugenia", "Luz", "Víctor", "Pepe", "Javier",
-            "Domingo", "Olegario", "Luis"
-        ];
-
-        const partA = [
-            { id: 'a0', label: '1.1', max: 1.0 },
-            { id: 'a1', label: '1.2', max: 1.0 },
-            { id: 'a2', label: '1.3', max: 1.0 },
-            { id: 'a3', label: '1.4', max: 1.0 }
-        ];
-
-        const partB = [
-            { id: 'b0', label: '1.5', max: 0.4 },
-            { id: 'b1', label: '1.6', max: 0.6 },
-            { id: 'b2', label: '1.7', max: 0.5 },
-            { id: 'b3', label: '1.8', max: 0.8 },
-            { id: 'b4', label: '1.9', max: 0.7 }
-        ];
-
-        const partC = [
-            { id: 'c0', label: 'Extensión mínima de 10 líneas', max: 0.5 },
-            { id: 'c1', label: 'Estructura (encabezado, cuerpo y despedida)', max: 0.5 },
-            { id: 'c2', label: 'Expresión escrita clara', max: 0.2 },
-            { id: 'c3', label: 'Normas gramaticales y ortográficas', max: 0.6 },
-            { id: 'c4', label: 'Ajuste a la temática, org. de ideas, coherencia y vocabulario', max: 1.0 },
-            { id: 'c5', label: 'Presentación y limpieza', max: 0.2 }
-        ];
-
-        const thematicQuestions = [
-            "1. ¿Menciona o reflexiona sobre la seguridad y los riesgos del mayor como PEATÓN?",
-            "2. ¿Trata las recomendaciones específicas para el mayor como CONDUCTOR?",
-            "3. ¿Incluye pautas o precauciones para el uso seguro del TRANSPORTE PÚBLICO?",
-            "4. ¿Vincula la seguridad vial con el mantenimiento de la AUTONOMÍA y la salud?",
-            "5. ¿Conecta los datos del texto de apoyo con la CONCIENCIACIÓN SOCIAL solicitada?"
-        ];
-        const optionLabels = ["Mucho / Excelente", "Bastante / Adecuado", "Poco / Superficial", "Nada / No lo trata"];
-
-        const colors = [
-            "#34495e", "#8e44ad", "#2980b9", "#c0392b", "#d35400",
-            "#16a085", "#27ae60", "#f39c12", "#e67e22", "#e74c3c",
-            "#9b59b6", "#8e44ad", "#2c3e50", "#f1c40f", "#1abc9c",
-            "#2ecc71", "#3498db", "#95a5a6"
-        ];
-
+        let config = {};
         let state = {};
-        
-        // Inicialización y sincronización
-        function initData() {
+        const optionLabels = ["Mucho / Excelente", "Bastante / Adecuado", "Poco / Superficial", "Nada / No lo trata"];
+        const colors = ["#34495e", "#8e44ad", "#2980b9", "#c0392b", "#d35400", "#16a085", "#27ae60", "#f39c12", "#e67e22", "#e74c3c", "#9b59b6", "#8e44ad", "#2c3e50", "#f1c40f", "#1abc9c", "#2ecc71", "#3498db", "#95a5a6"];
+
+        // INICIALIZACIÓN
+        function initApp() {
+            // Cargar Configuración Estructural
+            config = JSON.parse(document.getElementById('exam-config').textContent);
+            
+            // Cargar Datos (Notas)
             let embeddedPayload = { download_time: 0, data: {} };
-            try {
-                embeddedPayload = JSON.parse(document.getElementById('saved-data').textContent);
-            } catch (e) {}
+            try { embeddedPayload = JSON.parse(document.getElementById('saved-data').textContent); } catch (e) {}
 
             let localPayload = null;
             try {
-                const rawLocal = localStorage.getItem('rubrica_examen_v5_timestamped');
+                const rawLocal = localStorage.getItem('rubrica_examen_v7_data');
                 if (rawLocal) localPayload = JSON.parse(rawLocal);
             } catch (e) {}
 
-            // Prioridad a datos locales si son más recientes
             if (localPayload && localPayload.last_saved > (embeddedPayload.download_time || 0)) {
                 state = localPayload.data || {};
             } else {
                 state = embeddedPayload.data || {};
             }
+            render();
         }
 
         function guardarEnNavegador(mostrarAlerta) {
             try {
-                const wrapper = {
-                    last_saved: Date.now(),
-                    data: state
-                };
-                localStorage.setItem('rubrica_examen_v5_timestamped', JSON.stringify(wrapper));
-                
-                const statusEl = document.getElementById('save-status');
-                statusEl.innerText = "✓ Notas Guardadas en el Navegador";
-                statusEl.style.color = "#3498db";
-                
-                if (mostrarAlerta) {
-                    alert("¡Notas guardadas localmente! Ya puedes recargar la página de forma segura sin perder los datos.");
-                }
-            } catch(e) {
-                document.getElementById('save-status').innerText = "⚠ Memoria local no disponible";
-            }
+                localStorage.setItem('rubrica_examen_v7_data', JSON.stringify({ last_saved: Date.now(), data: state }));
+                document.getElementById('save-status').innerText = "✓ Guardado Local";
+                document.getElementById('save-status').style.color = "#3498db";
+                if (mostrarAlerta) alert("Notas guardadas localmente.");
+            } catch(e) {}
         }
 
-        // --- FUNCIONES DE BORRADO ---
-        
         function borrarTodo() {
-            if(confirm("¿Seguro que quieres BORRAR TODAS LAS NOTAS de TODOS los alumnos? Esta acción no se puede deshacer.")) {
+            if(confirm("¿Seguro que quieres BORRAR TODAS LAS NOTAS?")) {
                 state = {};
-                localStorage.removeItem('rubrica_examen_v5_timestamped');
+                localStorage.removeItem('rubrica_examen_v7_data');
                 document.getElementById('saved-data').textContent = '{"download_time":0,"data":{}}';
                 guardarEnNavegador(false);
                 render();
@@ -356,255 +219,291 @@
         }
 
         function borrarAlumno(sIdx, event) {
-            // Evitar que el acordeón se abra/cierre al pulsar el botón de borrar
             event.stopPropagation();
-            event.preventDefault();
-
-            if(confirm(`¿Seguro que quieres borrar todas las notas de ${students[sIdx]}?`)) {
+            if(confirm(`¿Limpiar notas de ${config.students[sIdx]}?`)) {
                 delete state[sIdx];
                 guardarEnNavegador(false);
                 render();
-                
-                const statusEl = document.getElementById('save-status');
-                statusEl.innerText = `🗑️ Datos de ${students[sIdx]} borrados`;
-                statusEl.style.color = "#e74c3c";
-                setTimeout(() => {
-                    statusEl.innerText = "✓ Notas Guardadas en el Navegador";
-                    statusEl.style.color = "#3498db";
-                }, 2500);
             }
         }
 
+        // --- SISTEMA DE IMPRESIÓN (PDF NATIVO) ---
+        function generarHTMLInforme(sIdx) {
+            const student = config.students[sIdx];
+            const sData = state[sIdx] || {};
+            
+            // Calcular totales
+            let tA=0, tB=0, tC=0;
+            config.partA.forEach((item, i) => tA += (parseFloat(sData[`a${i}`]) || 0));
+            config.partB.forEach((item, i) => tB += (parseFloat(sData[`b${i}`]) || 0));
+            config.partC.forEach((item, i) => tC += (parseFloat(sData[`c${i}`]) || 0));
+            let faltas = parseInt(sData['faltas']) || 0;
+            let penalizacion = faltas * 0.1;
+            let notaFinal = (tA + tB + tC) - penalizacion;
+            if(notaFinal < 0) notaFinal = 0;
 
+            // Extraer solo las temáticas contestadas
+            let temasHtml = "";
+            config.questions.forEach((q, qIdx) => {
+                let ansIdx = sData[`q_${qIdx}`];
+                if (ansIdx !== undefined && ansIdx !== null && ansIdx !== "") {
+                    temasHtml += `<li style="margin-bottom:8px;"><strong>${q}</strong><br><span style="color:#2c3e50;">Respuesta: <em>${optionLabels[ansIdx]}</em></span></li>`;
+                }
+            });
+            if(temasHtml === "") temasHtml = "<p><em>No se evaluaron cuestiones temáticas.</em></p>";
+
+            return `
+                <div style="font-family: Arial, sans-serif; padding: 30px; border: 2px solid #333; margin-bottom: 40px; border-radius: 10px; page-break-inside: avoid;">
+                    <h2 style="text-align: center; border-bottom: 2px solid #ccc; padding-bottom: 10px; color: #2c3e50;">Informe de Calificación</h2>
+                    <h1 style="text-align: center; color: #34495e;">Alumno/a: ${student}</h1>
+                    
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 1.1rem;">
+                        <tr style="background: #ecf0f1;">
+                            <th style="padding: 10px; border: 1px solid #bdc3c7; text-align: left;">Bloque</th>
+                            <th style="padding: 10px; border: 1px solid #bdc3c7; text-align: center;">Puntuación</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7;">PARTE A: Comprensión de un texto (Max 4.0)</td>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7; text-align: center; font-weight: bold;">${tA.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7;">PARTE B: Conocimiento de Lengua (Max 3.0)</td>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7; text-align: center; font-weight: bold;">${tB.toFixed(2)}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7;">PARTE C: Redacción (Max 3.0)</td>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7; text-align: center; font-weight: bold;">${tC.toFixed(2)}</td>
+                        </tr>
+                        <tr style="background: #fdf2e9; color: #c0392b;">
+                            <td style="padding: 10px; border: 1px solid #bdc3c7;">Faltas de Ortografía (${faltas} faltas registradas)</td>
+                            <td style="padding: 10px; border: 1px solid #bdc3c7; text-align: center; font-weight: bold;">- ${penalizacion.toFixed(2)}</td>
+                        </tr>
+                        <tr style="background: #eef7f2; color: #27ae60; font-size: 1.3rem;">
+                            <th style="padding: 10px; border: 1px solid #bdc3c7; text-align: right;">NOTA GLOBAL EXAMEN:</th>
+                            <th style="padding: 10px; border: 1px solid #bdc3c7; text-align: center;">${notaFinal.toFixed(2)} / 10</th>
+                        </tr>
+                    </table>
+
+                    <div style="margin-top: 30px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #ddd;">
+                        <h3 style="margin-top:0; color:#34495e;">Análisis Temático de la Redacción</h3>
+                        <ul style="list-style-type: none; padding-left: 0;">
+                            ${temasHtml}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        function imprimirAlumnoPDF(sIdx, event) {
+            event.stopPropagation();
+            let htmlContent = generarHTMLInforme(sIdx);
+            ejecutarImpresion(htmlContent, `Informe_${config.students[sIdx].replace(/\s+/g, '_')}`);
+        }
+
+        function imprimirTodosPDF() {
+            let htmlContent = "";
+            for(let i=0; i<config.students.length; i++) {
+                htmlContent += generarHTMLInforme(i);
+            }
+            ejecutarImpresion(htmlContent, "Informe_Todos_Alumnos");
+        }
+
+        function ejecutarImpresion(htmlBody, title) {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>${title}</title>
+                    <style>
+                        @media print { body { -webkit-print-color-adjust: exact; } }
+                    </style>
+                </head>
+                <body>
+                    ${htmlBody}
+                    <script>
+                        window.onload = function() { window.print(); setTimeout(function(){ window.close(); }, 500); }
+                    <\/script>
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+
+        // --- SISTEMA DE EXPORTACIÓN HTML ---
         function exportarArchivo() {
             try {
-                const payloadToEmbed = {
-                    download_time: Date.now(),
-                    data: state
-                };
+                // Actualizamos configuraciones y datos
+                document.getElementById('exam-config').textContent = JSON.stringify(config);
+                document.getElementById('saved-data').textContent = JSON.stringify({ download_time: Date.now(), data: state });
                 
-                document.getElementById('saved-data').textContent = JSON.stringify(payloadToEmbed);
-                
-                let htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
-                const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+                let htmlStr = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+                const blob = new Blob([htmlStr], { type: 'text/html;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
-                
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
-                a.download = "Rubrica_Examen_Notas_Fijadas.html";
+                a.download = "Examen_Personalizado_Notas.html";
                 document.body.appendChild(a);
                 a.click();
-                
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 100);
-                
-                document.getElementById('save-status').innerText = "✓ Nuevo archivo exportado correctamente";
-                document.getElementById('save-status').style.color = "#27ae60";
-            } catch(e) {
-                alert("Hubo un error al descargar el archivo.");
-            }
+                setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+            } catch(e) { alert("Error al exportar."); }
         }
 
-        function showPart(sIdx, part) {
-            document.getElementById(`s${sIdx}_cards`).style.display = 'none';
-            document.getElementById(`s${sIdx}_global`).style.display = 'none';
-            document.getElementById(`s${sIdx}_viewA`).style.display = part === 'A' ? 'block' : 'none';
-            document.getElementById(`s${sIdx}_viewB`).style.display = part === 'B' ? 'block' : 'none';
-            document.getElementById(`s${sIdx}_viewC`).style.display = part === 'C' ? 'block' : 'none';
+        // --- EDITOR MODAL LÓGICA ---
+        function arrToText(arr, isParts) {
+            if(!isParts) return arr.join("\n");
+            return arr.map(i => `${i.label} | ${i.max}`).join("\n");
         }
-
-        function showCards(sIdx) {
-            document.getElementById(`s${sIdx}_cards`).style.display = 'flex';
-            document.getElementById(`s${sIdx}_global`).style.display = 'flex';
-            document.getElementById(`s${sIdx}_viewA`).style.display = 'none';
-            document.getElementById(`s${sIdx}_viewB`).style.display = 'none';
-            document.getElementById(`s${sIdx}_viewC`).style.display = 'none';
-        }
-
-        function calculatePart(sIdx, partArray, prefix) {
-            let total = 0;
-            partArray.forEach((item, i) => {
-                const el = document.getElementById(`s${sIdx}_${prefix}${i}`);
-                let val = 0;
-                if (el.value !== "") {
-                    val = parseFloat(el.value);
-                    if (isNaN(val)) val = 0;
-                    if (val > item.max) { val = item.max; el.value = val; }
-                    if (val < 0) { val = 0; el.value = 0; }
-                }
-                total += val;
-                if(!state[sIdx]) state[sIdx] = {};
-                state[sIdx][`${prefix}${i}`] = el.value !== "" ? val : "";
+        function textToArr(text, isParts) {
+            const lines = text.trim().split("\n").filter(l => l.trim() !== "");
+            if(!isParts) return lines;
+            return lines.map(l => {
+                let p = l.split("|");
+                return { label: p[0] ? p[0].trim() : "Pregunta", max: parseFloat(p[1]) || 1.0 };
             });
-            return total;
+        }
+
+        function abrirEditor() {
+            document.getElementById('edit-students').value = arrToText(config.students, false);
+            document.getElementById('edit-partA').value = arrToText(config.partA, true);
+            document.getElementById('edit-partB').value = arrToText(config.partB, true);
+            document.getElementById('edit-partC').value = arrToText(config.partC, true);
+            document.getElementById('edit-questions').value = arrToText(config.questions, false);
+            document.getElementById('editorModal').style.display = 'block';
+        }
+        function cerrarEditor() { document.getElementById('editorModal').style.display = 'none'; }
+        
+        function guardarEditor() {
+            config.students = textToArr(document.getElementById('edit-students').value, false);
+            config.partA = textToArr(document.getElementById('edit-partA').value, true);
+            config.partB = textToArr(document.getElementById('edit-partB').value, true);
+            config.partC = textToArr(document.getElementById('edit-partC').value, true);
+            config.questions = textToArr(document.getElementById('edit-questions').value, false);
+            
+            // Re-inyectar config
+            document.getElementById('exam-config').textContent = JSON.stringify(config);
+            cerrarEditor();
+            render(); // Re-renderizar interfaz con nuevos datos
+            alert("Estructura actualizada. Las notas previas que coincidan en posición se mantendrán.");
+        }
+
+        // --- VISTAS Y TABLAS ---
+        function toggleView(sIdx, part) {
+            const views = ['A','B','C'];
+            const showing = document.getElementById(`s${sIdx}_view${part}`).style.display === 'block';
+            views.forEach(v => document.getElementById(`s${sIdx}_view${v}`).style.display = 'none');
+            document.getElementById(`s${sIdx}_cards`).style.display = showing ? 'flex' : 'none';
+            document.getElementById(`s${sIdx}_global`).style.display = showing ? 'flex' : 'none';
+            if(!showing) document.getElementById(`s${sIdx}_view${part}`).style.display = 'block';
+        }
+
+        function calc(sIdx, arr, pref) {
+            let tot = 0;
+            arr.forEach((item, i) => {
+                const el = document.getElementById(`s${sIdx}_${pref}${i}`);
+                let v = 0;
+                if(el && el.value !== "") {
+                    v = parseFloat(el.value) || 0;
+                    if(v > item.max) { v = item.max; el.value = v; }
+                    if(v < 0) { v = 0; el.value = 0; }
+                }
+                tot += v;
+                if(!state[sIdx]) state[sIdx] = {};
+                state[sIdx][`${pref}${i}`] = (el && el.value !== "") ? v : "";
+            });
+            return tot;
         }
 
         function updateScore(sIdx) {
-            const totalA = calculatePart(sIdx, partA, 'a');
-            const totalB = calculatePart(sIdx, partB, 'b');
-            const totalC = calculatePart(sIdx, partC, 'c');
-
-            const faltasEl = document.getElementById(`s${sIdx}_faltas`);
-            let faltas = 0;
-            if (faltasEl.value !== "") {
-                faltas = parseInt(faltasEl.value);
-                if (isNaN(faltas) || faltas < 0) { faltas = 0; faltasEl.value = 0; }
-            }
+            const tA = calc(sIdx, config.partA, 'a');
+            const tB = calc(sIdx, config.partB, 'b');
+            const tC = calc(sIdx, config.partC, 'c');
+            
+            const fel = document.getElementById(`s${sIdx}_faltas`);
+            let f = 0;
+            if(fel && fel.value !== "") { f = parseInt(fel.value) || 0; if(f<0){f=0;fel.value=0;} }
             if(!state[sIdx]) state[sIdx] = {};
-            state[sIdx]['faltas'] = faltasEl.value !== "" ? faltas : "";
+            state[sIdx]['faltas'] = (fel && fel.value !== "") ? f : "";
 
-            document.getElementById(`s${sIdx}_btnA_score`).innerText = totalA.toFixed(2);
-            document.getElementById(`s${sIdx}_btnB_score`).innerText = totalB.toFixed(2);
-            document.getElementById(`s${sIdx}_btnC_score`).innerText = totalC.toFixed(2);
+            if(document.getElementById(`s${sIdx}_btnA_score`)) document.getElementById(`s${sIdx}_btnA_score`).innerText = tA.toFixed(2);
+            if(document.getElementById(`s${sIdx}_btnB_score`)) document.getElementById(`s${sIdx}_btnB_score`).innerText = tB.toFixed(2);
+            if(document.getElementById(`s${sIdx}_btnC_score`)) document.getElementById(`s${sIdx}_btnC_score`).innerText = tC.toFixed(2);
 
-            let notaFinal = (totalA + totalB + totalC) - (faltas * 0.1);
-            if (notaFinal < 0) notaFinal = 0;
-
-            const finalStr = notaFinal.toFixed(2);
-            document.getElementById(`s${sIdx}_total`).innerText = finalStr + " / 10";
-            document.getElementById(`s${sIdx}_header_score`).innerText = finalStr;
-
-            // Auto-guardado de fondo para máxima seguridad
+            let fin = (tA + tB + tC) - (f * 0.1); if(fin < 0) fin = 0;
+            if(document.getElementById(`s${sIdx}_total`)) document.getElementById(`s${sIdx}_total`).innerText = fin.toFixed(2) + " / 10";
+            if(document.getElementById(`s${sIdx}_header_score`)) document.getElementById(`s${sIdx}_header_score`).innerText = fin.toFixed(2);
             guardarEnNavegador(false);
         }
 
-        function selectThematic(sIdx, qIdx, optIdx) {
-            if(!state[sIdx]) state[sIdx] = {};
-            state[sIdx][`q_${qIdx}`] = optIdx;
-            guardarEnNavegador(false);
-            
+        function selThem(sIdx, qIdx, oIdx) {
+            if(!state[sIdx]) state[sIdx] = {}; state[sIdx][`q_${qIdx}`] = oIdx; guardarEnNavegador(false);
             for(let i=0; i<4; i++) {
-                const btn = document.getElementById(`s${sIdx}_q${qIdx}_o${i}`);
-                btn.className = 'opt-btn'; 
-                if(i === optIdx) {
-                    if(i === 0) btn.classList.add('active-mucho');
-                    if(i === 1) btn.classList.add('active-bastante');
-                    if(i === 2) btn.classList.add('active-poco');
-                    if(i === 3) btn.classList.add('active-nada');
+                let b = document.getElementById(`s${sIdx}_q${qIdx}_o${i}`);
+                if(b) {
+                    b.className = 'opt-btn';
+                    if(i===oIdx) {
+                        if(i===0) b.classList.add('active-mucho'); if(i===1) b.classList.add('active-bastante');
+                        if(i===2) b.classList.add('active-poco'); if(i===3) b.classList.add('active-nada');
+                    }
                 }
             }
         }
 
-        function buildTable(sIdx, partArray, prefix) {
-            let html = `<table><thead><tr><th style="width:75%">Criterio</th><th style="width:25%">Nota</th></tr></thead><tbody>`;
-            partArray.forEach((item, i) => {
-                const savedVal = state[sIdx] && state[sIdx][`${prefix}${i}`] !== undefined ? state[sIdx][`${prefix}${i}`] : '';
-                const displayVal = savedVal !== "" && savedVal !== null ? savedVal : "";
-                html += `
-                    <tr>
-                        <td>${item.label}</td>
-                        <td>
-                            <input type="number" id="s${sIdx}_${prefix}${i}" step="0.1" min="0" max="${item.max}" value="${displayVal}" placeholder="Máx: ${item.max}" oninput="updateScore(${sIdx})">
-                        </td>
-                    </tr>
-                `;
+        function bTable(sIdx, arr, pref) {
+            let html = `<table><thead><tr><th>Criterio</th><th>Nota</th></tr></thead><tbody>`;
+            arr.forEach((item, i) => {
+                const val = (state[sIdx] && state[sIdx][`${pref}${i}`] !== undefined && state[sIdx][`${pref}${i}`] !== "") ? state[sIdx][`${pref}${i}`] : "";
+                html += `<tr><td>${item.label}</td><td><input type="number" id="s${sIdx}_${pref}${i}" step="0.1" min="0" max="${item.max}" value="${val}" placeholder="Máx:${item.max}" oninput="updateScore(${sIdx})"></td></tr>`;
             });
-            html += `</tbody></table>`;
-            return html;
+            return html + `</tbody></table>`;
         }
 
         function render() {
-            const container = document.getElementById('students-container');
-            container.innerHTML = ""; 
-            
-            students.forEach((student, sIdx) => {
-                const color = colors[sIdx % colors.length];
-                const savedFaltas = state[sIdx] && state[sIdx]['faltas'] !== undefined ? state[sIdx]['faltas'] : '';
-                const displayFaltas = savedFaltas !== "" && savedFaltas !== null ? savedFaltas : "";
+            const cont = document.getElementById('students-container'); cont.innerHTML = "";
+            config.students.forEach((student, sIdx) => {
+                const col = colors[sIdx % colors.length];
+                const sFaltas = (state[sIdx] && state[sIdx]['faltas'] !== undefined && state[sIdx]['faltas'] !== "") ? state[sIdx]['faltas'] : "";
                 
-                const details = document.createElement('details');
-                details.className = 'student-detail';
-                
-                const summary = document.createElement('summary');
-                summary.style.backgroundColor = color;
-                
-                // AÑADIDO: Botón de papelera 🗑️ individual
-                summary.innerHTML = `
-                    <div class="summary-left">
-                        <button class="btn-delete-student" onclick="borrarAlumno(${sIdx}, event)" title="Borrar datos de ${student}">🗑️</button>
-                        <span>${sIdx + 1}. ${student}</span>
-                    </div>
-                    <span class="header-score">Total: <span id="s${sIdx}_header_score">0.00</span> / 10</span>
-                `;
-                
-                const content = document.createElement('div');
-                content.className = 'content';
-
-                let thematicHtml = '';
-                thematicQuestions.forEach((qText, qIdx) => {
-                    thematicHtml += `<div class="question-row"><div class="question-text">${qText}</div><div class="options-group">`;
-                    optionLabels.forEach((optLabel, oIdx) => {
-                        thematicHtml += `<button type="button" class="opt-btn" id="s${sIdx}_q${qIdx}_o${oIdx}" onclick="selectThematic(${sIdx}, ${qIdx}, ${oIdx})">${optLabel}</button>`;
-                    });
-                    thematicHtml += `</div></div>`;
+                let thHtml = '';
+                config.questions.forEach((q, qIdx) => {
+                    thHtml += `<div class="question-row"><div class="question-text">${q}</div><div class="options-group">`;
+                    optionLabels.forEach((ol, oIdx) => { thHtml += `<button type="button" class="opt-btn" id="s${sIdx}_q${qIdx}_o${oIdx}" onclick="selThem(${sIdx}, ${qIdx}, ${oIdx})">${ol}</button>`; });
+                    thHtml += `</div></div>`;
                 });
 
-                content.innerHTML = `
-                    <div class="cards-container" id="s${sIdx}_cards">
-                        <div class="part-card card-a" onclick="showPart(${sIdx}, 'A')">
-                            <h3>PARTE A<br><small>Comprensión (4 ptos)</small></h3>
-                            <div class="score-display" id="s${sIdx}_btnA_score">0.00</div>
+                const det = document.createElement('details'); det.className = 'student-detail';
+                det.innerHTML = `
+                    <summary style="background:${col};">
+                        <div class="summary-left">
+                            <button class="btn-icon del" onclick="borrarAlumno(${sIdx}, event)" title="Borrar datos">🗑️</button>
+                            <button class="btn-icon" onclick="imprimirAlumnoPDF(${sIdx}, event)" title="Exportar PDF de ${student}">📄</button>
+                            <span>${sIdx + 1}. ${student}</span>
                         </div>
-                        <div class="part-card card-b" onclick="showPart(${sIdx}, 'B')">
-                            <h3>PARTE B<br><small>Lengua (3 ptos)</small></h3>
-                            <div class="score-display" id="s${sIdx}_btnB_score">0.00</div>
+                        <span class="header-score">Total: <span id="s${sIdx}_header_score">0.00</span> / 10</span>
+                    </summary>
+                    <div class="content">
+                        <div class="cards-container" id="s${sIdx}_cards">
+                            <div class="part-card card-a" onclick="toggleView(${sIdx}, 'A')"><h3>PARTE A<br><small>Comprensión</small></h3><div class="score-display" id="s${sIdx}_btnA_score">0.00</div></div>
+                            <div class="part-card card-b" onclick="toggleView(${sIdx}, 'B')"><h3>PARTE B<br><small>Lengua</small></h3><div class="score-display" id="s${sIdx}_btnB_score">0.00</div></div>
+                            <div class="part-card card-c" onclick="toggleView(${sIdx}, 'C')"><h3>PARTE C<br><small>Redacción</small></h3><div class="score-display" id="s${sIdx}_btnC_score">0.00</div></div>
                         </div>
-                        <div class="part-card card-c" onclick="showPart(${sIdx}, 'C')">
-                            <h3>PARTE C<br><small>Redacción (3 ptos)</small></h3>
-                            <div class="score-display" id="s${sIdx}_btnC_score">0.00</div>
+                        <div class="part-view" id="s${sIdx}_viewA"><h3>A. COMPRENSIÓN <button class="btn-back" onclick="toggleView(${sIdx}, 'A')">Volver</button></h3>${bTable(sIdx, config.partA, 'a')}</div>
+                        <div class="part-view" id="s${sIdx}_viewB"><h3>B. LENGUA <button class="btn-back" onclick="toggleView(${sIdx}, 'B')">Volver</button></h3>${bTable(sIdx, config.partB, 'b')}</div>
+                        <div class="part-view" id="s${sIdx}_viewC"><h3>C. REDACCIÓN <button class="btn-back" onclick="toggleView(${sIdx}, 'C')">Volver</button></h3>${bTable(sIdx, config.partC, 'c')}</div>
+                        
+                        <div class="global-section" id="s${sIdx}_global">
+                            <div class="faltas-box">Faltas Ortografía (-0.1/falta): <input type="number" id="s${sIdx}_faltas" min="0" value="${sFaltas}" placeholder="0" oninput="updateScore(${sIdx})"></div>
+                            <div class="total-box">NOTA FINAL: <span id="s${sIdx}_total">0.00 / 10</span></div>
                         </div>
-                    </div>
-
-                    <div class="part-view" id="s${sIdx}_viewA">
-                        <h3>A. COMPRENSIÓN DE UN TEXTO (4 PUNTOS) <button class="btn-back" onclick="showCards(${sIdx})">Volver</button></h3>
-                        ${buildTable(sIdx, partA, 'a')}
-                    </div>
-
-                    <div class="part-view" id="s${sIdx}_viewB">
-                        <h3>B. CONOCIMIENTO DE LENGUA (3 PUNTOS) <button class="btn-back" onclick="showCards(${sIdx})">Volver</button></h3>
-                        ${buildTable(sIdx, partB, 'b')}
-                    </div>
-
-                    <div class="part-view" id="s${sIdx}_viewC">
-                        <h3>C. REDACCIÓN DE UN TEXTO EN LENGUA CASTELLANA (3 PUNTOS) <button class="btn-back" onclick="showCards(${sIdx})">Volver</button></h3>
-                        ${buildTable(sIdx, partC, 'c')}
-                    </div>
-
-                    <div class="global-section" id="s${sIdx}_global">
-                        <div class="faltas-box">
-                            Faltas Totales del Examen (-0.1 pts/falta): 
-                            <input type="number" id="s${sIdx}_faltas" step="1" min="0" value="${displayFaltas}" placeholder="Cant." oninput="updateScore(${sIdx})">
-                        </div>
-                        <div class="total-box">
-                            NOTA FINAL: <span id="s${sIdx}_total">0.00 / 10</span>
-                        </div>
-                    </div>
-
-                    <details class="thematic-details">
-                        <summary>Extracción de Ideas del Texto de Apoyo (Informativo, no altera la nota numérica)</summary>
-                        <div class="thematic-content">${thematicHtml}</div>
-                    </details>
-                `;
-
-                details.appendChild(summary);
-                details.appendChild(content);
-                container.appendChild(details);
-
+                        
+                        <details class="thematic-details"><summary>Análisis Temático (No altera nota)</summary><div class="thematic-content">${thHtml}</div></details>
+                    </div>`;
+                cont.appendChild(det);
                 updateScore(sIdx);
-
-                thematicQuestions.forEach((_, qIdx) => {
-                    if (state[sIdx] && state[sIdx][`q_${qIdx}`] !== undefined) {
-                        selectThematic(sIdx, qIdx, state[sIdx][`q_${qIdx}`]);
-                    }
-                });
+                config.questions.forEach((_, qIdx) => { if (state[sIdx] && state[sIdx][`q_${qIdx}`] !== undefined) selThem(sIdx, qIdx, state[sIdx][`q_${qIdx}`]); });
             });
         }
-
-        initData();
-        render();
+        initApp();
     </script>
 </body>
 </html>
