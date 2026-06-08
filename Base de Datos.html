@@ -3,99 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base de Datos</title>
+    <title>Base de Datos - Sistema Avanzado</title>
+    
     <style>
-        /* VARIABLES Y ESTILOS BASE */
+        /* ESTÉTICA BASADA EN RÚBRICAS 13 Y 14 */
         :root {
-            --primary: #2563eb; --primary-dark: #1e40af; --dark: #0f172a; 
-            --bg: #f8fafc; --text: #334155; --border: #cbd5e1;
-            --trans: all 0.3s ease;
-            --slider-color: #3b82f6; /* Cambia dinámicamente */
+            --bg-color: #f4f7f6; --text-color: #333; --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --primary: #3498db; --success: #27ae60; --danger: #e74c3c; --warning: #f39c12; --dark: #2c3e50;
+            --trans: all 0.4s ease;
+            
+            /* Colores Filtro Edad */
+            --age-18: #3498db; /* Azul */
+            --age-31: #27ae60; /* Verde */
+            --age-41: #f1c40f; /* Amarillo */
+            --age-51: #e67e22; /* Naranja */
+            --age-61: #e74c3c; /* Rojo */
         }
         
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 0; padding-bottom: 100px; }
+        body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; padding-bottom: 80px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
         button { cursor: pointer; border: none; font-family: inherit; transition: var(--trans); }
-        input, select, textarea { font-family: inherit; transition: var(--trans); }
-        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); }
-        
+        input, select { font-family: inherit; transition: var(--trans); }
+        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2); }
+
         .hidden { opacity: 0; visibility: hidden; max-height: 0; overflow: hidden; margin: 0 !important; padding: 0 !important; border: none !important; }
-        .visible { opacity: 1; visibility: visible; max-height: 3000px; }
+        .visible { opacity: 1; visibility: visible; max-height: 5000px; }
 
-        /* BANNER GIGANTE CENTRAL */
-        .banner { background: var(--dark); color: white; padding: 30px 40px; display: flex; align-items: center; justify-content: center; position: relative; box-shadow: 0 4px 15px rgba(0,0,0,0.15); }
-        .banner h1 { margin: 0; font-size: 3rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
-        .btn-ajustes { position: absolute; right: 40px; top: 50%; transform: translateY(-50%); text-align: center; color: white; cursor: pointer; padding: 10px; border-radius: 8px; transition: var(--trans); }
-        .btn-ajustes:hover { background: rgba(255,255,255,0.1); }
-        .btn-ajustes span { font-size: 1.8rem; display: block; margin-bottom: 5px; }
-
-        /* PESTAÑAS */
-        .tabs { display: flex; gap: 5px; padding: 0 40px; background: #e2e8f0; border-bottom: 2px solid var(--border); }
-        .tab { padding: 15px 35px; background: transparent; font-weight: bold; font-size: 1.1rem; color: #64748b; border-radius: 8px 8px 0 0; margin-top: 10px; }
-        .tab.active { background: var(--bg); color: var(--primary); border-top: 4px solid var(--primary); }
-
-        .container { max-width: 1300px; margin: 30px auto; padding: 0 20px; }
-
-        /* TÍTULO EDITABLE */
-        .titulo-lista { font-size: 1.8rem; font-weight: bold; color: var(--dark); border: 2px solid transparent; padding: 5px 10px; border-radius: 6px; display: inline-block; margin-bottom: 20px; width: 100%; box-sizing: border-box;}
-        body.modo-edicion .titulo-lista { border-color: var(--primary); background: white; }
-
-        /* 4 BOTONES PRINCIPALES */
-        .main-toolbar { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
-        .btn-main { flex: 1; padding: 15px 20px; font-size: 1.1rem; font-weight: bold; border-radius: 10px; background: white; color: var(--dark); border: 1px solid var(--border); box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .btn-main:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
-        .btn-main.active { background: var(--primary); color: white; border-color: var(--primary); }
-
-        /* PANELES DE CONTROL */
-        .panel { background: white; padding: 25px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-top: 5px solid var(--primary); transition: var(--trans); }
-        .panel h2 { margin-top: 0; color: var(--dark); font-size: 1.3rem; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
-        .btn-action { padding: 10px 18px; border-radius: 6px; font-weight: bold; color: white; background: var(--dark); }
-        .btn-action:hover { opacity: 0.85; }
-
-        /* PANEL AÑADIR (Alumno Cero) */
-        .input-inline { padding: 12px; border: 2px solid var(--border); border-radius: 8px; font-size: 1rem; width: 220px; background: #f8fafc; }
-        .btn-tick { background: #16a34a; color: white; font-size: 1.2rem; width: 45px; height: 45px; border-radius: 8px; display: inline-flex; align-items: center; justify-content: center; transition: var(--trans); }
-
-        /* PANEL FILTRAR (Slider Edad) */
-        .slider-container { display: flex; align-items: center; gap: 15px; width: 100%; max-width: 500px; margin-top: 10px; }
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%; background: var(--slider-color); cursor: pointer; margin-top: -8px; box-shadow: 0 2px 5px rgba(0,0,0,0.3); transition: background 0.3s; }
+        /* BANNER Y PESTAÑAS */
+        .banner { background-color: var(--primary); padding: 30px; color: white; display: flex; justify-content: center; align-items: center; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .banner h1 { margin: 0; font-size: 2.5rem; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-ajustes { position: absolute; right: 30px; text-align: center; color: white; cursor: pointer; }
+        .btn-ajustes span { font-size: 1.8rem; display: block; }
         
-        /* PANEL ROLES (Emoji Android Style) */
-        .emoji-search-box { background: #f1f5f9; padding: 15px; border-radius: 8px; margin-top: 15px; border: 1px solid var(--border); }
-        .emoji-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 8px; max-height: 200px; overflow-y: auto; margin-top: 10px; }
-        .emoji-item { font-size: 1.8rem; text-align: center; padding: 8px; border-radius: 8px; cursor: pointer; transition: background 0.2s; }
-        .emoji-item:hover { background: #e2e8f0; }
-        .emoji-item.selected { background: #bfdbfe; border: 2px solid var(--primary); }
-        .rol-creado { display: inline-flex; align-items: center; gap: 8px; background: var(--dark); color: white; padding: 8px 15px; border-radius: 20px; font-weight: bold; margin: 5px; }
-        
-        .agrupar-lista { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 15px; max-height: 250px; overflow-y: auto; }
-        .estudiante-check { display: flex; align-items: center; gap: 10px; padding: 8px; border-bottom: 1px solid #e2e8f0; }
+        .tabs-header { display: flex; background: var(--dark); padding: 10px 20px 0 20px; gap: 5px; overflow-x: auto; }
+        .tab { background: rgba(255,255,255,0.2); color: white; padding: 12px 25px; border-radius: 8px 8px 0 0; font-weight: bold; font-size: 1rem; }
+        .tab.active { background: var(--bg-color); color: var(--dark); }
 
-        /* LISTA DE ALUMNOS Y FICHA (Todo Izquierda a Derecha) */
-        .student-row { background: white; border-radius: 10px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: var(--trans); overflow: hidden; border-left: 6px solid var(--primary); }
-        .student-header { padding: 18px 25px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-size: 1.2rem; font-weight: bold; background: white; }
-        .student-header:hover { background: #f8fafc; }
-        
-        .student-body { padding: 25px; border-top: 1px solid #e2e8f0; background: #fafafa; }
-        
-        /* Layout Lineal (Flexbox de izquierda a derecha) */
-        .seccion-lineal { display: flex; flex-wrap: wrap; align-items: center; gap: 15px; margin-bottom: 20px; background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
-        .seccion-titulo { width: 100%; font-size: 0.9rem; font-weight: bold; color: var(--primary); text-transform: uppercase; margin-bottom: 5px; border-bottom: 1px solid #f1f5f9; padding-bottom: 5px; }
-        
-        .campo-lineal { display: flex; align-items: center; gap: 8px; background: #f8fafc; padding: 8px 15px; border-radius: 6px; border: 1px solid var(--border); }
-        .campo-lineal label { font-size: 0.85rem; font-weight: bold; color: #64748b; }
-        .campo-lineal input, .campo-lineal select { border: none; background: transparent; font-size: 1rem; font-weight: 600; color: var(--dark); padding: 0; width: 140px;}
-        
-        /* Bloqueos de Edición */
-        body:not(.modo-edicion) .campo-lineal input, body:not(.modo-edicion) .campo-lineal select { pointer-events: none; }
-        
-        .edad-tag { padding: 5px 12px; border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
-        .btn-icon { padding: 8px 12px; border-radius: 6px; color: white; font-size: 1rem; }
+        /* BOTONERA PRINCIPAL */
+        .actions { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); margin-bottom: 20px; display: flex; gap: 10px; }
+        .btn { padding: 10px 20px; border-radius: 5px; font-size: 1rem; font-weight: bold; color: white; display: inline-flex; align-items: center; gap: 8px; }
+        .btn:hover { opacity: 0.85; transform: translateY(-1px); }
+        .bg-primary { background: var(--primary); } .bg-success { background: var(--success); } .bg-danger { background: var(--danger); } .bg-dark { background: var(--dark); }
 
-        /* Académico */
-        .btn-acad { background: var(--dark); color: white; padding: 8px 15px; border-radius: 6px; font-weight: bold; }
-        .mod-trans { background: #e0f2fe; color: #1e40af; padding: 8px 15px; border-radius: 20px; font-weight: bold; border: 1px solid #bfdbfe; cursor: pointer; }
+        /* PANELES DESPLEGABLES */
+        .panel { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 4px solid var(--primary); transition: var(--trans); }
+        .panel h2 { margin-top: 0; color: var(--dark); font-size: 1.2rem; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        
+        /* VOLCADO MASIVO */
+        .volcado-area { width: 100%; height: 120px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; resize: vertical; }
+        .preview-row { display: flex; gap: 10px; margin-bottom: 5px; align-items: center; background: #f9f9f9; padding: 8px; border-radius: 6px; }
+        .preview-row input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; }
+
+        /* LISTA DE ALUMNOS (Acordeones Rúbrica 13) */
+        .student-detail { margin-bottom: 15px; border-radius: 8px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1); background: #fff; transition: var(--trans); }
+        .student-summary { padding: 15px 20px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: #fff; transition: filter 0.2s; }
+        .student-summary:hover { filter: brightness(0.95); }
+        
+        .btn-icon { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); border-radius: 4px; color: white; padding: 6px 10px; font-size: 1rem; margin-left: 5px; }
+        .btn-icon:hover { background: rgba(0,0,0,0.3); }
+        
+        .content { padding: 20px; background: #fafafa; display: flex; flex-direction: column; gap: 15px; }
+
+        /* BLOQUES INTERNOS (Izquierda a Derecha) */
+        .bloque-lineal { background: #fff; border-radius: 8px; padding: 15px; border: 1px solid #e0e0e0; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
+        .bloque-titulo { width: 100%; font-size: 1rem; font-weight: bold; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 5px; margin-bottom: 5px; }
+        
+        .campo { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 8px 12px; border-radius: 6px; border: 1px solid #eee; }
+        .campo label { font-size: 0.85rem; font-weight: bold; color: #7f8c8d; }
+        .campo input { border: 1px solid #ccc; padding: 6px; border-radius: 4px; font-size: 0.95rem; }
+        body:not(.modo-edicion) .campo input { pointer-events: none; border-color: transparent; background: transparent; font-weight: bold; color: var(--dark); }
+
+        /* GÉNERO BOTONES */
+        .btn-gen { padding: 8px 15px; border-radius: 6px; border: 1px solid #ccc; background: white; font-weight: bold; cursor: pointer; color: #7f8c8d; }
+        .btn-gen.act-h { background: #3498db; color: white; border-color: #2980b9; }
+        .btn-gen.act-m { background: #9b59b6; color: white; border-color: #8e44ad; }
+        body:not(.modo-edicion) .btn-gen { pointer-events: none; opacity: 0.6; }
+        body:not(.modo-edicion) .btn-gen.act-h, body:not(.modo-edicion) .btn-gen.act-m { opacity: 1; }
+
+        /* EDAD CIRCULO */
+        .age-circle { width: 24px; height: 24px; border-radius: 50%; background: #ccc; cursor: pointer; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .age-text { font-weight: bold; color: var(--dark); background: #e2e8f0; padding: 4px 8px; border-radius: 4px; font-size: 0.9rem; }
+
+        /* ACADÉMICOS Y ETIQUETAS */
+        .btn-transversal { background: #ecf0f1; border: 1px solid #bdc3c7; padding: 8px 15px; border-radius: 20px; font-weight: bold; color: #2c3e50; }
+        .btn-transversal.active { background: var(--success); color: white; border-color: #27ae60; }
+        body:not(.modo-edicion) .btn-transversal { pointer-events: none; }
+
+        .btn-subject { background: var(--dark); color: white; padding: 10px 20px; border-radius: 8px; font-weight: bold; }
 
     </style>
 </head>
@@ -103,209 +98,191 @@
 
     <header class="banner">
         <h1>Base de Datos</h1>
-        <div class="btn-ajustes">
-            <span>⚙️</span>Ajustes
-        </div>
+        <div class="btn-ajustes"><span>⚙️</span>Ajustes</div>
     </header>
 
-    <nav class="tabs">
+    <nav class="tabs-header">
         <button class="tab active">Alumnos</button>
-        <button class="tab" style="opacity: 0.5;">Matemáticas</button>
-        <button class="tab" style="opacity: 0.5;">Lengua</button>
+        <button class="tab" style="opacity:0.5;">Matemáticas</button>
+        <button class="tab" style="opacity:0.5;">Lengua</button>
     </nav>
 
     <div class="container">
         
-        <input type="text" class="titulo-lista" value="Lista de Alumnos" readonly id="titulo-principal">
-
-        <div class="main-toolbar">
-            <button class="btn-main" id="btn-add" onclick="togglePanel('add')">➕ Añadir</button>
-            <button class="btn-main" id="btn-edit" onclick="toggleModoEdicion()">✏️ Editar</button>
-            <button class="btn-main" id="btn-filter" onclick="togglePanel('filter')">🔍 Filtrar</button>
-            <button class="btn-main" id="btn-roles" onclick="togglePanel('roles')">🏷️ Roles</button>
+        <div class="actions">
+            <button class="btn bg-primary" id="btn-editar" onclick="toggleModoEdicion()">✏️ Editar</button>
+            <button class="btn bg-dark" id="btn-filtrar" onclick="togglePanel('filtrar')">🔍 Filtrar / Ordenar</button>
+            <button class="btn bg-dark" id="btn-roles" onclick="togglePanel('roles')">🏷️ Roles</button>
         </div>
 
-        <div id="panel-add" class="panel hidden">
-            <h2>Método de Entrada</h2>
-            <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                <button class="btn-action bg-dark" onclick="document.getElementById('add-single').classList.remove('hidden')">➕ Añadir solo un alumno</button>
-                <button class="btn-action bg-dark">📥 Volcar todo el contenido</button>
+        <div id="panel-editar" class="panel hidden">
+            <h2>Opciones de Edición</h2>
+            <div style="display:flex; gap:10px; margin-bottom: 20px;">
+                <button class="btn bg-dark" onclick="document.getElementById('caja-volcado').classList.toggle('hidden')">📥 Volcar todo el contenido</button>
+                <button class="btn bg-danger" onclick="borrarTodosAlumnos()">🗑️ Borrar todos los alumnos</button>
             </div>
-            
-            <div id="add-single" class="hidden" style="background: #e0f2fe; padding: 20px; border-radius: 8px; border-left: 5px solid var(--primary); display: flex; gap: 15px; align-items: center;">
-                <input type="text" id="add-nom" class="input-inline" placeholder="Nombre" oninput="checkAlumnoCero()">
-                <input type="text" id="add-ape" class="input-inline" placeholder="Apellidos" oninput="checkAlumnoCero()">
-                <button id="add-tick" class="btn-tick hidden" onclick="crearAlumno()">✅</button>
+
+            <div id="caja-volcado" class="hidden" style="background:#f9f9f9; padding:15px; border-radius:8px; border:1px solid #ddd;">
+                <p style="margin-top:0; font-weight:bold;">Pega la lista de alumnos (Uno por línea):</p>
+                <textarea id="texto-volcado" class="volcado-area" placeholder="Ejemplo:\nJuan Pérez Gómez\nAna María López"></textarea>
+                <button class="btn bg-primary" style="margin-top:10px;" onclick="previsualizarVolcado()">👁️ Previsualizar y Ajustar</button>
+                
+                <div id="preview-volcado" class="hidden" style="margin-top:15px; border-top:2px solid #eee; padding-top:15px;">
+                    <p style="color:var(--danger); font-weight:bold; margin-top:0;">Revisa que los nombres y apellidos estén bien separados:</p>
+                    <div id="preview-filas" style="max-height: 200px; overflow-y:auto; margin-bottom:10px;"></div>
+                    <button class="btn bg-success" onclick="confirmarVolcado()">✅ Confirmar Lista</button>
+                </div>
+            </div>
+
+            <div style="background: #e0f2fe; padding: 15px; border-radius: 8px; display: flex; gap: 10px; align-items: center; margin-top: 15px;">
+                <strong style="color:var(--dark);">➕ Añadir un alumno:</strong>
+                <input type="text" id="nuevo-nombre" placeholder="Nombre" style="padding:8px; border-radius:4px; border:1px solid #ccc;" oninput="checkNuevo()">
+                <input type="text" id="nuevo-apellido" placeholder="Apellidos" style="padding:8px; border-radius:4px; border:1px solid #ccc;" oninput="checkNuevo()">
+                <button id="btn-nuevo-tick" class="btn bg-success hidden" style="padding:8px 15px;" onclick="crearAlumnoManual()">✅</button>
             </div>
         </div>
 
-        <div id="panel-filter" class="panel hidden">
-            <h2>Filtros de Búsqueda</h2>
-            
-            <div class="seccion-lineal" style="background: transparent; border: none; padding: 0;">
-                <div class="campo-lineal" style="flex-direction: column; align-items: flex-start; width: 300px;">
-                    <label>Rango de Edad: <span id="age-label" style="font-size:1.1rem; color:var(--slider-color);">18 - 30</span> años</label>
-                    <div class="slider-container">
-                        <input type="range" id="age-slider" min="0" max="4" value="0" oninput="updateSliderColor()">
-                    </div>
-                </div>
-                
-                <div class="campo-lineal">
-                    <label>Género:</label>
-                    <select><option>Todos</option><option>♂️ Hombre</option><option>♀️ Mujer</option></select>
-                </div>
-                
-                <div class="campo-lineal">
-                    <label>Municipio:</label>
-                    <select><option>Todos</option><option>Arucas</option></select>
-                </div>
-
-                <div class="campo-lineal">
-                    <label>Etiqueta / Rol:</label>
-                    <div id="filter-roles-container" style="display:flex; gap:5px; flex-wrap:wrap;">
-                        </div>
-                </div>
-            </div>
+        <div id="panel-filtrar" class="panel hidden">
+            <h2>Filtros y Vistas</h2>
+            <p>Opciones de orden y filtros (En desarrollo visual)...</p>
         </div>
 
         <div id="panel-roles" class="panel hidden">
-            <h2>Crear y Asignar Roles</h2>
-            
-            <div style="display: flex; gap: 15px; align-items: center;">
-                <button class="btn-action bg-dark" onclick="abrirBuscadorEmojis()">Añadir nuevo rol</button>
-            </div>
-
-            <div id="emoji-interface" class="emoji-search-box hidden">
-                <div style="display:flex; gap:10px; margin-bottom: 10px;">
-                    <input type="text" id="rol-nombre" class="input-inline" placeholder="Nombre del Rol (Ej: Vivero)">
-                    <input type="text" id="rol-desc" class="input-inline" placeholder="Breve descripción..." style="flex:1;">
-                </div>
-                
-                <label style="font-weight:bold; color:var(--primary);">Selecciona un Emoji:</label>
-                <input type="text" id="emoji-search" class="input-inline" placeholder="🔍 Buscar emoji (ej: agua, planta...)" style="width:100%; margin-top:5px;" oninput="filtrarEmojis()">
-                
-                <div id="emoji-grid" class="emoji-grid"></div>
-                
-                <button id="btn-save-rol" class="btn-action bg-success hidden" style="margin-top:15px;" onclick="guardarNuevoRol()">✅ Aplicar y Crear</button>
-            </div>
-
-            <div style="margin-top: 25px; border-top: 2px solid #f1f5f9; padding-top: 15px;">
-                <h3 style="margin-top:0;">Roles Creados</h3>
-                <div id="lista-roles-creados" style="display:flex; flex-wrap:wrap; margin-bottom:15px;"></div>
-                
-                <h3 style="margin-top:20px;">Agrupar alumnos por rol</h3>
-                <div class="campo-lineal" style="width: max-content; margin-bottom: 10px;">
-                    <label>Asignar Rol:</label>
-                    <select id="mass-role-select"><option value="">Selecciona un rol creado...</option></select>
-                </div>
-                <div id="mass-student-list" class="agrupar-lista">
-                    </div>
-                <button class="btn-action bg-primary" style="margin-top:10px;" onclick="aplicarRolMasivo()">Asignar a seleccionados</button>
-            </div>
+            <h2>Gestor de Etiquetas</h2>
+            <p>Carpeta estilo Android de Emojis y agrupaciones (En desarrollo visual)...</p>
         </div>
 
-        <div id="lista-alumnos">
-            </div>
+        <div id="lista-alumnos"></div>
 
     </div>
 
     <script>
-        // ==========================================
-        // ESTADO Y DICCIONARIOS
-        // ==========================================
+        // ESTADO GLOBAL
         let alumnos = [];
-        let roles = [];
-        let selectedEmoji = null;
+        let volcadoTemp = [];
+        let isEditingMode = false;
         
-        // Diccionario de emojis (Buscador Semántico)
-        const emojiDB = {
-            "agua": ["💧","🌊","💦","🧊","🚿"], "vivero planta": ["🌱","🌲","🌳","🪴","🌿","🌻","🚜"],
-            "herramienta mantenimiento": ["🔨","🔧","🪛","⛏️","🦺"], "educacion lengua matematica": ["📚","🎓","✏️","📐","📝"],
-            "grupo aprendiz": ["👥","👤","🧑‍🤝‍🧑","🧑‍🎓"], "alerta emergencia": ["🚨","⚠️","🛑"],
-            "general": ["⭐","✅","🔥","💡","💼","⚖️","💻","⚕️","🧹","🚌","🚑","🎨","🎵"]
-        };
+        const paletaColores = ["#34495e", "#8e44ad", "#2980b9", "#d35400", "#16a085", "#27ae60", "#f39c12", "#e67e22"];
+        const arucasCP = { "35400": "Arucas Centro", "35411": "Bañaderos/San Andrés", "35412": "Cardones", "35413": "Santidad", "35414": "Trapiche" };
 
-        // ==========================================
-        // CONTROL DE PANELES Y EDICIÓN
-        // ==========================================
-        function togglePanel(panelName) {
-            const panels = ['add', 'filter', 'roles'];
-            panels.forEach(p => {
+        // CONTROL PANELES Y EDICIÓN
+        function toggleModoEdicion() {
+            isEditingMode = !isEditingMode;
+            const btn = document.getElementById('btn-editar');
+            if(isEditingMode) {
+                btn.classList.replace('bg-primary', 'bg-warning');
+                btn.innerHTML = "🔓 Edición Activada";
+                document.body.classList.add('modo-edicion');
+                togglePanel('editar');
+            } else {
+                btn.classList.replace('bg-warning', 'bg-primary');
+                btn.innerHTML = "✏️ Editar";
+                document.body.classList.remove('modo-edicion');
+                togglePanel('none');
+            }
+            renderList();
+        }
+
+        function togglePanel(panel) {
+            const arr = ['editar', 'filtrar', 'roles'];
+            arr.forEach(p => {
                 const el = document.getElementById(`panel-${p}`);
-                const btn = document.getElementById(`btn-${p}`);
-                if(p === panelName && el.classList.contains('hidden')) {
-                    el.classList.remove('hidden'); el.classList.add('visible');
-                    btn.classList.add('active');
+                if(p === panel && el.classList.contains('hidden')) {
+                    el.classList.replace('hidden', 'visible');
                 } else {
-                    el.classList.remove('visible'); el.classList.add('hidden');
-                    btn.classList.remove('active');
+                    el.classList.replace('visible', 'hidden');
                 }
             });
-            if(panelName !== 'add') {
-                document.getElementById('add-single').classList.add('hidden');
-                document.getElementById('add-nom').value = ""; document.getElementById('add-ape').value = "";
-                checkAlumnoCero();
-            }
         }
 
-        function toggleModoEdicion() {
-            const body = document.body;
-            const btn = document.getElementById('btn-edit');
-            const tit = document.getElementById('titulo-principal');
+        // VOLCADO MASIVO (Con Inteligencia de 2 apellidos)
+        function previsualizarVolcado() {
+            const texto = document.getElementById('texto-volcado').value.trim();
+            if(!texto) return;
             
-            body.classList.toggle('modo-edicion');
+            const lineas = texto.split('\n').filter(l => l.trim() !== "");
+            volcadoTemp = [];
+            const contFilas = document.getElementById('preview-filas');
+            contFilas.innerHTML = "";
+
+            lineas.forEach((linea, index) => {
+                const palabras = linea.trim().split(/\s+/);
+                let nom = "", ape = "";
+                
+                if(palabras.length >= 3) {
+                    ape = palabras.slice(-2).join(" ");
+                    nom = palabras.slice(0, -2).join(" ");
+                } else if(palabras.length === 2) {
+                    nom = palabras[0]; ape = palabras[1];
+                } else {
+                    nom = linea; ape = "";
+                }
+
+                volcadoTemp.push({ nombre: nom, apellidos: ape });
+
+                contFilas.innerHTML += `
+                    <div class="preview-row">
+                        <strong style="width:20px;">${index+1}.</strong>
+                        <input type="text" id="prev-nom-${index}" value="${nom}" title="Nombre">
+                        <input type="text" id="prev-ape-${index}" value="${ape}" title="Apellidos">
+                    </div>
+                `;
+            });
             
-            if(body.classList.contains('modo-edicion')) {
-                btn.classList.add('active');
-                tit.removeAttribute('readonly');
-                togglePanel('none'); // Cierra otros paneles
-            } else {
-                btn.classList.remove('active');
-                tit.setAttribute('readonly', 'true');
-            }
-            renderList(); // Muestra/oculta botones de borrar en las filas
+            document.getElementById('preview-volcado').classList.replace('hidden', 'visible');
         }
 
-        // ==========================================
-        // ALUMNO CERO (CREACIÓN DIRECTA)
-        // ==========================================
-        function checkAlumnoCero() {
-            const n = document.getElementById('add-nom').value.trim();
-            const a = document.getElementById('add-ape').value.trim();
-            const tick = document.getElementById('add-tick');
-            if(n.length > 0 && a.length > 0) {
-                tick.classList.remove('hidden'); tick.classList.add('visible');
-            } else {
-                tick.classList.remove('visible'); tick.classList.add('hidden');
-            }
-        }
-
-        function crearAlumno() {
-            const n = document.getElementById('add-nom').value.trim();
-            const a = document.getElementById('add-ape').value.trim();
+        function confirmarVolcado() {
+            volcadoTemp.forEach((item, index) => {
+                const finalNom = document.getElementById(`prev-nom-${index}`).value.trim();
+                const finalApe = document.getElementById(`prev-ape-${index}`).value.trim();
+                crearObjetoAlumno(finalNom, finalApe);
+            });
             
-            const nuevo = {
-                id: Date.now(), nombre: n, apellidos: a,
-                dni: "", dob: "", genero: "",
-                nacionalidad: "España", cp: "", telefono: "",
-                emergencia: { nombre: "", parentesco: "", tel: "" },
-                rolesAsignados: [], academicoAbierto: false
-            };
-            
-            alumnos.push(nuevo);
-            
-            // Resetear Alumno Cero
-            document.getElementById('add-nom').value = "";
-            document.getElementById('add-ape').value = "";
-            checkAlumnoCero();
-            
+            document.getElementById('texto-volcado').value = "";
+            document.getElementById('preview-volcado').classList.replace('visible', 'hidden');
+            document.getElementById('caja-volcado').classList.replace('visible', 'hidden');
             renderList();
-            
-            // Abrir automáticamente la ficha del recién creado
-            toggleFicha(nuevo.id);
         }
 
-        function borrarAlumno(id, e) {
+        // CREACIÓN INDIVIDUAL
+        function checkNuevo() {
+            const n = document.getElementById('nuevo-nombre').value.trim();
+            const a = document.getElementById('nuevo-apellido').value.trim();
+            const btn = document.getElementById('btn-nuevo-tick');
+            if(n && a) btn.classList.replace('hidden', 'visible');
+            else btn.classList.replace('visible', 'hidden');
+        }
+
+        function crearAlumnoManual() {
+            const n = document.getElementById('nuevo-nombre').value.trim();
+            const a = document.getElementById('nuevo-apellido').value.trim();
+            crearObjetoAlumno(n, a);
+            document.getElementById('nuevo-nombre').value = "";
+            document.getElementById('nuevo-apellido').value = "";
+            checkNuevo();
+            renderList();
+        }
+
+        function crearObjetoAlumno(nom, ape) {
+            alumnos.push({
+                id: Date.now() + Math.random(),
+                nombre: nom, apellidos: ape,
+                dni: "", dob: "", genero: "",
+                domicilio: "", municipio: "", cp: "", nacionalidad: "España", telefono: "",
+                proyectoAbierto: false, transversales: [false,false,false,false,false],
+                emergencia: { nombre: "", parentesco: "", tel: "" },
+                abierto: false
+            });
+        }
+
+        function borrarTodosAlumnos() {
+            if(confirm("⚠️ ¿Estás seguro de borrar toda la base de datos de alumnos?")) {
+                alumnos = []; renderList();
+            }
+        }
+
+        function borrarFila(id, e) {
             e.stopPropagation();
             if(confirm("¿Eliminar alumno?")) {
                 alumnos = alumnos.filter(a => a.id !== id);
@@ -313,278 +290,150 @@
             }
         }
 
-        // ==========================================
-        // SLIDER DE EDAD (COLORES)
-        // ==========================================
-        const ageRanges = [
-            { text: "18 - 30", color: "#3b82f6" }, // Azul
-            { text: "31 - 40", color: "#16a34a" }, // Verde
-            { text: "41 - 50", color: "#eab308" }, // Amarillo
-            { text: "51 - 60", color: "#f97316" }, // Naranja
-            { text: "61 - 70", color: "#ef4444" }  // Rojo
-        ];
-
-        function updateSliderColor() {
-            const val = parseInt(document.getElementById('age-slider').value);
-            const label = document.getElementById('age-label');
-            const root = document.documentElement;
-            
-            label.textContent = ageRanges[val].text;
-            label.style.color = ageRanges[val].color;
-            root.style.setProperty('--slider-color', ageRanges[val].color);
-        }
-
-        // ==========================================
-        // GESTOR DE ROLES Y EMOJIS ANDROID
-        // ==========================================
-        function abrirBuscadorEmojis() {
-            const el = document.getElementById('emoji-interface');
-            el.classList.remove('hidden'); el.classList.add('visible');
-            filtrarEmojis();
-        }
-
-        function filtrarEmojis() {
-            const term = document.getElementById('emoji-search').value.toLowerCase();
-            const grid = document.getElementById('emoji-grid');
-            grid.innerHTML = "";
-            
-            let found = [];
-            for(let key in emojiDB) {
-                if(key.includes(term) || term === "") {
-                    found = found.concat(emojiDB[key]);
-                }
-            }
-            
-            // Eliminar duplicados si los hubiera
-            found = [...new Set(found)];
-            
-            found.forEach(emo => {
-                const div = document.createElement('div');
-                div.className = 'emoji-item';
-                div.textContent = emo;
-                div.onclick = () => {
-                    document.querySelectorAll('.emoji-item').forEach(e => e.classList.remove('selected'));
-                    div.classList.add('selected');
-                    selectedEmoji = emo;
-                    checkRolValido();
-                };
-                grid.appendChild(div);
-            });
-        }
-
-        function checkRolValido() {
-            const nom = document.getElementById('rol-nombre').value.trim();
-            const btn = document.getElementById('btn-save-rol');
-            if(nom.length > 0 && selectedEmoji) {
-                btn.classList.remove('hidden'); btn.classList.add('visible');
-            } else {
-                btn.classList.remove('visible'); btn.classList.add('hidden');
-            }
-        }
-        document.getElementById('rol-nombre').addEventListener('input', checkRolValido);
-
-        function guardarNuevoRol() {
-            const nom = document.getElementById('rol-nombre').value.trim();
-            const desc = document.getElementById('rol-desc').value.trim();
-            
-            roles.push({ id: `rol_${Date.now()}`, nombre: nom, desc: desc, emoji: selectedEmoji });
-            
-            // Reset
-            document.getElementById('rol-nombre').value = "";
-            document.getElementById('rol-desc').value = "";
-            document.getElementById('emoji-search').value = "";
-            selectedEmoji = null;
-            document.getElementById('emoji-interface').classList.remove('visible');
-            document.getElementById('emoji-interface').classList.add('hidden');
-            
-            actualizarUI_Roles();
-        }
-
-        function actualizarUI_Roles() {
-            // Píldoras visuales
-            const contPills = document.getElementById('lista-roles-creados');
-            contPills.innerHTML = "";
-            roles.forEach(r => {
-                contPills.innerHTML += `<div class="rol-creado" title="${r.desc}">${r.emoji} ${r.nombre}</div>`;
-            });
-
-            // Select de agrupación masiva
-            const select = document.getElementById('mass-role-select');
-            select.innerHTML = `<option value="">Selecciona un rol creado...</option>`;
-            roles.forEach(r => {
-                select.innerHTML += `<option value="${r.id}">${r.emoji} ${r.nombre}</option>`;
-            });
-
-            renderList(); // Refresca checkbox de alumnos masivos
-        }
-
-        function aplicarRolMasivo() {
-            const rId = document.getElementById('mass-role-select').value;
-            if(!rId) { alert("Selecciona un rol primero."); return; }
-            
-            const rolData = roles.find(r => r.id === rId);
-            const checkboxes = document.querySelectorAll('.mass-student-chk:checked');
-            
-            checkboxes.forEach(chk => {
-                const alId = parseInt(chk.value);
-                const al = alumnos.find(a => a.id === alId);
-                // Evitar duplicados
-                if(!al.rolesAsignados.some(ra => ra.id === rId)) {
-                    al.rolesAsignados.push(rolData);
-                }
-            });
-            
-            alert(`✅ Se ha asignado el rol ${rolData.emoji} ${rolData.nombre} a los alumnos seleccionados.`);
+        // EDICIÓN INTERNA DE CAMPOS
+        function toggleFicha(id, e) {
+            if(e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
+            const al = alumnos.find(a => a.id === id);
+            al.abierto = !al.abierto;
             renderList();
         }
 
-        // ==========================================
-        // RENDERIZADO DE LA LISTA (Ficha Izq a Der)
-        // ==========================================
-        function renderList() {
-            const cont = document.getElementById('lista-alumnos');
-            const contMass = document.getElementById('mass-student-list');
-            
-            cont.innerHTML = "";
-            contMass.innerHTML = "";
-
-            const isEdit = document.body.classList.contains('modo-edicion');
-
-            alumnos.forEach((alum, index) => {
-                // Inyectar en lista masiva de roles
-                contMass.innerHTML += `
-                    <label class="estudiante-check">
-                        <input type="checkbox" class="mass-student-chk" value="${alum.id}">
-                        ${index + 1}. ${alum.nombre} ${alum.apellidos}
-                    </label>
-                `;
-
-                // Construir fila principal
-                const div = document.createElement('div');
-                div.className = 'student-row';
-                
-                // Botón papelera solo en edición
-                const btnBorrar = isEdit ? `<button class="btn-icon bg-danger" onclick="borrarAlumno(${alum.id}, event)">🗑️</button>` : '';
-                
-                // Dibujar roles asignados en el header
-                let rolesHTML = alum.rolesAsignados.map(r => `<span style="margin-left:8px; font-size:1.2rem;" title="${r.nombre}">${r.emoji}</span>`).join('');
-
-                // Ficha Lineal (Flex Izquierda a Derecha)
-                div.innerHTML = `
-                    <div class="student-header" onclick="toggleFicha(${alum.id}, event)">
-                        <div>${index + 1}. 👤 ${alum.nombre} ${alum.apellidos} ${rolesHTML}</div>
-                        <div>${btnBorrar}</div>
-                    </div>
-                    
-                    <div id="ficha-${alum.id}" class="student-body hidden">
-                        
-                        <div class="seccion-titulo">A. Datos Personales</div>
-                        <div class="seccion-lineal">
-                            <div class="campo-lineal"><label>DNI:</label><input type="text" value="${alum.dni}"></div>
-                            <div class="campo-lineal">
-                                <label>Nacimiento:</label>
-                                <input type="date" id="dob-${alum.id}" value="${alum.dob}" onchange="calcEdad(${alum.id})">
-                                <span style="font-size:1.2rem;">🎂</span>
-                                <span id="edad-${alum.id}" class="edad-tag hidden"></span>
-                            </div>
-                            <div class="campo-lineal">
-                                <label>Género:</label>
-                                <select><option value="">-</option><option ${alum.genero==='H'?'selected':''}>♂️ Hombre</option><option ${alum.genero==='M'?'selected':''}>♀️ Mujer</option></select>
-                            </div>
-                        </div>
-
-                        <div class="seccion-titulo">B. Ubicación y Contacto</div>
-                        <div class="seccion-lineal">
-                            <div class="campo-lineal">
-                                <label>Nacionalidad:</label>
-                                <input type="text" value="${alum.nacionalidad}" style="width:100px;">
-                                <span style="font-size:1.2rem;">${alum.nacionalidad.toLowerCase()==='españa'?'🇪🇸':''}</span>
-                            </div>
-                            <div class="campo-lineal">
-                                <label>Código Postal:</label>
-                                <input type="text" value="${alum.cp}" style="width:80px;" placeholder="354...">
-                                <span style="font-size:1.2rem; cursor:pointer;" title="Autocompletar barrio">📍</span>
-                            </div>
-                            <div class="campo-lineal"><label>Teléfono:</label><input type="text" value="${alum.telefono}" style="width:120px;"></div>
-                        </div>
-
-                        <div class="seccion-titulo">C. Datos Académicos</div>
-                        <div class="seccion-lineal" style="background: #f8fafc; border-color: var(--primary);">
-                            <div id="btn-add-proy-${alum.id}" class="${alum.academicoAbierto ? 'hidden' : 'visible'}">
-                                <button class="btn-action bg-primary" onclick="abrirAcademico(${alum.id})">➕ Añadir proyecto</button>
-                            </div>
-                            
-                            <div id="acad-content-${alum.id}" class="${alum.academicoAbierto ? 'visible' : 'hidden'}" style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; width:100%;">
-                                <strong style="color:var(--dark);">Trayectoria Arucas:</strong>
-                                <span class="mod-trans" onclick="this.classList.toggle('active')">🔘 PRL</span>
-                                <span class="mod-trans" onclick="this.classList.toggle('active')">🔘 Medio Ambiente</span>
-                                <span class="mod-trans" onclick="this.classList.toggle('active')">🔘 Igualdad</span>
-                                <span class="mod-trans" onclick="this.classList.toggle('active')">🔘 Informática</span>
-                                <span class="mod-trans" onclick="this.classList.toggle('active')">🔘 Orientación</span>
-                                <div style="width:1px; height:30px; background:#cbd5e1; margin: 0 10px;"></div>
-                                <button class="btn-acad">📐 Matemáticas</button>
-                                <button class="btn-acad">📚 Lengua</button>
-                            </div>
-                        </div>
-
-                        <div class="seccion-titulo" style="color: var(--danger);">🚨 D. Contacto de Emergencia</div>
-                        <div class="seccion-lineal" style="border-color: #fecaca; background: #fff5f5;">
-                            <div class="campo-lineal"><label>Nombre:</label><input type="text" value="${alum.emergencia.nombre}"></div>
-                            <div class="campo-lineal"><label>Parentesco:</label><input type="text" value="${alum.emergencia.parentesco}"></div>
-                            <div class="campo-lineal"><label>Teléfono:</label><input type="text" value="${alum.emergencia.tel}"></div>
-                            <button class="btn-action bg-success" onclick="guardarEmergencia(${alum.id})">✅ Confirmar</button>
-                        </div>
-
-                    </div>
-                `;
-                cont.appendChild(div);
-                if(alum.dob) calcEdad(alum.id);
-            });
-        }
-
-        // ==========================================
-        // FUNCIONES DE LA FICHA
-        // ==========================================
-        function toggleFicha(id, e) {
-            if(e.target.tagName === 'BUTTON' || e.target.closest('.edit-controls')) return;
-            const f = document.getElementById(`ficha-${id}`);
-            if(f.classList.contains('hidden')) {
-                f.classList.remove('hidden'); f.classList.add('visible');
-            } else {
-                f.classList.remove('visible'); f.classList.add('hidden');
-            }
+        function setGenero(id, val) {
+            const al = alumnos.find(a => a.id === id);
+            al.genero = val; renderList();
         }
 
         function calcEdad(id) {
             const val = document.getElementById(`dob-${id}`).value;
-            const disp = document.getElementById(`edad-${id}`);
+            const al = alumnos.find(a => a.id === id);
+            al.dob = val;
+            
             if(!val) return;
-            
             const age = new Date().getFullYear() - new Date(val).getFullYear();
-            disp.textContent = `${age} años`;
-            disp.classList.remove('hidden'); disp.classList.add('visible');
             
-            if(age <= 30) { disp.style.background = 'var(--age-18)'; disp.style.color = '#0284c7'; }
-            else if(age <= 40) { disp.style.background = 'var(--age-31)'; disp.style.color = '#166534'; }
-            else if(age <= 50) { disp.style.background = 'var(--age-41)'; disp.style.color = '#854d0e'; }
-            else if(age <= 60) { disp.style.background = 'var(--age-51)'; disp.style.color = '#9a3412'; }
-            else { disp.style.background = 'var(--age-61)'; disp.style.color = '#991b1b'; }
+            const circle = document.getElementById(`age-circ-${id}`);
+            const text = document.getElementById(`age-text-${id}`);
+            
+            // Colores por rango
+            if(age <= 30) circle.style.background = 'var(--age-18)';
+            else if(age <= 40) circle.style.background = 'var(--age-31)';
+            else if(age <= 50) circle.style.background = 'var(--age-41)';
+            else if(age <= 60) circle.style.background = 'var(--age-51)';
+            else circle.style.background = 'var(--age-61)';
+
+            text.textContent = `${age} años`;
         }
 
-        function abrirAcademico(id) {
-            const alum = alumnos.find(a => a.id === id);
-            alum.academicoAbierto = true;
-            document.getElementById(`btn-add-proy-${id}`).classList.replace('visible', 'hidden');
-            document.getElementById(`acad-content-${id}`).classList.replace('hidden', 'visible');
+        function mostrarEdadTexto(id) {
+            const text = document.getElementById(`age-text-${id}`);
+            if(text.textContent !== "") {
+                text.classList.toggle('hidden'); text.classList.toggle('visible');
+            }
         }
 
-        function guardarEmergencia(id) {
-            alert("✅ Contacto de emergencia confirmado.");
+        function checkCP(id) {
+            const val = document.getElementById(`cp-${id}`).value;
+            const muni = document.getElementById(`muni-${id}`);
+            if(arucasCP[val]) muni.value = arucasCP[val];
         }
 
-        // Inicializar color del slider
-        updateSliderColor();
+        function abrirProyecto(id) {
+            const al = alumnos.find(a => a.id === id);
+            al.proyectoAbierto = true; renderList();
+        }
 
+        // RENDER PRINCIPAL
+        function renderList() {
+            alumnos.sort((a,b) => a.nombre.localeCompare(b.nombre));
+            const cont = document.getElementById('lista-alumnos');
+            cont.innerHTML = "";
+
+            alumnos.forEach((al, index) => {
+                const colorCabecera = paletaColores[index % paletaColores.length];
+                
+                // Botones Cabecera
+                let headBtns = isEditingMode 
+                    ? `<button class="btn-icon del" onclick="borrarFila(${al.id}, event)">🗑️</button>` 
+                    : ``;
+
+                // Transversales (Arucas)
+                const tNames = ["PRL", "Medio Ambiente", "Igualdad", "Informática", "Orientación"];
+                let transHTML = "";
+                tNames.forEach((t, i) => {
+                    const act = al.transversales[i] ? 'active' : '';
+                    transHTML += `<button class="btn-transversal ${act}" onclick="alumnos.find(x=>x.id==${al.id}).transversales[${i}]=!alumnos.find(x=>x.id==${al.id}).transversales[${i}]; renderList();">${t}</button>`;
+                });
+
+                const div = document.createElement('div');
+                div.className = 'student-detail';
+                
+                div.innerHTML = `
+                    <div class="student-summary" style="background:${colorCabecera};" onclick="toggleFicha(${al.id}, event)">
+                        <div>${index+1}. ${al.nombre} ${al.apellidos}</div>
+                        <div>${headBtns}</div>
+                    </div>
+                    
+                    <div class="content ${al.abierto ? 'visible' : 'hidden'}">
+                        
+                        <div class="bloque-lineal">
+                            <div class="bloque-titulo">A. Datos Personales</div>
+                            <div class="campo"><label>DNI/NIE</label><input type="text" value="${al.dni}" onchange="al.dni=this.value"></div>
+                            <div class="campo">
+                                <label>Nacimiento</label>
+                                <input type="date" id="dob-${al.id}" value="${al.dob}" onchange="calcEdad(${al.id})">
+                                <span style="font-size:1.5rem;">🎂</span>
+                                <div id="age-circ-${al.id}" class="age-circle" onclick="mostrarEdadTexto(${al.id})"></div>
+                                <span id="age-text-${al.id}" class="age-text hidden"></span>
+                            </div>
+                            <div class="campo" style="background:transparent; border:none; padding:0;">
+                                <label style="margin-right:5px;">Género:</label>
+                                <button class="btn-gen ${al.genero==='H'?'act-h':''}" onclick="setGenero(${al.id}, 'H')">♂️ Hombre</button>
+                                <button class="btn-gen ${al.genero==='M'?'act-m':''}" onclick="setGenero(${al.id}, 'M')">♀️ Mujer</button>
+                            </div>
+                        </div>
+
+                        <div class="bloque-lineal">
+                            <div class="bloque-titulo">B. Ubicación y Contacto</div>
+                            <div class="campo"><label>Domicilio</label><input type="text" value="${al.domicilio}" style="width:200px;"></div>
+                            <div class="campo"><label>CP</label><input type="text" id="cp-${al.id}" value="${al.cp}" style="width:70px;" oninput="checkCP(${al.id})"></div>
+                            <div class="campo"><label>Municipio</label><input type="text" id="muni-${al.id}" value="${al.municipio}" style="width:150px;"></div>
+                            <div class="campo">
+                                <label>Nacionalidad</label>
+                                <input type="text" value="${al.nacionalidad}" style="width:100px;">
+                                <span style="font-size:1.2rem;">${al.nacionalidad.toLowerCase()==='españa'?'🇪🇸':''}</span>
+                            </div>
+                            <div class="campo"><label>Teléfono</label><input type="text" value="${al.telefono}" style="width:120px;"></div>
+                        </div>
+
+                        <div class="bloque-lineal">
+                            <div class="bloque-titulo">C. Datos Académicos</div>
+                            ${!al.proyectoAbierto 
+                                ? `<button class="btn bg-primary" onclick="abrirProyecto(${al.id})">➕ Añadir Proyecto</button>` 
+                                : `<div style="width:100%; display:flex; gap:15px; align-items:center; flex-wrap:wrap;">
+                                    <strong style="color:var(--dark);">Trayectoria Arucas:</strong>
+                                    ${transHTML}
+                                    <div style="width:2px; height:30px; background:#ccc; margin:0 10px;"></div>
+                                    <button class="btn-subject">📚 Lengua</button>
+                                    <button class="btn-subject">📐 Matemáticas</button>
+                                   </div>`
+                            }
+                        </div>
+
+                        <div class="bloque-lineal" style="border-left: 4px solid var(--danger);">
+                            <div class="bloque-titulo" style="color:var(--danger);">🚨 D. Contacto de Emergencia</div>
+                            <div class="campo"><label>Nombre</label><input type="text" value="${al.emergencia.nombre}"></div>
+                            <div class="campo"><label>Parentesco</label><input type="text" value="${al.emergencia.parentesco}"></div>
+                            <div class="campo"><label>Teléfono</label><input type="text" value="${al.emergencia.tel}"></div>
+                            <button class="btn bg-success">✅ Confirmar</button>
+                        </div>
+
+                    </div>
+                `;
+                
+                cont.appendChild(div);
+                if(al.dob) calcEdad(al.id); // Calcula color y edad si ya la tenía
+            });
+        }
     </script>
 </body>
 </html>
