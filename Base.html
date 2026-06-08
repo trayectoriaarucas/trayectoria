@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Base de Datos - Ayuntamiento de Arucas</title>
+    
+    <script id="app-state" type="application/json">{
+        "config": {
+            "title": "Base de Datos",
+            "bannerColor": "#1e3a8a",
+            "pestañas": [
+                {"id": "plantilla", "title": "Alumnos", "fixed": true}
+            ]
+        },
+        "personal": [
+            {
+                "id": "p_1",
+                "nombre": "Jaime",
+                "apellidos": "Falcón Amado",
+                "dni": "42000000X",
+                "dob": "1980-05-15",
+                "genero": "M",
+                "estado": "alta",
+                "rol": "Técnico",
+                "grupo": 1,
+                "contacto": {"tel": "600123456", "email": "jaime@email.com", "dir": "Calle Ejemplo 1", "cp": "35411", "barrio": "Bañaderos"},
+                "area": "Vivero",
+                "academicos": {
+                    "transversales": {"prl": true, "medioambiente": false, "igualdad": false, "informatica": true, "orientacion": false}
+                },
+                "emergencia": {"nombre": "María", "parentesco": "Hermana", "tel": "600987654"}
+            }
+        ]
+    }</script>
+
+    <style>
+        /* VARIABLES DE COLOR Y ESTILOS GLOBALES */
+        :root {
+            --bg-color: #f8fafc; --text-color: #334155; --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --primary: #2563eb; --dark: #1e293b; --success: #16a34a; --danger: #dc2626; --warning: #d97706;
+            --celeste: #e0f2fe; --verde: #dcfce7; --amarillo: #fef08a; --naranja: #fed7aa; --coral: #fecaca;
+        }
+        body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+        /* BANNER Y PESTAÑAS (Basado en Rúbrica 14) */
+        .banner { background-color: var(--primary); padding: 20px; color: white; display: flex; justify-content: space-between; align-items: center; border-radius: 0 0 12px 12px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .banner h1 { margin: 0; font-size: 2rem; text-transform: capitalize; }
+        .tabs-header { display: flex; gap: 5px; overflow-x: auto; padding: 0 20px; }
+        .tab { background: #cbd5e1; color: var(--dark); padding: 12px 25px; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; border: none; font-size: 1rem; transition: background 0.2s; }
+        .tab.active { background: var(--bg-color); border-top: 3px solid var(--primary); }
+        .tab-add { background: #e2e8f0; color: var(--primary); }
+
+        /* BARRAS DE HERRAMIENTAS (Izquierda y Derecha) */
+        .toolbars-wrapper { display: flex; justify-content: space-between; align-items: center; background: white; padding: 12px 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .toolbar-group { display: flex; gap: 8px; align-items: center; }
+        .btn { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-size: 0.95rem; font-weight: bold; color: white; display: inline-flex; align-items: center; gap: 5px; transition: opacity 0.2s; }
+        .btn:hover { opacity: 0.85; }
+        .bg-primary { background: var(--primary); } .bg-dark { background: var(--dark); } .bg-success { background: var(--success); } .bg-danger { background: var(--danger); }
+        .btn-icon-only { padding: 8px 12px; font-size: 1.2rem; }
+
+        /* PÍLDORAS VISUALES (Insignias) */
+        .pill { display: inline-flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 20px; font-size: 0.85rem; font-weight: 600; background: #f1f5f9; color: var(--dark); border: 1px solid #e2e8f0; }
+        .pill-rol { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
+        .pill-area { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
+        .pill-grupo { background: #fef9c3; color: #854d0e; border-color: #fef08a; }
+        .pill-estado-alta { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
+        
+        /* ACORDEÓN DE ALUMNOS (Basado en Rúbrica 13 + Mejoras V6) */
+        details.student-row { margin-bottom: 12px; border-radius: 8px; overflow: hidden; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
+        details.student-row > summary { padding: 12px 20px; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; transition: background 0.2s; }
+        details.student-row > summary::-webkit-details-marker { display: none; }
+        details.student-row > summary:hover { background: #f8fafc; }
+        .summary-content { display: flex; align-items: center; gap: 15px; width: 100%; }
+        .student-name { font-weight: bold; font-size: 1.1rem; min-width: 200px; display: flex; align-items: center; gap: 8px; }
+        
+        /* BLOQUES INTERNOS DE LA FICHA */
+        .student-details-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; padding: 20px; background: #f8fafc; border-top: 1px solid #e2e8f0; }
+        .detail-block { background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0; }
+        .detail-block h3 { margin: 0 0 15px 0; font-size: 1rem; color: var(--primary); border-bottom: 2px solid #f1f5f9; padding-bottom: 5px; }
+        .data-row { display: flex; flex-direction: column; margin-bottom: 10px; font-size: 0.9rem; }
+        .data-row label { font-weight: bold; color: #64748b; font-size: 0.8rem; margin-bottom: 2px; }
+        .data-row input { padding: 6px; border: 1px solid #cbd5e1; border-radius: 4px; font-family: inherit; }
+        .data-row input:disabled { background: transparent; border-color: transparent; color: var(--dark); font-weight: 500; padding: 0; }
+
+        /* MÓDULOS TRANSVERSALES */
+        .module-btn { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px; margin-bottom: 5px; border: 1px solid #e2e8f0; border-radius: 6px; background: #f8fafc; cursor: default; color: #94a3b8; font-weight: 600; text-align: left; }
+        .module-btn.active { background: var(--verde); color: #166534; border-color: #bbf7d0; }
+
+        /* CONTROL MODO EDICIÓN */
+        .edit-controls { display: none; }
+        body.edit-mode .edit-controls { display: inline-flex; }
+        body.edit-mode .read-controls { display: none; }
+        body.edit-mode .module-btn { cursor: pointer; }
+        body.edit-mode .data-row input:disabled { background: #fff; border-color: #cbd5e1; padding: 6px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="banner" id="main-banner">
+        <h1 id="app-title">Base de Datos</h1>
+        <button class="btn bg-dark btn-icon-only" title="Cambiar Fondo Temático">🖼️</button>
+    </div>
+
+    <div class="tabs-header" id="tabs-container">
+        <button class="tab active">Alumnos</button>
+        <button class="tab tab-add">➕ Añadir Asignatura</button>
+    </div>
+
+    <div class="container">
+        <div class="toolbars-wrapper">
+            <div class="toolbar-group">
+                <button class="btn bg-dark read-controls">📝 Añadir Masivo</button>
+                <button class="btn bg-dark read-controls">🔍 Filtrar / Etiquetas</button>
+                <button class="btn bg-primary read-controls" onclick="toggleEditMode()">✏️ Modo Edición</button>
+                
+                <button class="btn bg-success edit-controls" onclick="toggleEditMode()">✅ Confirmar</button>
+                <button class="btn bg-dark edit-controls" onclick="toggleEditMode()">❌ Cancelar</button>
+                <button class="btn bg-danger edit-controls" onclick="borrarTodo()">🗑️ Borrar Todo</button>
+            </div>
+
+            <div class="toolbar-group">
+                <button class="btn bg-dark">🔀 Alternar Formato</button>
+                <button class="btn bg-dark">🔤 Ordenar A-Z</button>
+                <button class="btn bg-dark">⚙️ Ajustes</button>
+            </div>
+        </div>
+
+        <div id="students-container">
+            </div>
+    </div>
+
+    <script>
+        // ESTADO GLOBAL DE LA APP
+        let state = JSON.parse(document.getElementById('app-state').textContent);
+        let isEditMode = false;
+
+        // DICCIONARIOS DE EMOJIS
+        const rolEmojis = { "Aprendiz": "🧑‍🎓", "Maestro": "📜", "Técnico": "🔧", "Técnico Administrativo": "💼", "Capataz": "🦺" };
+        const areaEmojis = { "Vivero": "🌱", "Vías y Obras": "🔨", "Educación": "🖌️" };
+
+        function initApp() {
+            renderStudents();
+        }
+
+        // ALTERNAR MODO EDICIÓN
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            if (isEditMode) {
+                document.body.classList.add('edit-mode');
+            } else {
+                document.body.classList.remove('edit-mode');
+            }
+            renderStudents(); // Re-renderizar para activar/desactivar inputs
+        }
+
+        // ALERTA BORRAR TODO
+        function borrarTodo() {
+            if(confirm("⚠️ AVISO: ¿Quieres borrar todos los campos?\n\nSe eliminarán todos los registros excepto la primera fila, que quedará limpia como plantilla.")) {
+                alert("Función de borrado en desarrollo...");
+            }
+        }
+
+        // RENDERIZAR LISTA DE ALUMNOS
+        function renderStudents() {
+            const container = document.getElementById('students-container');
+            container.innerHTML = "";
+
+            state.personal.forEach((p, idx) => {
+                const sRow = document.createElement('details');
+                sRow.className = 'student-row';
+                
+                // Color de rango (Ejemplo base: celeste)
+                const ageClass = "range-celeste"; 
+
+                // HTML DEL SUMMARY (Lista Cerrada)
+                let summaryHTML = `
+                    <summary class="${ageClass}">
+                        <div class="summary-content">
+                            <div class="student-name">👤 ${p.nombre} ${p.apellidos}</div>
+                            <div class="pill pill-rol">${rolEmojis[p.rol] || '❓'} ${p.rol}</div>
+                            <div class="pill pill-area">${areaEmojis[p.area] || '📍'} ${p.area}</div>
+                            <div class="pill pill-grupo">1️⃣ Grupo ${p.grupo}</div>
+                            <div class="pill pill-estado-alta">${p.estado === 'alta' ? '▶️ Alta' : '⏸️ Baja'}</div>
+                        </div>
+                        <div class="edit-controls">
+                            <button class="btn btn-icon-only bg-primary">✏️</button>
+                            <button class="btn btn-icon-only bg-danger" style="margin-left:5px;">🗑️</button>
+                        </div>
+                    </summary>
+                `;
+
+                // HTML DEL CONTENIDO (Ficha Expandida - 4 Bloques)
+                let contentHTML = `
+                    <div class="student-details-grid">
+                        
+                        <div class="detail-block">
+                            <h3>A. Datos Personales</h3>
+                            <div class="data-row"><label>🪪 DNI/NIE:</label><input type="text" value="${p.dni}" disabled></div>
+                            <div class="data-row"><label>🎂 Nacimiento:</label><input type="date" value="${p.dob}" disabled></div>
+                            <div class="data-row"><label>Género:</label><input type="text" value="${p.genero === 'M' ? '♂️ Hombre' : '♀️ Mujer'}" disabled></div>
+                        </div>
+
+                        <div class="detail-block">
+                            <h3>B. Contacto y Ubicación</h3>
+                            <div class="data-row"><label>📞 Teléfono:</label><input type="text" value="${p.contacto.tel}" disabled></div>
+                            <div class="data-row"><label>🏠 Dirección:</label><input type="text" value="${p.contacto.dir}" disabled></div>
+                            <div class="data-row"><label>📍 Código Postal / Barrio:</label><input type="text" value="${p.contacto.cp} - ${p.contacto.barrio}" disabled></div>
+                        </div>
+
+                        <div class="detail-block" style="grid-column: span 2;">
+                            <h3>C. Gestión Académica</h3>
+                            <div style="display: flex; gap: 20px;">
+                                <div style="flex: 1;">
+                                    <div style="background:var(--dark); color:white; padding:15px; border-radius:8px; margin-bottom:10px; cursor:pointer;">📚 Lengua Castellana N2</div>
+                                    <div style="background:var(--dark); color:white; padding:15px; border-radius:8px; cursor:pointer;">📐 Matemáticas N2</div>
+                                </div>
+                                <div style="flex: 1;">
+                                    <button class="module-btn ${p.academicos.transversales.prl ? 'active' : ''}">${p.academicos.transversales.prl ? '✅' : '🔘'} PRL</button>
+                                    <button class="module-btn ${p.academicos.transversales.medioambiente ? 'active' : ''}">${p.academicos.transversales.medioambiente ? '✅' : '🔘'} Medio Ambiente</button>
+                                    <button class="module-btn ${p.academicos.transversales.igualdad ? 'active' : ''}">${p.academicos.transversales.igualdad ? '✅' : '🔘'} Igualdad</button>
+                                    <button class="module-btn ${p.academicos.transversales.informatica ? 'active' : ''}">${p.academicos.transversales.informatica ? '✅' : '🔘'} Informática</button>
+                                    <button class="module-btn ${p.academicos.transversales.orientacion ? 'active' : ''}">${p.academicos.transversales.orientacion ? '✅' : '🔘'} Orientación Laboral</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-block">
+                            <h3>D. Emergencia</h3>
+                            <div class="data-row"><label>🚨 Nombre Contacto:</label><input type="text" value="${p.emergencia.nombre}" disabled></div>
+                            <div class="data-row"><label>Vínculo:</label><input type="text" value="${p.emergencia.parentesco}" disabled></div>
+                            <div class="data-row"><label>Teléfono:</label><input type="text" value="${p.emergencia.tel}" disabled></div>
+                        </div>
+
+                    </div>
+                `;
+
+                sRow.innerHTML = summaryHTML + contentHTML;
+                container.appendChild(sRow);
+            });
+        }
+
+        // Inicializar
+        initApp();
+    </script>
+</body>
+</html>
