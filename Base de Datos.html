@@ -3,79 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base de Datos - Ayuntamiento de Arucas</title>
+    <title>Base de Datos</title>
     
     <script id="app-state" type="application/json">
     {
-        "config": {
-            "title": "Base de Datos",
-            "pestañas": [
-                {"id": "plantilla", "title": "Alumnos", "fixed": true}
-            ]
-        },
-        "personal": [
-            {
-                "id": "p_1",
-                "nombre": "Jaime",
-                "apellidos": "Falcón Amado",
-                "dni": "42000000X",
-                "dob": "1980-05-15",
-                "edad_rango": "celeste",
-                "genero": "M",
-                "estado": "alta",
-                "rol": "Técnico",
-                "grupo": 1,
-                "contacto": {
-                    "tel": "600 123 456", 
-                    "email": "jaime.falcon@ejemplo.com", 
-                    "dir": "Calle Principal, 12, Bajo A", 
-                    "cp": "35411", 
-                    "barrio": "Bañaderos",
-                    "nacionalidad": "España"
-                },
-                "area": "Vivero",
-                "academicos": {
-                    "transversales": {
-                        "prl": true, 
-                        "medioambiente": false, 
-                        "igualdad": true, 
-                        "informatica": false, 
-                        "orientacion": false
-                    }
-                },
-                "emergencia": {
-                    "nombre": "María Falcón", 
-                    "parentesco": "Hermana", 
-                    "tel": "600 987 654"
-                }
-            }
+        "personal": [],
+        "etiquetas": [
+            {"id": "t1", "emoji": "🌱", "nombre": "Vivero"},
+            {"id": "t2", "emoji": "🔨", "nombre": "Vías y Obras"},
+            {"id": "t3", "emoji": "🔧", "nombre": "Técnico"}
         ]
     }
     </script>
 
     <style>
-        /* ==========================================
-           ESTILOS GLOBALES Y VARIABLES (Estilo Rúbrica 13)
-           ========================================== */
+        /* VARIABLES Y ESTILOS BASE */
         :root {
-            --bg-body: #f0f4f8;
+            --bg-body: #f4f7f6;
             --text-main: #2c3e50;
-            --text-light: #7f8c8d;
-            
-            /* Paleta Principal */
-            --primary: #2980b9;
-            --primary-dark: #2471a3;
+            --primary: #3498db;
             --dark: #2c3e50;
             --success: #27ae60;
             --danger: #e74c3c;
-            --warning: #f39c12;
-            
-            /* Colores de Rangos de Edad */
-            --rango-celeste: #e0f2fe; /* 18-30 */
-            --rango-verde: #dcfce7;   /* 31-40 */
-            --rango-amarillo: #fef08a;/* 41-50 */
-            --rango-naranja: #fed7aa; /* 51-60 */
-            --rango-coral: #fecaca;   /* 61-70 */
+            --border-color: #cbd5e1;
+            --anim-speed: 0.4s; /* Velocidad de fundidos */
         }
 
         body {
@@ -86,518 +37,368 @@
             padding: 0;
             padding-bottom: 50px;
         }
+        .app-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
 
-        .app-container {
-            max-width: 1300px;
-            margin: 0 auto;
-            padding: 20px;
+        /* ANIMACIONES Y FUNDIDOS GLOBALES */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(-10px);
+            animation: fadeInAnim var(--anim-speed) ease forwards;
+        }
+        .fade-out {
+            opacity: 1;
+            transition: opacity var(--anim-speed) ease;
+        }
+        @keyframes fadeInAnim {
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* ==========================================
-           1. BANNER PRINCIPAL
-           ========================================== */
+        /* BANNER Y PESTAÑAS */
         .main-banner {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            color: white;
-            padding: 40px 40px;
-            border-radius: 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
+            background: var(--primary); color: white;
+            padding: 30px; border-radius: 12px; margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-        .main-banner h1 {
-            margin: 0;
-            font-size: 3rem;
-            letter-spacing: 1px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-        .btn-fondo {
-            background: rgba(255,255,255,0.2);
-            border: 2px solid rgba(255,255,255,0.4);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 1.2rem;
-            transition: all 0.3s ease;
-        }
-        .btn-fondo:hover {
-            background: rgba(255,255,255,0.4);
-            transform: scale(1.05);
-        }
-
-        /* ==========================================
-           2. SISTEMA DE PESTAÑAS
-           ========================================== */
-        .tabs-container {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            padding: 0 10px;
-            border-bottom: 3px solid #cbd5e1;
-        }
+        .main-banner h1 { margin: 0; font-size: 2.5rem; }
+        
+        .tabs-container { display: flex; gap: 8px; border-bottom: 3px solid var(--border-color); margin-bottom: 20px; }
         .tab {
-            padding: 15px 30px;
-            background: #e2e8f0;
-            color: var(--text-light);
-            border: none;
-            border-radius: 12px 12px 0 0;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s;
+            padding: 12px 25px; background: #e2e8f0; color: var(--text-main);
+            border: none; border-radius: 8px 8px 0 0; font-weight: bold; cursor: pointer;
+            transition: background var(--anim-speed) ease;
         }
-        .tab.active {
-            background: white;
-            color: var(--primary);
-            border-top: 4px solid var(--primary);
-            box-shadow: 0 -4px 6px rgba(0,0,0,0.05);
-        }
-        .tab-add {
-            background: transparent;
-            color: var(--success);
-        }
-        .tab-add:hover {
-            background: #dcfce7;
-        }
+        .tab.active { background: white; border-top: 4px solid var(--primary); color: var(--primary); }
 
-        /* ==========================================
-           3. BOTONERAS (HERRAMIENTAS)
-           ========================================== */
+        /* BOTONERAS SUPERIORES */
         .toolbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: white;
-            padding: 15px 25px;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 25px;
+            display: flex; justify-content: space-between; background: white;
+            padding: 15px; border-radius: 8px; margin-bottom: 25px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
-        .toolbar-group {
-            display: flex;
-            gap: 10px;
-        }
+        .toolbar-group { display: flex; gap: 10px; }
         .btn {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            color: white;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: opacity 0.2s, transform 0.1s;
+            padding: 10px 15px; border: none; border-radius: 6px; font-weight: bold; color: white;
+            cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+            transition: opacity var(--anim-speed) ease, background var(--anim-speed) ease;
         }
-        .btn:hover { opacity: 0.9; transform: translateY(-1px); }
-        .btn:active { transform: translateY(1px); }
+        .btn:hover { opacity: 0.8; }
+        .bg-dark { background: var(--dark); } .bg-primary { background: var(--primary); } .bg-success { background: var(--success); }
+
+        /* BARRA DE CREACIÓN DE ALUMNO */
+        .crear-alumno-bar {
+            background: white; padding: 15px 20px; border-radius: 8px;
+            display: flex; gap: 15px; align-items: center; margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-left: 5px solid var(--primary);
+        }
+        .input-base {
+            padding: 10px; border: 1px solid var(--border-color); border-radius: 6px;
+            font-size: 1rem; width: 200px; transition: border var(--anim-speed) ease;
+        }
+        .input-base:focus { border-color: var(--primary); outline: none; }
         
-        .bg-dark { background: var(--dark); }
-        .bg-primary { background: var(--primary); }
-        .bg-success { background: var(--success); }
-        .bg-danger { background: var(--danger); }
-
-        /* Controles según el modo */
-        .edit-controls { display: none; }
-        body.is-editing .edit-controls { display: inline-flex; }
-        body.is-editing .read-controls { display: none; }
-
-        /* ==========================================
-           4. LISTA DE ALUMNOS (ACORDEÓN)
-           ========================================== */
-        .student-row {
-            background: white;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-            overflow: hidden;
-            border-left: 8px solid var(--rango-celeste); /* Color dinámico por edad */
+        /* Botón de confirmar creación oculto por defecto */
+        #btn-confirmar-creacion {
+            opacity: 0; visibility: hidden; transform: scale(0.9);
+            transition: all var(--anim-speed) ease;
         }
+        #btn-confirmar-creacion.show {
+            opacity: 1; visibility: visible; transform: scale(1);
+        }
+
+        /* FICHA DEL ALUMNO (Desplegable suave) */
+        .alumno-card {
+            background: white; border-radius: 8px; margin-bottom: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05); overflow: hidden;
+            transition: all var(--anim-speed) ease;
+        }
+        .alumno-header {
+            padding: 15px 20px; display: flex; justify-content: space-between;
+            align-items: center; cursor: pointer; border-bottom: 1px solid transparent;
+            transition: background var(--anim-speed) ease;
+        }
+        .alumno-header:hover { background: #f8fafc; }
+        .alumno-nombre-tit { font-size: 1.2rem; font-weight: bold; }
         
-        .student-summary {
-            padding: 20px 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            transition: background 0.2s;
-            list-style: none;
-        }
-        .student-summary::-webkit-details-marker { display: none; }
-        .student-summary:hover { background: #f8fafc; }
-        
-        .summary-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            flex-wrap: wrap;
-            width: 100%;
-        }
-        .student-name {
-            font-size: 1.3rem;
-            font-weight: bold;
-            color: var(--dark);
-            min-width: 250px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Píldoras Visuales */
-        .pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 6px 15px;
-            border-radius: 20px;
-            font-size: 0.95rem;
-            font-weight: bold;
-            background: #f1f5f9;
-            color: var(--dark);
-            border: 1px solid #e2e8f0;
-        }
-        .pill-rol { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
-        .pill-area { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
-        .pill-grupo { background: #fef9c3; color: #854d0e; border-color: #fef08a; }
-        .pill-alta { background: #dbeafe; color: #1e40af; border-color: #bfdbfe; }
-
-        /* Botones de acción individual (Lápiz y Papelera) */
-        .row-actions { display: none; gap: 8px; }
-        body.is-editing .row-actions { display: flex; }
-
-        /* ==========================================
-           5. INTERIOR DE LA FICHA (4 BLOQUES)
-           ========================================== */
-        .student-content {
-            padding: 30px;
+        /* Contenido expandible */
+        .alumno-body {
+            max-height: 0; opacity: 0; overflow: hidden;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out;
             background: #f8fafc;
-            border-top: 1px solid #e2e8f0;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 25px;
+        }
+        .alumno-card.open .alumno-body {
+            max-height: 2500px; /* Suficiente para expandir */
+            opacity: 1; border-top: 1px solid var(--border-color);
         }
 
-        .block-card {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            border: 1px solid #e2e8f0;
-        }
-        .block-card.full-width { grid-column: 1 / -1; }
+        /* BLOQUES INTERNOS DE LA FICHA */
+        .bloques-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 20px; }
+        .bloque { background: white; padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); }
+        .bloque.full { grid-column: 1 / -1; }
+        .bloque-tit { font-size: 1.1rem; color: var(--primary); margin-top: 0; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; }
         
-        .block-title {
-            margin: 0 0 20px 0;
-            font-size: 1.2rem;
-            color: var(--primary);
-            border-bottom: 2px solid #f1f5f9;
-            padding-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* Inputs y Formularios */
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-        .input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .input-group.full { grid-column: 1 / -1; }
-        .input-group label {
-            font-size: 0.85rem;
-            font-weight: bold;
-            color: var(--text-light);
-            text-transform: uppercase;
-        }
-        .input-group input, .input-group select {
-            padding: 10px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-family: inherit;
-            color: var(--dark);
-            background: white;
-        }
+        .form-row { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+        .form-row label { font-size: 0.85rem; font-weight: bold; color: #7f8c8d; }
         
-        /* Apariencia de Inputs cuando NO estamos en Modo Edición */
-        body:not(.is-editing) .input-group input,
-        body:not(.is-editing) .input-group select {
-            border-color: transparent;
-            background: transparent;
-            padding: 0;
-            font-weight: 500;
-            -webkit-appearance: none;
-            pointer-events: none;
+        /* Botones de acción dentro de la ficha */
+        .btn-accion-ficha {
+            background: #e2e8f0; color: var(--dark); border: none; padding: 8px 12px;
+            border-radius: 6px; cursor: pointer; font-weight: bold; transition: all var(--anim-speed) ease;
         }
-
-        /* ==========================================
-           6. SECCIÓN ACADÉMICA (DOS COLUMNAS)
-           ========================================== */
-        .academic-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
+        .btn-accion-ficha:hover { background: #cbd5e1; }
         
-        /* Columna Izquierda: Asignaturas Core */
-        .core-subjects { display: flex; flex-direction: column; gap: 15px; }
-        .subject-btn {
-            background: var(--dark);
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            text-align: center;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            transition: transform 0.2s, background 0.2s;
-            border: none;
+        /* Etiquetas / Roles */
+        .tags-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .tag-pill {
+            background: #f1f5f9; border: 1px solid #cbd5e1; padding: 5px 12px;
+            border-radius: 20px; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
         }
-        .subject-btn:hover { transform: translateY(-3px); background: #1a252f; }
+        .tag-pill.active { background: var(--success); color: white; border-color: var(--success); }
 
-        /* Columna Derecha: Módulos Transversales */
-        .transversal-modules { display: flex; flex-direction: column; gap: 10px; }
-        .module-btn {
-            background: #f1f5f9;
-            border: 2px solid #e2e8f0;
-            padding: 12px 15px;
-            border-radius: 8px;
-            text-align: left;
-            font-size: 1.05rem;
-            font-weight: bold;
-            color: var(--text-light);
-            cursor: default; /* En modo lectura no hace nada */
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.2s;
-        }
-        .module-btn.completed {
-            background: #dcfce7;
-            border-color: var(--success);
-            color: #166534;
-        }
-        /* Solo se pueden clicar los módulos si estamos en modo edición */
-        body.is-editing .module-btn { cursor: pointer; }
-        body.is-editing .module-btn:hover { filter: brightness(0.95); }
+        /* Barra Académica */
+        .academico-box { border: 1px dashed var(--primary); padding: 15px; border-radius: 8px; background: #f0f8ff; text-align: center;}
+        .modulos-transversales { display: flex; flex-direction: column; gap: 8px; margin-top: 15px; display: none; }
+        .modulos-transversales.show { display: flex; animation: fadeInAnim var(--anim-speed) ease forwards; }
+        .mod-btn { text-align: left; background: white; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; cursor: pointer; }
 
     </style>
 </head>
 <body>
 
     <div class="app-container">
-        
         <header class="main-banner">
-            <h1 id="app-title">Base de Datos</h1>
-            <button class="btn-fondo" title="Galería de Fondos Temáticos">🖼️ Fondos</button>
+            <h1>Base de Datos</h1>
         </header>
 
         <nav class="tabs-container">
             <button class="tab active">Alumnos</button>
-            <button class="tab tab-add">➕ Añadir Asignatura</button>
+            <button class="tab" style="opacity:0.5; cursor:not-allowed;" title="Aún no enlazada">Matemáticas</button>
+            <button class="tab" style="opacity:0.5; cursor:not-allowed;" title="Aún no enlazada">Lengua</button>
         </nav>
 
         <div class="toolbar">
-            
             <div class="toolbar-group">
-                <button class="btn bg-dark read-controls">📝 Añadir Masivo</button>
-                <button class="btn bg-dark read-controls">🔍 Filtrar / Etiquetas</button>
-                <button class="btn bg-primary read-controls" onclick="activarEdicionGlobal()">✏️ Modo Edición</button>
-                
-                <button class="btn bg-success edit-controls" onclick="guardarEdicionGlobal()">✅ Confirmar</button>
-                <button class="btn bg-dark edit-controls" onclick="cancelarEdicionGlobal()">❌ Cancelar</button>
-                <button class="btn bg-danger edit-controls" onclick="borrarTodo()">🗑️ Borrar Todo</button>
+                <button class="btn bg-dark">📥 Volcar Datos</button>
+                <button class="btn bg-dark">🔍 Filtrar / Etiquetas</button>
+                <button class="btn bg-primary">✏️ Modo Edición</button>
             </div>
-
             <div class="toolbar-group">
-                <button class="btn bg-dark">🔀 Alternar Formato</button>
+                <button class="btn bg-dark">🔀 Formato Nombre</button>
                 <button class="btn bg-dark">🔤 Ordenar A-Z</button>
             </div>
         </div>
 
-        <main id="lista-alumnos-container">
-            </main>
+        <div class="crear-alumno-bar">
+            <strong>👤 Nuevo Alumno:</strong>
+            <input type="text" id="input-nombre" class="input-base" placeholder="Nombre" oninput="comprobarInputs()">
+            <input type="text" id="input-apellidos" class="input-base" placeholder="Apellidos" oninput="comprobarInputs()">
+            <button id="btn-confirmar-creacion" class="btn bg-success" onclick="crearAlumno()">✅ Confirmar</button>
+        </div>
 
+        <main id="lista-alumnos">
+            </main>
     </div>
 
     <script>
-        // ==========================================
-        // LÓGICA DE LA APLICACIÓN
-        // ==========================================
-        
-        // 1. Cargar Estado JSON
+        // Lógica de Estado
         let appState = JSON.parse(document.getElementById('app-state').textContent);
-        
-        // Diccionarios de Emojis
-        const emojis = {
-            roles: { "Aprendiz": "🧑‍🎓", "Maestro": "📜", "Técnico": "🔧", "Técnico Administrativo": "💼", "Capataz": "🦺" },
-            areas: { "Vivero": "🌱", "Vías y Obras": "🔨", "Educación": "🖌️" }
-        };
+        let studentCount = 0;
 
-        // 2. Funciones de Modo Edición
-        function activarEdicionGlobal() {
-            document.body.classList.add('is-editing');
-        }
-        function cancelarEdicionGlobal() {
-            document.body.classList.remove('is-editing');
-            renderizarLista(); // Restaura datos originales
-        }
-        function guardarEdicionGlobal() {
-            // Aquí iría la lógica para guardar los valores de los inputs en el JSON
-            document.body.classList.remove('is-editing');
-            alert("Cambios guardados con éxito.");
-        }
-        function borrarTodo() {
-            if(confirm("⚠️ ¿Quieres borrar todos los campos?\n\nSe eliminarán todos los alumnos menos el último, que quedará limpio.")) {
-                alert("Función de borrado activada.");
+        // 1. Lógica de Input (Aparecer Tick Verde con fundido)
+        function comprobarInputs() {
+            const nom = document.getElementById('input-nombre').value.trim();
+            const ape = document.getElementById('input-apellidos').value.trim();
+            const btn = document.getElementById('btn-confirmar-creacion');
+            
+            if(nom.length > 0 && ape.length > 0) {
+                btn.classList.add('show');
+            } else {
+                btn.classList.remove('show');
             }
         }
 
-        // 3. Motor de Renderizado
-        function renderizarLista() {
-            const container = document.getElementById('lista-alumnos-container');
-            container.innerHTML = ""; // Limpiar lista
-
-            appState.personal.forEach((alumno, index) => {
-                const iconoRol = emojis.roles[alumno.rol] || '❓';
-                const iconoArea = emojis.areas[alumno.area] || '📍';
-                const textoEstado = alumno.estado === 'alta' ? '▶️ Alta' : '⏸️ Baja';
-                const textoGenero = alumno.genero === 'M' ? '♂️ Hombre' : '♀️ Mujer';
-                const colorRangoCSS = `var(--rango-${alumno.edad_rango})`;
-
-                // Crear elemento Acordeón (details)
-                const detalleHTML = document.createElement('details');
-                detalleHTML.className = 'student-row';
-                detalleHTML.style.borderLeftColor = colorRangoCSS;
-
-                detalleHTML.innerHTML = `
-                    <summary class="student-summary">
-                        <div class="summary-info">
-                            <div class="student-name">👤 ${alumno.nombre} ${alumno.apellidos}</div>
-                            <span class="pill pill-rol">${iconoRol} ${alumno.rol}</span>
-                            <span class="pill pill-area">${iconoArea} ${alumno.area}</span>
-                            <span class="pill pill-grupo">1️⃣ Grupo ${alumno.grupo}</span>
-                            <span class="pill pill-alta">${textoEstado}</span>
-                        </div>
-                        <div class="row-actions">
-                            <button class="btn bg-primary" style="padding: 10px;">✏️</button>
-                            <button class="btn bg-danger" style="padding: 10px;">🗑️</button>
-                        </div>
-                    </summary>
-
-                    <div class="student-content">
+        // 2. Crear Alumno y volcarlo a la lista
+        function crearAlumno() {
+            const nom = document.getElementById('input-nombre').value.trim();
+            const ape = document.getElementById('input-apellidos').value.trim();
+            
+            const nuevoID = 'alum_' + studentCount++;
+            
+            // Añadir al HTML
+            const container = document.getElementById('lista-alumnos');
+            const alumDiv = document.createElement('div');
+            alumDiv.className = 'alumno-card fade-in';
+            alumDiv.id = nuevoID;
+            
+            alumDiv.innerHTML = `
+                <div class="alumno-header" onclick="toggleFicha('${nuevoID}')">
+                    <div class="alumno-nombre-tit">👤 ${nom} ${ape}</div>
+                    <div id="resumen-tags-${nuevoID}">▶️ Alta</div>
+                </div>
+                
+                <div class="alumno-body">
+                    <div class="bloques-grid">
                         
-                        <div class="block-card">
-                            <h3 class="block-title">A. Datos Personales</h3>
-                            <div class="form-grid">
-                                <div class="input-group">
-                                    <label>🪪 DNI/NIE</label>
-                                    <input type="text" value="${alumno.dni}">
+                        <div class="bloque">
+                            <h3 class="bloque-tit">Datos Personales</h3>
+                            <div class="form-row">
+                                <label>🪪 DNI/NIE</label>
+                                <input type="text" class="input-base">
+                            </div>
+                            <div class="form-row">
+                                <label>🎂 Fecha de Nacimiento</label>
+                                <div style="display:flex; gap:10px; align-items:center;">
+                                    <input type="date" class="input-base" id="dob-${nuevoID}">
+                                    <button class="btn-accion-ficha" onclick="calcularEdad('${nuevoID}')" title="Calcular Edad">🎂</button>
+                                    <span id="edad-resultado-${nuevoID}" style="font-weight:bold; color:var(--primary); transition:opacity 0.4s; opacity:0;"></span>
                                 </div>
-                                <div class="input-group">
-                                    <label>🎂 Nacimiento</label>
-                                    <input type="date" value="${alumno.dob}">
-                                </div>
-                                <div class="input-group">
-                                    <label>Género</label>
-                                    <select>
-                                        <option value="M" ${alumno.genero==='M'?'selected':''}>♂️ Hombre</option>
-                                        <option value="F" ${alumno.genero==='F'?'selected':''}>♀️ Mujer</option>
-                                    </select>
-                                </div>
+                            </div>
+                            <div class="form-row">
+                                <label>Género</label>
+                                <select class="input-base">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="H">♂️ Hombre</option>
+                                    <option value="M">♀️ Mujer</option>
+                                </select>
                             </div>
                         </div>
 
-                        <div class="block-card">
-                            <h3 class="block-title">B. Ubicación y Contacto</h3>
-                            <div class="form-grid">
-                                <div class="input-group full">
-                                    <label>🏠 Dirección</label>
-                                    <input type="text" value="${alumno.contacto.dir}">
-                                </div>
-                                <div class="input-group">
-                                    <label>📍 CP / Barrio</label>
-                                    <input type="text" value="${alumno.contacto.cp} - ${alumno.contacto.barrio}">
-                                </div>
-                                <div class="input-group">
-                                    <label>Nacionalidad</label>
-                                    <input type="text" value="🇪🇸 ${alumno.contacto.nacionalidad}">
-                                </div>
-                                <div class="input-group">
-                                    <label>📞 Teléfono</label>
-                                    <input type="text" value="${alumno.contacto.tel}">
-                                </div>
+                        <div class="bloque">
+                            <h3 class="bloque-tit">Datos de Contacto</h3>
+                            <div class="form-row">
+                                <label>📞 Teléfono</label>
+                                <input type="text" class="input-base">
+                            </div>
+                            <div class="form-row">
+                                <label>📧 Email</label>
+                                <input type="text" class="input-base">
+                            </div>
+                            <div class="form-row">
+                                <label>📍 Municipio / Dirección</label>
+                                <input type="text" class="input-base" placeholder="Ej: Arucas">
                             </div>
                         </div>
 
-                        <div class="block-card full-width">
-                            <h3 class="block-title">C. Gestión Académica</h3>
-                            <div class="academic-layout">
-                                <div class="core-subjects">
-                                    <button class="subject-btn">📚 Lengua Castellana N2</button>
-                                    <button class="subject-btn">📐 Matemáticas N2</button>
-                                </div>
-                                <div class="transversal-modules">
-                                    <button class="module-btn ${alumno.academicos.transversales.prl ? 'completed' : ''}">
-                                        ${alumno.academicos.transversales.prl ? '✅' : '🔘'} Prevención de Riesgos (PRL)
-                                    </button>
-                                    <button class="module-btn ${alumno.academicos.transversales.medioambiente ? 'completed' : ''}">
-                                        ${alumno.academicos.transversales.medioambiente ? '✅' : '🔘'} Medio Ambiente
-                                    </button>
-                                    <button class="module-btn ${alumno.academicos.transversales.igualdad ? 'completed' : ''}">
-                                        ${alumno.academicos.transversales.igualdad ? '✅' : '🔘'} Igualdad
-                                    </button>
-                                    <button class="module-btn ${alumno.academicos.transversales.informatica ? 'completed' : ''}">
-                                        ${alumno.academicos.transversales.informatica ? '✅' : '🔘'} Informática
-                                    </button>
-                                    <button class="module-btn ${alumno.academicos.transversales.orientacion ? 'completed' : ''}">
-                                        ${alumno.academicos.transversales.orientacion ? '✅' : '🔘'} Orientación Laboral
-                                    </button>
-                                </div>
+                        <div class="bloque full">
+                            <h3 class="bloque-tit">Roles y Etiquetas Asignadas</h3>
+                            <p style="font-size:0.85rem; color:#7f8c8d; margin:0;">Selecciona las etiquetas (vinculadas a la gestión central de la lupa):</p>
+                            <div class="tags-container" id="tags-${nuevoID}">
+                                ${generarBotonesEtiquetas()}
                             </div>
                         </div>
 
-                        <div class="block-card full-width">
-                            <h3 class="block-title">D. Contacto de Emergencia</h3>
-                            <div class="form-grid">
-                                <div class="input-group">
-                                    <label>🚨 Nombre Contacto</label>
-                                    <input type="text" value="${alumno.emergencia.nombre}">
-                                </div>
-                                <div class="input-group">
-                                    <label>Vínculo / Parentesco</label>
-                                    <input type="text" value="${alumno.emergencia.parentesco}">
-                                </div>
-                                <div class="input-group">
-                                    <label>📞 Teléfono Directo</label>
-                                    <input type="text" value="${alumno.emergencia.tel}">
-                                </div>
+                        <div class="bloque">
+                            <h3 class="bloque-tit">Datos Académicos</h3>
+                            <div id="academico-vacio-${nuevoID}" class="academico-box">
+                                <button class="btn bg-primary" onclick="añadirProyecto('${nuevoID}')">➕ Añadir Proyecto/Curso</button>
+                            </div>
+                            
+                            <div id="academico-lleno-${nuevoID}" class="modulos-transversales">
+                                <strong>📚 Proyecto: Trayectoria Arucas</strong>
+                                <p style="font-size:0.8rem; color:#e74c3c; margin:0;">(Las pestañas de Lengua y Matemáticas aún no están enlazadas al sistema. Crealas arriba primero).</p>
+                                <hr style="border:0; border-top:1px solid #ccc; width:100%;">
+                                <button class="mod-btn" onclick="toggleBtn(this)">🔘 PRL (Prevención Riesgos)</button>
+                                <button class="mod-btn" onclick="toggleBtn(this)">🔘 Medio Ambiente</button>
+                                <button class="mod-btn" onclick="toggleBtn(this)">🔘 Igualdad</button>
+                                <button class="mod-btn" onclick="toggleBtn(this)">🔘 Informática</button>
+                                <button class="mod-btn" onclick="toggleBtn(this)">🔘 Orientación Laboral</button>
                             </div>
                         </div>
 
+                        <div class="bloque">
+                            <h3 class="bloque-tit">Contacto de Emergencia</h3>
+                            <div class="form-row">
+                                <label>Nombre de la Persona</label>
+                                <input type="text" class="input-base" placeholder="Nombre completo">
+                            </div>
+                            <div class="form-row">
+                                <label>Parentesco</label>
+                                <input type="text" class="input-base" placeholder="Ej: Hermano, Pareja...">
+                            </div>
+                            <div class="form-row">
+                                <label>Teléfono</label>
+                                <input type="text" class="input-base" placeholder="Teléfono directo">
+                            </div>
+                        </div>
+
+                        <div class="bloque full" style="text-align:right; border:none; padding-top:0;">
+                            <button class="btn bg-success" onclick="cerrarYConfirmar('${nuevoID}')">✅ Confirmar Datos de Ficha</button>
+                        </div>
                     </div>
-                `;
-
-                container.appendChild(detalleHTML);
-            });
+                </div>
+            `;
+            
+            container.appendChild(alumDiv);
+            
+            // Limpiar inputs superiores y ocultar tick
+            document.getElementById('input-nombre').value = '';
+            document.getElementById('input-apellidos').value = '';
+            comprobarInputs();
         }
 
-        // 4. Iniciar la app al cargar
-        window.onload = renderizarLista;
+        // 3. Funciones Interactivas de la Ficha
+        function toggleFicha(id) {
+            const card = document.getElementById(id);
+            card.classList.toggle('open');
+        }
 
+        function cerrarYConfirmar(id) {
+            alert("Datos guardados en el sistema.");
+            document.getElementById(id).classList.remove('open');
+        }
+
+        // 4. Calcular Edad con Fundido
+        function calcularEdad(id) {
+            const dateInput = document.getElementById(`dob-${id}`).value;
+            const resSpan = document.getElementById(`edad-resultado-${id}`);
+            
+            if(!dateInput) {
+                alert("Introduce una fecha primero.");
+                return;
+            }
+            
+            // Cálculo básico simulado
+            const birth = new Date(dateInput);
+            const hoy = new Date();
+            let edad = hoy.getFullYear() - birth.getFullYear();
+            
+            // Mostrar con fundido
+            resSpan.textContent = `Tiene ${edad} años`;
+            resSpan.style.opacity = 1; 
+        }
+
+        // 5. Gestión Académica (Añadir Proyecto)
+        function añadirProyecto(id) {
+            const nombreProy = prompt("Introduce el nombre del proyecto (Ej: Trayectoria Arucas):", "Trayectoria Arucas");
+            if(nombreProy) {
+                // Ocultar botón de añadir
+                document.getElementById(`academico-vacio-${id}`).style.display = 'none';
+                // Mostrar módulos con fundido
+                const lleno = document.getElementById(`academico-lleno-${id}`);
+                lleno.classList.add('show');
+            }
+        }
+
+        // 6. Generar Etiquetas Base
+        function generarBotonesEtiquetas() {
+            let html = "";
+            appState.etiquetas.forEach(t => {
+                html += `<button class="tag-pill" onclick="this.classList.toggle('active')">${t.emoji} ${t.nombre}</button>`;
+            });
+            return html;
+        }
+
+        // Botones toggle genericos
+        function toggleBtn(btn) {
+            if(btn.innerHTML.includes('🔘')) {
+                btn.innerHTML = btn.innerHTML.replace('🔘', '✅');
+                btn.style.background = '#dcfce7';
+                btn.style.borderColor = 'var(--success)';
+            } else {
+                btn.innerHTML = btn.innerHTML.replace('✅', '🔘');
+                btn.style.background = 'white';
+                btn.style.borderColor = 'var(--border-color)';
+            }
+        }
     </script>
 </body>
 </html>
