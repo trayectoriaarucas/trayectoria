@@ -3,435 +3,658 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base de Datos - Sistema Avanzado</title>
-    
+    <title>Sistema de Gestión Educativa - Arucas</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* ESTÉTICA BASADA EN RÚBRICAS 13 Y 14 */
+        /* =========================================================
+           VARIABLES GLOBALES Y ESTILO INSTITUCIONAL
+           ========================================================= */
         :root {
-            --bg-color: #f4f7f6; --text-color: #333; --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            --primary: #3498db; --success: #27ae60; --danger: #e74c3c; --warning: #f39c12; --dark: #2c3e50;
-            --trans: all 0.4s ease;
-            
-            /* Colores Filtro Edad */
-            --age-18: #3498db; /* Azul */
-            --age-31: #27ae60; /* Verde */
-            --age-41: #f1c40f; /* Amarillo */
-            --age-51: #e67e22; /* Naranja */
-            --age-61: #e74c3c; /* Rojo */
+            --brand-primary: #1e3a8a; /* Azul institucional */
+            --brand-secondary: #3b82f6;
+            --brand-light: #eff6ff;
+            --text-dark: #0f172a;
+            --text-gray: #64748b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --surface: #ffffff;
+            --bg-app: #f1f5f9;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
+        * { box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-app); color: var(--text-dark); margin: 0; padding-bottom: 100px; }
+        button { cursor: pointer; border: none; font-family: inherit; transition: var(--transition); }
+        input, select, textarea { font-family: inherit; outline: none; transition: var(--transition); }
         
-        body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; padding-bottom: 80px; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .hidden { display: none !important; }
+
+        /* =========================================================
+           BANNER HERO EDITABLE
+           ========================================================= */
+        .hero {
+            position: relative; height: 260px; display: flex; align-items: center; justify-content: center;
+            background: linear-gradient(135deg, var(--brand-primary), #0f172a);
+            background-size: cover; background-position: center; transition: background 0.5s;
+        }
+        .hero h1 {
+            color: white; font-size: 3.5rem; font-weight: 800; letter-spacing: -1px; text-transform: uppercase;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.4); padding: 10px 20px; border-radius: 8px; border: 2px solid transparent;
+        }
+        .hero h1[contenteditable="true"] { background: rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.8); outline: none; }
         
-        button { cursor: pointer; border: none; font-family: inherit; transition: var(--trans); }
-        input, select { font-family: inherit; transition: var(--trans); }
-        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2); }
+        .btn-settings {
+            position: absolute; top: 20px; right: 30px; background: rgba(255,255,255,0.15); backdrop-filter: blur(8px);
+            color: white; padding: 10px 20px; border-radius: 30px; font-weight: 600; display: flex; align-items: center; gap: 8px; border: 1px solid rgba(255,255,255,0.2);
+        }
+        .btn-settings:hover { background: rgba(255,255,255,0.25); transform: translateY(-2px); }
 
-        .hidden { opacity: 0; visibility: hidden; max-height: 0; overflow: hidden; margin: 0 !important; padding: 0 !important; border: none !important; }
-        .visible { opacity: 1; visibility: visible; max-height: 5000px; }
+        /* Panel Ajustes Banner */
+        .settings-panel {
+            position: absolute; top: 70px; right: 30px; background: white; padding: 20px; border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); width: 320px; z-index: 50; border: 1px solid var(--border);
+        }
+        .color-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 10px 0; }
+        .color-dot { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; border: 2px solid var(--border); transition: transform 0.2s; }
+        .color-dot:hover { transform: scale(1.15); }
+        .theme-btn { width: 100%; padding: 10px; margin-bottom: 8px; border-radius: 8px; font-weight: 600; text-align: left; background: var(--bg-app); border: 1px solid var(--border); }
+        .theme-btn:hover { background: var(--border); }
 
-        /* BANNER Y PESTAÑAS */
-        .banner { background-color: var(--primary); padding: 30px; color: white; display: flex; justify-content: center; align-items: center; position: relative; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .banner h1 { margin: 0; font-size: 2.5rem; text-transform: uppercase; letter-spacing: 1px; }
-        .btn-ajustes { position: absolute; right: 30px; text-align: center; color: white; cursor: pointer; }
-        .btn-ajustes span { font-size: 1.8rem; display: block; }
+        /* =========================================================
+           SISTEMA DE PESTAÑAS (TABS)
+           ========================================================= */
+        .tabs-nav {
+            display: flex; align-items: flex-end; background: var(--surface); padding: 0 40px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1); overflow-x: auto;
+        }
+        .tab {
+            padding: 18px 30px; font-size: 1.1rem; font-weight: 600; color: var(--text-gray);
+            background: transparent; border-bottom: 3px solid transparent;
+        }
+        .tab.active { color: var(--brand-primary); border-bottom-color: var(--brand-primary); }
+        .tab:hover:not(.active) { color: var(--text-dark); background: var(--brand-light); border-radius: 8px 8px 0 0; }
+        .btn-add-tab { padding: 10px 20px; margin: 10px; background: var(--brand-light); color: var(--brand-primary); border-radius: 8px; font-weight: bold; border: 1px dashed var(--brand-secondary); }
+        .btn-add-tab:hover { background: #dbeafe; }
+
+        /* =========================================================
+           CONTENEDOR CENTRAL Y BOTONERA MAIN
+           ========================================================= */
+        .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
         
-        .tabs-header { display: flex; background: var(--dark); padding: 10px 20px 0 20px; gap: 5px; overflow-x: auto; }
-        .tab { background: rgba(255,255,255,0.2); color: white; padding: 12px 25px; border-radius: 8px 8px 0 0; font-weight: bold; font-size: 1rem; }
-        .tab.active { background: var(--bg-color); color: var(--dark); }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .toolbar-group { display: flex; gap: 15px; }
+        .btn-main {
+            padding: 12px 24px; font-size: 1.05rem; font-weight: 600; border-radius: 8px;
+            display: flex; align-items: center; gap: 8px; box-shadow: var(--shadow);
+        }
+        .btn-main.primary { background: var(--brand-primary); color: white; }
+        .btn-main.primary:hover { background: #1e40af; transform: translateY(-2px); }
+        .btn-main.secondary { background: white; color: var(--text-dark); border: 1px solid var(--border); }
+        .btn-main.secondary:hover { background: var(--bg-app); transform: translateY(-2px); }
 
-        /* BOTONERA PRINCIPAL */
-        .actions { background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid var(--primary); margin-bottom: 20px; display: flex; gap: 10px; }
-        .btn { padding: 10px 20px; border-radius: 5px; font-size: 1rem; font-weight: bold; color: white; display: inline-flex; align-items: center; gap: 8px; }
-        .btn:hover { opacity: 0.85; transform: translateY(-1px); }
-        .bg-primary { background: var(--primary); } .bg-success { background: var(--success); } .bg-danger { background: var(--danger); } .bg-dark { background: var(--dark); }
-
-        /* PANELES DESPLEGABLES */
-        .panel { background: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); border-top: 4px solid var(--primary); transition: var(--trans); }
-        .panel h2 { margin-top: 0; color: var(--dark); font-size: 1.2rem; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        /* =========================================================
+           VENTANAS MODALES (SUPERPUESTAS)
+           ========================================================= */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 1000;
+            opacity: 0; visibility: hidden; transition: var(--transition);
+        }
+        .modal-overlay.active { opacity: 1; visibility: visible; }
         
-        /* VOLCADO MASIVO */
-        .volcado-area { width: 100%; height: 120px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; resize: vertical; }
-        .preview-row { display: flex; gap: 10px; margin-bottom: 5px; align-items: center; background: #f9f9f9; padding: 8px; border-radius: 6px; }
-        .preview-row input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; flex: 1; }
-
-        /* LISTA DE ALUMNOS (Acordeones Rúbrica 13) */
-        .student-detail { margin-bottom: 15px; border-radius: 8px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1); background: #fff; transition: var(--trans); }
-        .student-summary { padding: 15px 20px; font-size: 1.1rem; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; align-items: center; color: #fff; transition: filter 0.2s; }
-        .student-summary:hover { filter: brightness(0.95); }
+        .modal-content {
+            background: var(--surface); width: 90%; max-width: 600px; border-radius: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            transform: translateY(20px); transition: var(--transition); max-height: 90vh; display: flex; flex-direction: column;
+        }
+        .modal-overlay.active .modal-content { transform: translateY(0); }
         
-        .btn-icon { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); border-radius: 4px; color: white; padding: 6px 10px; font-size: 1rem; margin-left: 5px; }
-        .btn-icon:hover { background: rgba(0,0,0,0.3); }
+        .modal-header { padding: 20px 25px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-header h2 { margin: 0; color: var(--text-dark); font-size: 1.4rem; }
+        .btn-close { background: var(--bg-app); color: var(--text-gray); width: 36px; height: 36px; border-radius: 50%; font-size: 1.2rem; display: flex; align-items: center; justify-content: center; }
+        .btn-close:hover { background: #fee2e2; color: var(--danger); }
         
-        .content { padding: 20px; background: #fafafa; display: flex; flex-direction: column; gap: 15px; }
+        .modal-body { padding: 25px; overflow-y: auto; }
 
-        /* BLOQUES INTERNOS (Izquierda a Derecha) */
-        .bloque-lineal { background: #fff; border-radius: 8px; padding: 15px; border: 1px solid #e0e0e0; display: flex; flex-wrap: wrap; gap: 15px; align-items: center; }
-        .bloque-titulo { width: 100%; font-size: 1rem; font-weight: bold; color: var(--primary); border-bottom: 2px solid #eee; padding-bottom: 5px; margin-bottom: 5px; }
+        /* Componentes dentro de Modales */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-weight: 600; margin-bottom: 8px; color: var(--text-gray); font-size: 0.9rem; text-transform: uppercase; }
+        .form-control { width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; }
         
-        .campo { display: flex; align-items: center; gap: 10px; background: #f9f9f9; padding: 8px 12px; border-radius: 6px; border: 1px solid #eee; }
-        .campo label { font-size: 0.85rem; font-weight: bold; color: #7f8c8d; }
-        .campo input { border: 1px solid #ccc; padding: 6px; border-radius: 4px; font-size: 0.95rem; }
-        body:not(.modo-edicion) .campo input { pointer-events: none; border-color: transparent; background: transparent; font-weight: bold; color: var(--dark); }
+        /* Previsualización del Volcado (Corrector) */
+        .volcado-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; background: var(--bg-app); padding: 10px; border-radius: 8px; }
+        .volcado-row input { flex: 1; border: 1px solid #ccc; padding: 8px; border-radius: 4px; }
 
-        /* GÉNERO BOTONES */
-        .btn-gen { padding: 8px 15px; border-radius: 6px; border: 1px solid #ccc; background: white; font-weight: bold; cursor: pointer; color: #7f8c8d; }
-        .btn-gen.act-h { background: #3498db; color: white; border-color: #2980b9; }
-        .btn-gen.act-m { background: #9b59b6; color: white; border-color: #8e44ad; }
-        body:not(.modo-edicion) .btn-gen { pointer-events: none; opacity: 0.6; }
-        body:not(.modo-edicion) .btn-gen.act-h, body:not(.modo-edicion) .btn-gen.act-m { opacity: 1; }
+        /* Slider de Edad */
+        .slider-wrapper { display: flex; align-items: center; gap: 15px; }
+        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 8px; background: var(--border); border-radius: 4px; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%; background: var(--age-color, var(--brand-secondary)); cursor: pointer; margin-top: -8px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        
+        /* Emojis y Roles */
+        .emoji-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(45px, 1fr)); gap: 8px; max-height: 150px; overflow-y: auto; background: var(--bg-app); padding: 10px; border-radius: 8px; }
+        .emoji-btn { font-size: 1.5rem; background: transparent; border-radius: 8px; padding: 5px; cursor: pointer; }
+        .emoji-btn:hover { background: #cbd5e1; }
+        .emoji-btn.selected { background: var(--brand-light); border: 2px solid var(--brand-secondary); }
+        .rol-tag { display: inline-flex; align-items: center; gap: 6px; background: var(--brand-primary); color: white; padding: 6px 12px; border-radius: 20px; font-weight: 600; font-size: 0.85rem; margin-right: 5px; margin-bottom: 5px; }
 
-        /* EDAD CIRCULO */
-        .age-circle { width: 24px; height: 24px; border-radius: 50%; background: #ccc; cursor: pointer; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .age-text { font-weight: bold; color: var(--dark); background: #e2e8f0; padding: 4px 8px; border-radius: 4px; font-size: 0.9rem; }
+        /* =========================================================
+           LISTA DE ALUMNOS Y FICHAS (DISEÑO PREMIUM)
+           ========================================================= */
+        .student-card { background: var(--surface); border-radius: 12px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border); overflow: hidden; transition: var(--transition); border-left: 6px solid var(--card-color, var(--brand-secondary)); }
+        
+        .student-header { padding: 20px 25px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; background: var(--surface); transition: background 0.2s; }
+        .student-header:hover { background: var(--brand-light); }
+        .student-name { font-size: 1.15rem; font-weight: 700; color: var(--text-dark); display: flex; align-items: center; gap: 10px; }
+        .student-number { color: var(--text-gray); font-weight: 800; opacity: 0.5; }
+        
+        /* Controles de Lápiz y Edición */
+        .card-controls { display: flex; gap: 8px; }
+        .btn-ctrl { width: 38px; height: 38px; border-radius: 8px; display: flex; justify-content: center; align-items: center; font-size: 1.1rem; color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-ctrl:hover { transform: scale(1.05); }
 
-        /* ACADÉMICOS Y ETIQUETAS */
-        .btn-transversal { background: #ecf0f1; border: 1px solid #bdc3c7; padding: 8px 15px; border-radius: 20px; font-weight: bold; color: #2c3e50; }
-        .btn-transversal.active { background: var(--success); color: white; border-color: #27ae60; }
-        body:not(.modo-edicion) .btn-transversal { pointer-events: none; }
+        .student-body { padding: 25px; background: #fafafa; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        
+        .data-section { background: white; padding: 20px; border-radius: 12px; border: 1px solid var(--border); }
+        .data-section.full { grid-column: 1 / -1; }
+        .section-title { font-size: 1rem; font-weight: 800; color: var(--brand-primary); margin-top: 0; margin-bottom: 15px; text-transform: uppercase; border-bottom: 2px solid var(--bg-app); padding-bottom: 8px; }
+        
+        /* Diseño de Campos Internos */
+        .field-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; background: var(--bg-app); padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border); }
+        .field-row label { font-size: 0.85rem; font-weight: 700; color: var(--text-gray); min-width: 100px; }
+        .field-row input, .field-row select { border: none; background: transparent; flex: 1; font-weight: 600; color: var(--text-dark); padding: 4px; }
+        
+        /* Estado Lectura vs Edición */
+        .student-card.read-only .field-row input, .student-card.read-only .field-row select { pointer-events: none; -webkit-appearance: none; appearance: none; }
+        .student-card.editing .field-row { background: white; border-color: var(--brand-secondary); box-shadow: inset 0 0 0 1px var(--brand-secondary); }
+        
+        /* Signos de Género */
+        .gender-opts { display: flex; gap: 5px; flex: 1; }
+        .gen-btn { flex: 1; padding: 6px; border-radius: 6px; font-weight: bold; background: white; border: 1px solid var(--border); color: var(--text-gray); display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .gen-btn.active-h { background: #dbeafe; color: #1e40af; border-color: #3b82f6; }
+        .gen-btn.active-m { background: #fce7f3; color: #be185d; border-color: #ec4899; }
+        .student-card.read-only .gen-btn:not(.active-h):not(.active-m) { display: none; }
+        .student-card.read-only .gender-opts { pointer-events: none; }
 
-        .btn-subject { background: var(--dark); color: white; padding: 10px 20px; border-radius: 8px; font-weight: bold; }
+        /* Edad Tarta */
+        .age-badge { padding: 4px 10px; border-radius: 20px; font-weight: bold; font-size: 0.85rem; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+
+        /* Píldoras CP y Académico */
+        .pill-select { background: white; border: 1px solid var(--border); padding: 6px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; cursor: pointer; color: var(--text-gray); }
+        .pill-select.active { background: var(--brand-primary); color: white; border-color: var(--brand-primary); }
+        .acad-btn { background: var(--text-dark); color: white; padding: 8px 16px; border-radius: 8px; font-weight: bold; }
 
     </style>
 </head>
 <body>
 
-    <header class="banner">
-        <h1>Base de Datos</h1>
-        <div class="btn-ajustes"><span>⚙️</span>Ajustes</div>
+    <header class="hero" id="main-hero">
+        <h1 id="hero-title">BASE DE DATOS</h1>
+        <button class="btn-settings" onclick="toggleConfig()">⚙️ Ajustes de Diseño</button>
+        
+        <div class="settings-panel hidden" id="settings-panel">
+            <h3 style="margin-top:0; color:var(--text-dark); font-size:1.1rem;">Personalizar Banner</h3>
+            <p style="font-size:0.85rem; color:var(--text-gray);">Haz clic en el título central para cambiar el texto.</p>
+            
+            <label style="font-size:0.85rem; font-weight:bold; color:var(--text-gray);">Color del Texto</label>
+            <div class="color-grid" id="color-grid"></div>
+            
+            <label style="font-size:0.85rem; font-weight:bold; color:var(--text-gray); margin-top:10px; display:block;">Fondo Temático</label>
+            <button class="theme-btn" onclick="changeTheme('linear-gradient(135deg, #1e3a8a, #0f172a)')">📘 Institucional / Educación</button>
+            <button class="theme-btn" onclick="changeTheme('linear-gradient(135deg, #047857, #064e3b)')">🔬 Ciencias / Medio Ambiente</button>
+            <button class="theme-btn" onclick="changeTheme('linear-gradient(135deg, #be185d, #831843)')">🎭 Humanidades / Social</button>
+            <button class="theme-btn" onclick="changeTheme('linear-gradient(135deg, #b45309, #78350f)')">⚒️ Siderurgia / Taller</button>
+            
+            <button style="width:100%; margin-top:10px; background:var(--success); color:white; padding:10px; border-radius:8px; font-weight:bold;" onclick="toggleConfig()">✅ Aplicar</button>
+        </div>
     </header>
 
-    <nav class="tabs-header">
+    <nav class="tabs-nav" id="tabs-container">
         <button class="tab active">Alumnos</button>
-        <button class="tab" style="opacity:0.5;">Matemáticas</button>
-        <button class="tab" style="opacity:0.5;">Lengua</button>
+        <button class="btn-add-tab" onclick="addAsignatura()">➕ Añadir Asignatura</button>
     </nav>
 
     <div class="container">
-        
-        <div class="actions">
-            <button class="btn bg-primary" id="btn-editar" onclick="toggleModoEdicion()">✏️ Editar</button>
-            <button class="btn bg-dark" id="btn-filtrar" onclick="togglePanel('filtrar')">🔍 Filtrar / Ordenar</button>
-            <button class="btn bg-dark" id="btn-roles" onclick="togglePanel('roles')">🏷️ Roles</button>
-        </div>
-
-        <div id="panel-editar" class="panel hidden">
-            <h2>Opciones de Edición</h2>
-            <div style="display:flex; gap:10px; margin-bottom: 20px;">
-                <button class="btn bg-dark" onclick="document.getElementById('caja-volcado').classList.toggle('hidden')">📥 Volcar todo el contenido</button>
-                <button class="btn bg-danger" onclick="borrarTodosAlumnos()">🗑️ Borrar todos los alumnos</button>
+        <div class="toolbar">
+            <h2 style="margin:0; color:var(--brand-primary); font-size:1.8rem;">Listado General</h2>
+            <div class="toolbar-group">
+                <button class="btn-main secondary" onclick="openModal('modal-gestion')">👥 Gestión y Añadir</button>
+                <button class="btn-main secondary" onclick="openModal('modal-roles')">🏷️ Etiquetas y Roles</button>
+                <button class="btn-main primary" onclick="openModal('modal-filtros')">🔍 Vistas y Filtros</button>
             </div>
-
-            <div id="caja-volcado" class="hidden" style="background:#f9f9f9; padding:15px; border-radius:8px; border:1px solid #ddd;">
-                <p style="margin-top:0; font-weight:bold;">Pega la lista de alumnos (Uno por línea):</p>
-                <textarea id="texto-volcado" class="volcado-area" placeholder="Ejemplo:\nJuan Pérez Gómez\nAna María López"></textarea>
-                <button class="btn bg-primary" style="margin-top:10px;" onclick="previsualizarVolcado()">👁️ Previsualizar y Ajustar</button>
-                
-                <div id="preview-volcado" class="hidden" style="margin-top:15px; border-top:2px solid #eee; padding-top:15px;">
-                    <p style="color:var(--danger); font-weight:bold; margin-top:0;">Revisa que los nombres y apellidos estén bien separados:</p>
-                    <div id="preview-filas" style="max-height: 200px; overflow-y:auto; margin-bottom:10px;"></div>
-                    <button class="btn bg-success" onclick="confirmarVolcado()">✅ Confirmar Lista</button>
-                </div>
-            </div>
-
-            <div style="background: #e0f2fe; padding: 15px; border-radius: 8px; display: flex; gap: 10px; align-items: center; margin-top: 15px;">
-                <strong style="color:var(--dark);">➕ Añadir un alumno:</strong>
-                <input type="text" id="nuevo-nombre" placeholder="Nombre" style="padding:8px; border-radius:4px; border:1px solid #ccc;" oninput="checkNuevo()">
-                <input type="text" id="nuevo-apellido" placeholder="Apellidos" style="padding:8px; border-radius:4px; border:1px solid #ccc;" oninput="checkNuevo()">
-                <button id="btn-nuevo-tick" class="btn bg-success hidden" style="padding:8px 15px;" onclick="crearAlumnoManual()">✅</button>
-            </div>
-        </div>
-
-        <div id="panel-filtrar" class="panel hidden">
-            <h2>Filtros y Vistas</h2>
-            <p>Opciones de orden y filtros (En desarrollo visual)...</p>
-        </div>
-
-        <div id="panel-roles" class="panel hidden">
-            <h2>Gestor de Etiquetas</h2>
-            <p>Carpeta estilo Android de Emojis y agrupaciones (En desarrollo visual)...</p>
         </div>
 
         <div id="lista-alumnos"></div>
+    </div>
 
+    <div class="modal-overlay" id="modal-gestion">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Gestión de Alumnos</h2>
+                <button class="btn-close" onclick="closeModal('modal-gestion')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div style="background:var(--brand-light); padding:20px; border-radius:12px; margin-bottom:20px; border:1px solid #bfdbfe;">
+                    <h3 style="margin-top:0; color:var(--brand-primary); font-size:1rem;">➕ Añadir Manualmente</h3>
+                    <div style="display:flex; gap:10px;">
+                        <input type="text" id="add-nom" placeholder="Nombre" class="form-control" oninput="checkAddBtn()">
+                        <input type="text" id="add-ape" placeholder="Apellidos" class="form-control" oninput="checkAddBtn()">
+                    </div>
+                    <button id="btn-add-manual" class="hidden" style="width:100%; margin-top:10px; background:var(--success); color:white; padding:12px; border-radius:8px; font-weight:bold;" onclick="crearAlumnoManual()">✅ Confirmar y Crear Ficha</button>
+                </div>
+
+                <hr style="border:0; border-top:1px solid var(--border); margin:20px 0;">
+
+                <div>
+                    <h3 style="margin-top:0; color:var(--brand-primary); font-size:1rem;">📥 Volcar Lista Completa</h3>
+                    <p style="font-size:0.85rem; color:var(--text-gray); margin-top:0;">Pega los nombres completos (uno por línea). El sistema detectará los apellidos.</p>
+                    <textarea id="txt-volcado" class="form-control" style="height:120px; resize:vertical;" placeholder="Ejemplo:\nJuan Pérez Gómez\nAna María López"></textarea>
+                    <button style="width:100%; margin-top:10px; background:var(--text-dark); color:white; padding:12px; border-radius:8px; font-weight:bold;" onclick="procesarVolcado()">👁️ Previsualizar y Corregir</button>
+                </div>
+
+                <div id="volcado-preview" class="hidden" style="margin-top:20px; background:#fffbeb; padding:15px; border-radius:12px; border:1px solid #fde68a;">
+                    <strong style="color:var(--warning);">⚠️ Revisa la división automática:</strong>
+                    <div id="volcado-filas" style="max-height: 200px; overflow-y:auto; margin:15px 0;"></div>
+                    <button style="width:100%; background:var(--success); color:white; padding:12px; border-radius:8px; font-weight:bold;" onclick="confirmarVolcado()">✅ Confirmar e Importar Todos</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-filtros">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Vistas y Filtros</h2>
+                <button class="btn-close" onclick="closeModal('modal-filtros')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Ordenar Por:</label>
+                    <select id="filtro-formato" class="form-control" onchange="renderList()">
+                        <option value="NA">Alfabéticamente (Nombre, Apellidos)</option>
+                        <option value="AN">Alfabéticamente (Apellidos, Nombre)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Rango de Edad: <span id="lbl-edad" style="color:var(--brand-secondary); font-size:1.1rem; margin-left:5px;">18 - 30</span> años</label>
+                    <div class="slider-wrapper">
+                        <input type="range" id="slider-edad" min="0" max="4" value="0" oninput="actualizarSlider()">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Género:</label>
+                    <select class="form-control"><option>Todos</option><option>Hombres</option><option>Mujeres</option></select>
+                </div>
+                
+                <button style="width:100%; margin-top:10px; background:var(--brand-primary); color:white; padding:12px; border-radius:8px; font-weight:bold;" onclick="closeModal('modal-filtros')">Aplicar Filtros</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-roles">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Etiquetas y Roles</h2>
+                <button class="btn-close" onclick="closeModal('modal-roles')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Crear Nueva Etiqueta:</label>
+                    <div style="display:flex; gap:10px; margin-bottom:10px;">
+                        <input type="text" id="rol-nombre" class="form-control" placeholder="Nombre (Ej: Vivero, Grupo 1)">
+                        <input type="text" id="rol-search" class="form-control" placeholder="Buscar emoji (ej: planta)" oninput="buscarEmoji()" style="width:150px;">
+                    </div>
+                    <div id="emoji-grid" class="emoji-grid"></div>
+                    <button id="btn-save-rol" style="width:100%; margin-top:10px; background:var(--success); color:white; padding:12px; border-radius:8px; font-weight:bold;" onclick="guardarRol()">✅ Crear Etiqueta</button>
+                </div>
+
+                <div class="form-group" style="margin-top:20px; border-top:1px solid var(--border); padding-top:20px;">
+                    <label>Asignación Masiva:</label>
+                    <div id="roles-creados" style="display:flex; flex-wrap:wrap; margin-bottom:10px;"></div>
+                    <button style="width:100%; background:var(--text-dark); color:white; padding:12px; border-radius:8px; font-weight:bold;">Asignar rol a seleccionados</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-        // ESTADO GLOBAL
+        // =========================================================
+        // LÓGICA DE NEGOCIO Y ESTADO GLOBAL
+        // =========================================================
         let alumnos = [];
         let volcadoTemp = [];
-        let isEditingMode = false;
-        
-        const paletaColores = ["#34495e", "#8e44ad", "#2980b9", "#d35400", "#16a085", "#27ae60", "#f39c12", "#e67e22"];
-        const arucasCP = { "35400": "Arucas Centro", "35411": "Bañaderos/San Andrés", "35412": "Cardones", "35413": "Santidad", "35414": "Trapiche" };
+        let rolesGuardados = [];
+        let emojiSeleccionado = null;
 
-        // CONTROL PANELES Y EDICIÓN
-        function toggleModoEdicion() {
-            isEditingMode = !isEditingMode;
-            const btn = document.getElementById('btn-editar');
-            if(isEditingMode) {
-                btn.classList.replace('bg-primary', 'bg-warning');
-                btn.innerHTML = "🔓 Edición Activada";
-                document.body.classList.add('modo-edicion');
-                togglePanel('editar');
+        const coloresCabecera = ["#3b82f6", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#06b6d4"];
+        const coloresEdad = [
+            { t: "18 - 30", c: "#3b82f6", bg: "#dbeafe", tc: "#1e40af" }, 
+            { t: "31 - 40", c: "#10b981", bg: "#d1fae5", tc: "#065f46" }, 
+            { t: "41 - 50", c: "#eab308", bg: "#fef08a", tc: "#854d0e" }, 
+            { t: "51 - 60", c: "#f97316", bg: "#ffedd5", tc: "#9a3412" }, 
+            { t: "61 - 70", c: "#ef4444", bg: "#fee2e2", tc: "#991b1b" }
+        ];
+
+        // Base de Datos Estricta: Arucas (Real)
+        const dbArucas = {
+            "35400": ["Arucas Centro", "La Goleta", "Visvique", "Los Castillos"],
+            "35411": ["Santidad Alta", "Santidad Baja", "Lomo de Arucas", "Juan XXIII", "La Guitarrilla"],
+            "35412": ["Los Portales", "Las Longueras", "Cardones"],
+            "35413": ["Trasmontaña", "Tinocas"],
+            "35414": ["Bañaderos", "San Andrés", "El Altillo", "El Pagador", "Quintanilla"],
+            "35415": ["La Cruz", "Los Castillos"],
+            "35418": ["Montaña de Arucas", "La Montañeta"]
+        };
+
+        const emojiDict = { "planta vivero": ["🌱","🌲","🌻","🌿"], "herramienta": ["🔨","🔧","🦺"], "educacion": ["📚","🎓","📐"], "alerta": ["🚨","⚠️"], "general": ["👥","⭐","✅"] };
+
+        // =========================================================
+        // UI: BANNER Y PESTAÑAS
+        // =========================================================
+        function toggleConfig() {
+            const p = document.getElementById('settings-panel');
+            const title = document.querySelector('.hero h1');
+            if(p.classList.contains('hidden')){
+                p.classList.remove('hidden'); title.setAttribute('contenteditable', 'true'); title.focus();
             } else {
-                btn.classList.replace('bg-warning', 'bg-primary');
-                btn.innerHTML = "✏️ Editar";
-                document.body.classList.remove('modo-edicion');
-                togglePanel('none');
+                p.classList.add('hidden'); title.removeAttribute('contenteditable');
             }
-            renderList();
         }
 
-        function togglePanel(panel) {
-            const arr = ['editar', 'filtrar', 'roles'];
-            arr.forEach(p => {
-                const el = document.getElementById(`panel-${p}`);
-                if(p === panel && el.classList.contains('hidden')) {
-                    el.classList.replace('hidden', 'visible');
-                } else {
-                    el.classList.replace('visible', 'hidden');
-                }
+        // Rellenar colores banner
+        const colors = ["#ffffff","#f8fafc","#cbd5e1","#fca5a5","#fcd34d","#86efac","#93c5fd","#c4b5fd"];
+        colors.forEach(c => {
+            const d = document.createElement('div'); d.className = 'color-dot'; d.style.background = c;
+            d.onclick = () => document.execCommand('foreColor', false, c);
+            document.querySelector('.color-grid').appendChild(d);
+        });
+
+        function changeTheme(bg) { document.getElementById('main-hero').style.background = bg; }
+
+        function addAsignatura() {
+            const nom = prompt("Nombre de la nueva pestaña (Ej: Competencia Matemática N2):");
+            if(nom) {
+                const nav = document.getElementById('tabs-container');
+                const btn = document.createElement('button'); btn.className = 'tab'; btn.textContent = nom;
+                nav.insertBefore(btn, document.querySelector('.btn-add-tab'));
+            }
+        }
+
+        // =========================================================
+        // UI: MODALES Y FILTROS
+        // =========================================================
+        function openModal(id) { document.getElementById(id).classList.add('active'); }
+        function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+        function actualizarSlider() {
+            const val = document.getElementById('slider-edad').value;
+            const lbl = document.getElementById('lbl-edad');
+            lbl.textContent = coloresEdad[val].t;
+            lbl.style.color = coloresEdad[val].c;
+            document.documentElement.style.setProperty('--age-color', coloresEdad[val].c);
+        }
+
+        // =========================================================
+        // UI: ROLES Y EMOJIS
+        // =========================================================
+        function buscarEmoji() {
+            const term = document.getElementById('rol-search').value.toLowerCase();
+            const grid = document.getElementById('emoji-grid');
+            grid.innerHTML = "";
+            let arr = term === "" ? Object.values(emojiDict).flat() : [];
+            if(term !== "") {
+                for(let key in emojiDict) if(key.includes(term)) arr = arr.concat(emojiDict[key]);
+            }
+            [...new Set(arr)].forEach(e => {
+                const b = document.createElement('div'); b.className = 'emoji-btn'; b.textContent = e;
+                b.onclick = () => { document.querySelectorAll('.emoji-btn').forEach(x=>x.classList.remove('selected')); b.classList.add('selected'); emojiSeleccionado = e; };
+                grid.appendChild(b);
             });
         }
+        buscarEmoji();
 
-        // VOLCADO MASIVO (Con Inteligencia de 2 apellidos)
-        function previsualizarVolcado() {
-            const texto = document.getElementById('texto-volcado').value.trim();
-            if(!texto) return;
-            
-            const lineas = texto.split('\n').filter(l => l.trim() !== "");
-            volcadoTemp = [];
-            const contFilas = document.getElementById('preview-filas');
-            contFilas.innerHTML = "";
-
-            lineas.forEach((linea, index) => {
-                const palabras = linea.trim().split(/\s+/);
-                let nom = "", ape = "";
-                
-                if(palabras.length >= 3) {
-                    ape = palabras.slice(-2).join(" ");
-                    nom = palabras.slice(0, -2).join(" ");
-                } else if(palabras.length === 2) {
-                    nom = palabras[0]; ape = palabras[1];
-                } else {
-                    nom = linea; ape = "";
-                }
-
-                volcadoTemp.push({ nombre: nom, apellidos: ape });
-
-                contFilas.innerHTML += `
-                    <div class="preview-row">
-                        <strong style="width:20px;">${index+1}.</strong>
-                        <input type="text" id="prev-nom-${index}" value="${nom}" title="Nombre">
-                        <input type="text" id="prev-ape-${index}" value="${ape}" title="Apellidos">
-                    </div>
-                `;
-            });
-            
-            document.getElementById('preview-volcado').classList.replace('hidden', 'visible');
+        function guardarRol() {
+            const nom = document.getElementById('rol-nombre').value;
+            if(nom && emojiSeleccionado) {
+                rolesGuardados.push({n:nom, e:emojiSeleccionado});
+                document.getElementById('rol-nombre').value = ""; emojiSeleccionado = null; buscarEmoji();
+                const cont = document.getElementById('roles-creados');
+                cont.innerHTML = "";
+                rolesGuardados.forEach(r => cont.innerHTML += `<div class="rol-tag">${r.e} ${r.n}</div>`);
+            }
         }
 
-        function confirmarVolcado() {
-            volcadoTemp.forEach((item, index) => {
-                const finalNom = document.getElementById(`prev-nom-${index}`).value.trim();
-                const finalApe = document.getElementById(`prev-ape-${index}`).value.trim();
-                crearObjetoAlumno(finalNom, finalApe);
-            });
-            
-            document.getElementById('texto-volcado').value = "";
-            document.getElementById('preview-volcado').classList.replace('visible', 'hidden');
-            document.getElementById('caja-volcado').classList.replace('visible', 'hidden');
-            renderList();
-        }
-
-        // CREACIÓN INDIVIDUAL
-        function checkNuevo() {
-            const n = document.getElementById('nuevo-nombre').value.trim();
-            const a = document.getElementById('nuevo-apellido').value.trim();
-            const btn = document.getElementById('btn-nuevo-tick');
-            if(n && a) btn.classList.replace('hidden', 'visible');
-            else btn.classList.replace('visible', 'hidden');
+        // =========================================================
+        // CREACIÓN Y VOLCADO (LA INTELIGENCIA DEL SISTEMA)
+        // =========================================================
+        function checkAddBtn() {
+            const n = document.getElementById('add-nom').value.trim();
+            const a = document.getElementById('add-ape').value.trim();
+            const b = document.getElementById('btn-add-manual');
+            if(n && a) b.classList.remove('hidden'); else b.classList.add('hidden');
         }
 
         function crearAlumnoManual() {
-            const n = document.getElementById('nuevo-nombre').value.trim();
-            const a = document.getElementById('nuevo-apellido').value.trim();
-            crearObjetoAlumno(n, a);
-            document.getElementById('nuevo-nombre').value = "";
-            document.getElementById('nuevo-apellido').value = "";
-            checkNuevo();
-            renderList();
+            crearObjetoAlumno(document.getElementById('add-nom').value.trim(), document.getElementById('add-ape').value.trim());
+            document.getElementById('add-nom').value = ""; document.getElementById('add-ape').value = "";
+            closeModal('modal-gestion'); checkAddBtn(); renderList();
         }
 
-        function crearObjetoAlumno(nom, ape) {
+        function procesarVolcado() {
+            const txt = document.getElementById('txt-volcado').value;
+            if(!txt.trim()) return;
+            const lineas = txt.split('\n').filter(l => l.trim() !== "");
+            
+            volcadoTemp = [];
+            const cont = document.getElementById('volcado-filas');
+            cont.innerHTML = "";
+
+            lineas.forEach((linea, i) => {
+                const parts = linea.trim().split(/\s+/);
+                let nom = "", ape = "";
+                // Matemáticamente separa las 2 últimas como apellidos
+                if(parts.length >= 3) { ape = parts.slice(-2).join(" "); nom = parts.slice(0, -2).join(" "); } 
+                else if(parts.length === 2) { nom = parts[0]; ape = parts[1]; } 
+                else { nom = linea; }
+
+                volcadoTemp.push({n: nom, a: ape});
+                cont.innerHTML += `
+                    <div class="volcado-row">
+                        <input type="text" id="v-n-${i}" value="${nom}" title="Nombre">
+                        <input type="text" id="v-a-${i}" value="${ape}" title="Apellidos">
+                    </div>
+                `;
+            });
+            document.getElementById('volcado-preview').classList.remove('hidden');
+        }
+
+        function confirmarVolcado() {
+            volcadoTemp.forEach((_, i) => {
+                const n = document.getElementById(`v-n-${i}`).value.trim();
+                const a = document.getElementById(`v-a-${i}`).value.trim();
+                if(n || a) crearObjetoAlumno(n, a);
+            });
+            document.getElementById('txt-volcado').value = "";
+            document.getElementById('volcado-preview').classList.add('hidden');
+            closeModal('modal-gestion'); renderList();
+        }
+
+        function crearObjetoAlumno(n, a) {
             alumnos.push({
                 id: Date.now() + Math.random(),
-                nombre: nom, apellidos: ape,
-                dni: "", dob: "", genero: "",
-                domicilio: "", municipio: "", cp: "", nacionalidad: "España", telefono: "",
-                proyectoAbierto: false, transversales: [false,false,false,false,false],
-                emergencia: { nombre: "", parentesco: "", tel: "" },
-                abierto: false
+                n: n, a: a,
+                dni: "", dob: "", gen: "",
+                domicilio: "", cp: "", municipio: "", nacionalidad: "España", tel: "",
+                emergencia: {n:"", p:"", t:""}, isEditing: false, abierto: false,
+                academicoAbierto: false
             });
         }
 
-        function borrarTodosAlumnos() {
-            if(confirm("⚠️ ¿Estás seguro de borrar toda la base de datos de alumnos?")) {
-                alumnos = []; renderList();
-            }
+        // =========================================================
+        // LÓGICA INTERNA DE LA FICHA Y RENDER
+        // =========================================================
+        function toggleEdicionFila(id, e) {
+            e.stopPropagation();
+            const al = alumnos.find(x => x.id === id);
+            al.isEditing = !al.isEditing;
+            if(al.isEditing) al.abierto = true; // Abre si edita
+            renderList();
+        }
+
+        function toggleAcordeon(id) {
+            const al = alumnos.find(x => x.id === id);
+            if(!al.isEditing) { al.abierto = !al.abierto; renderList(); }
         }
 
         function borrarFila(id, e) {
             e.stopPropagation();
-            if(confirm("¿Eliminar alumno?")) {
-                alumnos = alumnos.filter(a => a.id !== id);
-                renderList();
-            }
+            if(confirm("¿Eliminar definitivamente a este alumno?")) { alumnos = alumnos.filter(x => x.id !== id); renderList(); }
         }
 
-        // EDICIÓN INTERNA DE CAMPOS
-        function toggleFicha(id, e) {
-            if(e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
-            const al = alumnos.find(a => a.id === id);
-            al.abierto = !al.abierto;
-            renderList();
+        function setGen(id, val) { alumnos.find(x => x.id === id).gen = val; renderList(); }
+        function calcEdadColor(dob) {
+            if(!dob) return {txt:"", bg:"transparent", tc:""};
+            const age = new Date().getFullYear() - new Date(dob).getFullYear();
+            if(age <= 30) return {txt:`${age} años`, ...coloresEdad[0]};
+            if(age <= 40) return {txt:`${age} años`, ...coloresEdad[1]};
+            if(age <= 50) return {txt:`${age} años`, ...coloresEdad[2]};
+            if(age <= 60) return {txt:`${age} años`, ...coloresEdad[3]};
+            return {txt:`${age} años`, ...coloresEdad[4]};
         }
 
-        function setGenero(id, val) {
-            const al = alumnos.find(a => a.id === id);
-            al.genero = val; renderList();
-        }
-
-        function calcEdad(id) {
-            const val = document.getElementById(`dob-${id}`).value;
-            const al = alumnos.find(a => a.id === id);
-            al.dob = val;
-            
-            if(!val) return;
-            const age = new Date().getFullYear() - new Date(val).getFullYear();
-            
-            const circle = document.getElementById(`age-circ-${id}`);
-            const text = document.getElementById(`age-text-${id}`);
-            
-            // Colores por rango
-            if(age <= 30) circle.style.background = 'var(--age-18)';
-            else if(age <= 40) circle.style.background = 'var(--age-31)';
-            else if(age <= 50) circle.style.background = 'var(--age-41)';
-            else if(age <= 60) circle.style.background = 'var(--age-51)';
-            else circle.style.background = 'var(--age-61)';
-
-            text.textContent = `${age} años`;
-        }
-
-        function mostrarEdadTexto(id) {
-            const text = document.getElementById(`age-text-${id}`);
-            if(text.textContent !== "") {
-                text.classList.toggle('hidden'); text.classList.toggle('visible');
-            }
-        }
-
-        function checkCP(id) {
+        // EL MOTOR LÓGICO DE ARUCAS
+        function detectarCP(id) {
+            const al = alumnos.find(x => x.id === id);
             const val = document.getElementById(`cp-${id}`).value;
-            const muni = document.getElementById(`muni-${id}`);
-            if(arucasCP[val]) muni.value = arucasCP[val];
+            al.cp = val;
+            const cont = document.getElementById(`muni-container-${id}`);
+            
+            if(dbArucas[val]) {
+                al.municipio = "Arucas";
+                let html = `<div style="display:flex; flex-wrap:wrap; gap:5px; margin-top:5px;">`;
+                dbArucas[val].forEach(poblacion => {
+                    html += `<div class="pill-select" onclick="this.classList.toggle('active')">${poblacion}</div>`;
+                });
+                html += `<input type="text" placeholder="Añadir manual..." style="border:1px dashed #ccc; padding:4px 8px; border-radius:15px; font-size:0.85rem; width:120px;"></div>`;
+                cont.innerHTML = html;
+            } else {
+                cont.innerHTML = `<input type="text" value="${al.municipio}" placeholder="Escribe el Municipio" style="width:100%; margin-top:5px; padding:6px; border:1px solid #ccc; border-radius:6px;" onchange="alumnos.find(x=>x.id==${id}).municipio=this.value">`;
+            }
         }
 
-        function abrirProyecto(id) {
-            const al = alumnos.find(a => a.id === id);
-            al.proyectoAbierto = true; renderList();
-        }
-
-        // RENDER PRINCIPAL
         function renderList() {
-            alumnos.sort((a,b) => a.nombre.localeCompare(b.nombre));
+            const f = document.getElementById('filtro-formato').value;
+            alumnos.sort((a,b) => {
+                const sA = f === 'NA' ? `${a.n} ${a.a}` : `${a.a} ${a.n}`;
+                const sB = f === 'NA' ? `${b.n} ${b.a}` : `${b.a} ${b.n}`;
+                return sA.localeCompare(sB);
+            });
+
             const cont = document.getElementById('lista-alumnos');
             cont.innerHTML = "";
 
-            alumnos.forEach((al, index) => {
-                const colorCabecera = paletaColores[index % paletaColores.length];
-                
-                // Botones Cabecera
-                let headBtns = isEditingMode 
-                    ? `<button class="btn-icon del" onclick="borrarFila(${al.id}, event)">🗑️</button>` 
-                    : ``;
+            alumnos.forEach((al, i) => {
+                const colorCard = coloresCabecera[i % coloresCabecera.length];
+                const nombreVista = f === 'NA' ? `${al.n} ${al.a}` : `${al.a}, ${al.n}`;
+                const cl = al.isEditing ? 'editing' : 'read-only';
+                const ageData = calcEdadColor(al.dob);
 
-                // Transversales (Arucas)
-                const tNames = ["PRL", "Medio Ambiente", "Igualdad", "Informática", "Orientación"];
-                let transHTML = "";
-                tNames.forEach((t, i) => {
-                    const act = al.transversales[i] ? 'active' : '';
-                    transHTML += `<button class="btn-transversal ${act}" onclick="alumnos.find(x=>x.id==${al.id}).transversales[${i}]=!alumnos.find(x=>x.id==${al.id}).transversales[${i}]; renderList();">${t}</button>`;
-                });
+                // El sistema de Lápiz vs ✅❌🗑️
+                let ctrls = al.isEditing 
+                    ? `<button class="btn-ctrl" style="background:var(--success);" onclick="toggleEdicionFila(${al.id}, event)">✅</button>
+                       <button class="btn-ctrl" style="background:var(--text-gray);" onclick="toggleEdicionFila(${al.id}, event)">❌</button>
+                       <button class="btn-ctrl" style="background:var(--danger);" onclick="borrarFila(${al.id}, event)">🗑️</button>`
+                    : `<button class="btn-ctrl" style="background:var(--brand-secondary);" onclick="toggleEdicionFila(${al.id}, event)">✏️</button>`;
 
                 const div = document.createElement('div');
-                div.className = 'student-detail';
-                
+                div.className = `student-card ${cl}`;
+                div.style.setProperty('--card-color', colorCard);
+
                 div.innerHTML = `
-                    <div class="student-summary" style="background:${colorCabecera};" onclick="toggleFicha(${al.id}, event)">
-                        <div>${index+1}. ${al.nombre} ${al.apellidos}</div>
-                        <div>${headBtns}</div>
+                    <div class="student-header" onclick="toggleAcordeon(${al.id})">
+                        <div class="student-name">
+                            <span class="student-number">${i+1}.</span> ${nombreVista || "<em>Nuevo Alumno</em>"}
+                        </div>
+                        <div class="card-controls">${ctrls}</div>
                     </div>
-                    
-                    <div class="content ${al.abierto ? 'visible' : 'hidden'}">
+
+                    <div class="student-body ${al.abierto ? 'visible' : 'hidden'}">
                         
-                        <div class="bloque-lineal">
-                            <div class="bloque-titulo">A. Datos Personales</div>
-                            <div class="campo"><label>DNI/NIE</label><input type="text" value="${al.dni}" onchange="al.dni=this.value"></div>
-                            <div class="campo">
+                        <div class="data-section">
+                            <h3 class="section-title">A. Datos Personales</h3>
+                            ${al.isEditing ? `
+                                <div class="field-row"><label>Nombre</label><input type="text" value="${al.n}" onchange="alumnos.find(x=>x.id==${al.id}).n=this.value"></div>
+                                <div class="field-row"><label>Apellidos</label><input type="text" value="${al.a}" onchange="alumnos.find(x=>x.id==${al.id}).a=this.value"></div>
+                            ` : ''}
+                            <div class="field-row"><label>DNI / NIE</label><input type="text" value="${al.dni}" placeholder="00000000X"></div>
+                            
+                            <div class="field-row">
                                 <label>Nacimiento</label>
-                                <input type="date" id="dob-${al.id}" value="${al.dob}" onchange="calcEdad(${al.id})">
-                                <span style="font-size:1.5rem;">🎂</span>
-                                <div id="age-circ-${al.id}" class="age-circle" onclick="mostrarEdadTexto(${al.id})"></div>
-                                <span id="age-text-${al.id}" class="age-text hidden"></span>
+                                <input type="date" value="${al.dob}" onchange="alumnos.find(x=>x.id==${al.id}).dob=this.value; renderList();">
+                                <span style="font-size:1.4rem; margin-left:5px;">🎂</span>
+                                ${ageData.txt ? `<span class="age-badge" style="background:${ageData.bg}; color:${ageData.tc};">${ageData.txt}</span>` : ''}
                             </div>
-                            <div class="campo" style="background:transparent; border:none; padding:0;">
-                                <label style="margin-right:5px;">Género:</label>
-                                <button class="btn-gen ${al.genero==='H'?'act-h':''}" onclick="setGenero(${al.id}, 'H')">♂️ Hombre</button>
-                                <button class="btn-gen ${al.genero==='M'?'act-m':''}" onclick="setGenero(${al.id}, 'M')">♀️ Mujer</button>
+                            
+                            <div class="field-row">
+                                <label>Género</label>
+                                <div class="gender-opts">
+                                    <button class="gen-btn ${al.gen==='H'?'active-h':''}" onclick="setGen(${al.id}, 'H')">♂️ Hombre</button>
+                                    <button class="gen-btn ${al.gen==='M'?'active-m':''}" onclick="setGen(${al.id}, 'M')">♀️ Mujer</button>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="bloque-lineal">
-                            <div class="bloque-titulo">B. Ubicación y Contacto</div>
-                            <div class="campo"><label>Domicilio</label><input type="text" value="${al.domicilio}" style="width:200px;"></div>
-                            <div class="campo"><label>CP</label><input type="text" id="cp-${al.id}" value="${al.cp}" style="width:70px;" oninput="checkCP(${al.id})"></div>
-                            <div class="campo"><label>Municipio</label><input type="text" id="muni-${al.id}" value="${al.municipio}" style="width:150px;"></div>
-                            <div class="campo">
-                                <label>Nacionalidad</label>
-                                <input type="text" value="${al.nacionalidad}" style="width:100px;">
-                                <span style="font-size:1.2rem;">${al.nacionalidad.toLowerCase()==='españa'?'🇪🇸':''}</span>
+                        <div class="data-section">
+                            <h3 class="section-title">B. Ubicación y Contacto</h3>
+                            <div class="field-row"><label>Domicilio</label><input type="text" value="${al.domicilio}" placeholder="Calle, número, piso..."></div>
+                            
+                            <div class="field-row" style="align-items:flex-start;">
+                                <label style="margin-top:8px;">Código Postal</label>
+                                <div style="flex:1;">
+                                    <input type="text" id="cp-${al.id}" value="${al.cp}" placeholder="Ej: 35414" style="width:100px; border:1px solid #ccc; padding:6px; border-radius:6px;" oninput="detectarCP(${al.id})">
+                                    <div id="muni-container-${al.id}" style="margin-top:5px; color:var(--brand-primary); font-weight:600;">${al.municipio}</div>
+                                </div>
                             </div>
-                            <div class="campo"><label>Teléfono</label><input type="text" value="${al.telefono}" style="width:120px;"></div>
+
+                            <div class="field-row"><label>Nacionalidad</label><input type="text" value="${al.nacionalidad}"> <span style="font-size:1.2rem;">${al.nacionalidad.toLowerCase()==='españa'?'🇪🇸':''}</span></div>
+                            <div class="field-row"><label>Teléfono</label><input type="text" value="${al.tel}" placeholder="600 000 000"></div>
                         </div>
 
-                        <div class="bloque-lineal">
-                            <div class="bloque-titulo">C. Datos Académicos</div>
-                            ${!al.proyectoAbierto 
-                                ? `<button class="btn bg-primary" onclick="abrirProyecto(${al.id})">➕ Añadir Proyecto</button>` 
-                                : `<div style="width:100%; display:flex; gap:15px; align-items:center; flex-wrap:wrap;">
-                                    <strong style="color:var(--dark);">Trayectoria Arucas:</strong>
-                                    ${transHTML}
-                                    <div style="width:2px; height:30px; background:#ccc; margin:0 10px;"></div>
-                                    <button class="btn-subject">📚 Lengua</button>
-                                    <button class="btn-subject">📐 Matemáticas</button>
-                                   </div>`
-                            }
+                        <div class="data-section full">
+                            <h3 class="section-title">C. Datos Académicos</h3>
+                            ${!al.academicoAbierto && al.isEditing ? `
+                                <button style="background:var(--brand-light); color:var(--brand-primary); padding:10px 20px; border-radius:8px; font-weight:bold; border:1px dashed var(--brand-secondary);" onclick="alumnos.find(x=>x.id==${al.id}).academicoAbierto=true; renderList();">➕ Añadir Proyecto Educativo</button>
+                            ` : ''}
+                            
+                            ${al.academicoAbierto || (!al.isEditing && al.academicoAbierto) ? `
+                                <div style="background:var(--bg-app); padding:15px; border-radius:8px; border:1px solid var(--border);">
+                                    <strong style="color:var(--brand-primary); font-size:1.1rem; display:block; margin-bottom:10px;">Trayectoria Arucas:</strong>
+                                    <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+                                        <button class="pill-select">PRL</button><button class="pill-select">Medio Ambiente</button><button class="pill-select">Igualdad</button>
+                                        <div style="width:2px; height:20px; background:var(--border); margin:0 10px;"></div>
+                                        <button class="acad-btn">📚 Lengua</button><button class="acad-btn">📐 Matemáticas</button>
+                                    </div>
+                                </div>
+                            ` : ''}
                         </div>
 
-                        <div class="bloque-lineal" style="border-left: 4px solid var(--danger);">
-                            <div class="bloque-titulo" style="color:var(--danger);">🚨 D. Contacto de Emergencia</div>
-                            <div class="campo"><label>Nombre</label><input type="text" value="${al.emergencia.nombre}"></div>
-                            <div class="campo"><label>Parentesco</label><input type="text" value="${al.emergencia.parentesco}"></div>
-                            <div class="campo"><label>Teléfono</label><input type="text" value="${al.emergencia.tel}"></div>
-                            <button class="btn bg-success">✅ Confirmar</button>
+                        <div class="data-section full" style="border-left:4px solid var(--danger); background:#fef2f2;">
+                            <h3 class="section-title" style="color:var(--danger); border-bottom-color:#fecaca;">🚨 D. Contacto de Emergencia</h3>
+                            <div style="display:flex; gap:15px; flex-wrap:wrap;">
+                                <div class="field-row" style="flex:1; background:white; border-color:#fecaca;"><label>Nombre</label><input type="text" value="${al.emergencia.n}"></div>
+                                <div class="field-row" style="flex:1; background:white; border-color:#fecaca;"><label>Parentesco</label><input type="text" value="${al.emergencia.p}" placeholder="Madre, Padre, Pareja..."></div>
+                                <div class="field-row" style="flex:1; background:white; border-color:#fecaca;"><label>Teléfono</label><input type="text" value="${al.emergencia.t}"></div>
+                            </div>
                         </div>
 
                     </div>
                 `;
-                
                 cont.appendChild(div);
-                if(al.dob) calcEdad(al.id); // Calcula color y edad si ya la tenía
+                if(al.cp) detectarCP(al.id); // Re-renderizar los barrios si tiene CP
             });
         }
     </script>
