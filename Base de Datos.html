@@ -3,658 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestión - Base de Datos Profesional</title>
+    <title>Base de Datos - Ayuntamiento de Arucas</title>
     
     <script id="app-state" type="application/json">{
-        "download_time": 0,
         "config": {
-            "mainTitle": "Base de Datos",
-            "tabTitle": "Alumnos",
-            "listTitle": "Listado de Alumnos",
-            "globalTags": ["Grupo 1", "Grupo 2", "Vivero", "Vías y Obras", "Educación", "Aprendiz", "Maestro/a"]
+            "title": "Base de Datos",
+            "pestañas": [
+                {"id": "plantilla", "title": "Alumnos", "fixed": true}
+            ]
         },
-        "displaySettings": {
-            "nameFormat": "name-surname"
-        },
-        "students": []
+        "personal": [
+            {
+                "id": "p_1",
+                "nombre": "Jaime",
+                "apellidos": "Falcón Amado",
+                "dni": "42000000X",
+                "dob": "1980-05-15",
+                "genero": "M",
+                "estado": "alta",
+                "rol": "Técnico",
+                "grupo": 1,
+                "contacto": {"tel": "600123456", "email": "jaime@email.com", "dir": "Calle Ejemplo 1", "cp": "35411", "barrio": "Bañaderos"},
+                "area": "Vivero",
+                "academicos": {
+                    "transversales": {"prl": true, "medioambiente": false, "igualdad": false, "informatica": true, "orientacion": false}
+                },
+                "emergencia": {"nombre": "María", "parentesco": "Hermana", "tel": "600987654"}
+            }
+        ]
     }</script>
 
     <style>
+        /* ESTÉTICA BASADA EN RÚBRICA 13 */
         :root {
-            --bg-color: #f4f7f6;
-            --text-color: #333;
+            --bg-color: #f4f7f6; 
+            --text-color: #333; 
             --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            --orange-main: #e67e22;
-            --primary: #3498db;
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --dark-blue: #2c3e50;
-            --light-gray: #fafafa;
+            --color-primary: #3498db; 
+            --color-dark: #2c3e50; 
+            --color-success: #27ae60; 
+            --color-danger: #e74c3c; 
+            --color-warning: #f39c12;
+            
+            /* Colores de Edad */
+            --age-18: #e0f2fe; --age-31: #dcfce7; --age-41: #fef08a; --age-51: #fed7aa; --age-61: #fecaca;
         }
-        body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 20px; box-sizing: border-box; }
-        .container { max-width: 950px; margin: 0 auto; }
         
-        /* Título Principal Naranja Elegant */
-        .main-header { text-align: center; margin-bottom: 20px; }
-        .main-header h1 { color: var(--orange-main); font-size: 2.3rem; margin: 0; font-weight: bold; }
-        
-        /* Sistema de Pestañas Original */
-        .tabs-container { display: flex; border-bottom: 3px solid var(--dark-blue); margin-bottom: 20px; padding-left: 5px; }
-        .tab { background: #dcdde1; color: #2f3640; padding: 10px 25px; border-radius: 8px 8px 0 0; font-weight: bold; border: none; font-size: 1.1rem; display: flex; align-items: center; gap: 8px; }
-        .tab.active { background: var(--dark-blue); color: white; }
+        body { font-family: var(--font-family); background-color: var(--bg-color); color: var(--text-color); margin: 0; padding: 0; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
 
-        /* Barra de Acciones */
-        .top-bar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .top-bar-left { display: flex; align-items: center; gap: 15px; }
-        .top-bar-left h2 { margin: 0; font-size: 1.3rem; color: var(--dark-blue); }
+        /* SISTEMA DE PESTAÑAS (Top) */
+        .tabs-header { display: flex; background: var(--color-dark); padding: 15px 20px 0 20px; gap: 5px; overflow-x: auto; }
+        .tab { background: rgba(255,255,255,0.2); color: white; padding: 12px 25px; border-radius: 8px 8px 0 0; cursor: pointer; font-weight: bold; border: none; font-size: 1rem; transition: background 0.2s; }
+        .tab:hover { background: rgba(255,255,255,0.4); }
+        .tab.active { background: var(--bg-color); color: var(--color-dark); }
+        .tab-add { background: var(--color-success); } .tab-add:hover { background: #2ecc71; }
+
+        /* BANNER PRINCIPAL */
+        .banner { background-color: var(--color-primary); padding: 20px 30px; color: white; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .banner h1 { margin: 0; font-size: 2rem; }
         
-        .btn { padding: 9px 16px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.95rem; font-weight: bold; color: white; display: inline-flex; align-items: center; gap: 6px; margin: 2px; }
+        /* BOTONERA (BARRAS DE HERRAMIENTAS) */
+        .toolbar { display: flex; justify-content: space-between; align-items: center; background: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; flex-wrap: wrap; gap: 10px; border-left: 5px solid var(--color-primary); }
+        .toolbar-group { display: flex; gap: 8px; align-items: center; }
+        
+        .btn { padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-size: 0.95rem; font-weight: bold; color: white; display: inline-flex; align-items: center; gap: 5px; transition: opacity 0.2s; }
         .btn:hover { opacity: 0.85; }
-        .btn-primary { background-color: var(--primary); }
-        .btn-success { background-color: var(--success); }
-        .btn-danger { background-color: var(--danger); }
-        .btn-dark { background-color: var(--dark-blue); }
-        .btn-orange { background-color: var(--orange-main); }
+        .bg-primary { background-color: var(--color-primary); } .bg-dark { background-color: var(--color-dark); } .bg-success { background-color: var(--color-success); } .bg-danger { background-color: var(--color-danger); } .bg-warning { background-color: var(--color-warning); }
 
-        /* Edición Inline */
-        .inline-edit-box { display: inline-flex; align-items: center; gap: 5px; }
-        .inline-edit-input { font-size: inherit; font-weight: inherit; color: #333; padding: 4px 8px; border: 2px solid var(--primary); border-radius: 4px; outline: none; }
-        .icon-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem; padding: 2px 6px; border-radius: 4px; }
-        .icon-btn:hover { background: rgba(0,0,0,0.05); }
-
-        /* Panel de Filtros Superior */
-        .filter-panel { background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-bottom: 20px; border-top: 4px solid var(--primary); }
-        .filter-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 12px; margin-bottom: 15px; }
-        .filter-group { display: flex; flex-direction: column; gap: 4px; }
-        .filter-group label { font-size: 0.85rem; font-weight: bold; color: #7f8c8d; }
-        .filter-input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 0.9rem; width: 100%; box-sizing: border-box; }
+        /* LISTA DE ALUMNOS (ACORDEÓN ESTILO RÚBRICA 13) */
+        details.student-detail { margin-bottom: 15px; border-radius: 8px; overflow: hidden; box-shadow: 0 3px 10px rgba(0,0,0,0.1); background: #fff; border-left: 6px solid var(--age-18); }
+        details.student-detail > summary { padding: 15px 20px; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid #eee; transition: background 0.2s; }
+        details.student-detail > summary::-webkit-details-marker { display: none; }
+        details.student-detail > summary:hover { background: #fdfdfd; }
         
-        .tag-filter-container { display: flex; flex-wrap: wrap; gap: 6px; padding: 5px 0; }
-        .tag-pill { padding: 5px 14px; background: #f39c12; color: white; border-radius: 20px; font-size: 0.85rem; font-weight: bold; cursor: pointer; border: 2px solid transparent; opacity: 0.55; transition: all 0.2s; }
-        .tag-pill.active { opacity: 1; border-color: #2c3e50; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-
-        /* RESTAURACIÓN DE LOS 18 DESPLEGABLES REFINADOS */
-        details.student-card { background: white; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 3px 10px rgba(0,0,0,0.1); overflow: hidden; }
-        details.student-card > summary { padding: 18px 20px; font-size: 1.2rem; font-weight: bold; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; color: white; }
-        details.student-card > summary::-webkit-details-marker { display: none; }
+        .summary-content { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; width: 100%; }
+        .student-name { font-weight: bold; font-size: 1.1rem; color: var(--color-dark); min-width: 220px; }
         
-        .summary-left { display: flex; align-items: center; gap: 12px; }
-        .btn-icon { background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.4); border-radius: 4px; color: white; cursor: pointer; padding: 4px 8px; font-size: 1rem; transition: background 0.2s; }
-        .btn-icon:hover { background: rgba(0,0,0,0.2); }
-        .btn-icon.del:hover { background: var(--danger); border-color: #c0392b; }
+        /* PÍLDORAS VISUALES */
+        .pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 12px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; border: 1px solid #ddd; background: #f9f9f9; color: var(--color-dark); }
         
-        .student-body { padding: 20px; background: #fafafa; border-top: 1px solid #eee; }
-        .student-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .data-field { display: flex; flex-direction: column; gap: 4px; }
-        .data-field label { font-size: 0.85rem; color: #7f8c8d; font-weight: bold; }
-        .data-field input, .data-field select { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; width: 100%; box-sizing: border-box; background: #fff; }
-        .static-age-display { font-size: 1rem; font-weight: bold; color: var(--dark-blue); padding: 8px; background: #ebf3f9; border-radius: 4px; border: 1px solid #aed581; text-align: center; }
-
-        /* Selector Alternativo Binario de Género */
-        .gender-container { display: flex; gap: 8px; width: 100%; }
-        .gender-btn { flex: 1; padding: 8px; border: 1px solid #ccc; background: white; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 0.95rem; color: #555; transition: all 0.2s; }
-        .gender-btn.active-male { background-color: #3498db !important; color: white !important; border-color: #2980b9 !important; }
-        .gender-btn.active-female { background-color: #f06292 !important; color: white !important; border-color: #d81b60 !important; }
-
-        /* Secciones con diseño de Tarjeta Limpia */
-        .sub-section { background: white; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px; margin-top: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-        .sub-section h4 { margin: 0 0 12px 0; color: var(--dark-blue); border-bottom: 2px solid #eee; padding-bottom: 6px; font-size: 1.05rem; }
+        /* CONTENIDO DESPLEGABLE (4 BLOQUES) */
+        .content-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; padding: 20px; background: #fafafa; }
+        .detail-block { background: #fff; padding: 20px; border-radius: 8px; border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .detail-block h3 { margin: 0 0 15px 0; font-size: 1.05rem; color: var(--color-dark); border-bottom: 2px solid #f4f7f6; padding-bottom: 8px; }
         
-        /* Contactos Cercanos con Chips */
-        .relationship-selector { display: flex; flex-wrap: wrap; gap: 6px; margin: 5px 0; }
-        .rel-chip { padding: 6px 14px; border: 1px solid #ccc; background: #fff; border-radius: 20px; cursor: pointer; font-size: 0.85rem; font-weight: bold; color: #666; }
-        .rel-chip.active-pareja { background: #ef5350 !important; color: white !important; border-color: #d32f2f !important; }
-        .rel-chip.active-hermano { background: #26a69a !important; color: white !important; border-color: #00796b !important; }
-        .rel-chip.active-amigo { background: #ab47bc !important; color: white !important; border-color: #7b1fa2 !important; }
-        .rel-chip.active-padre { background: #42a5f5 !important; color: white !important; border-color: #1976d2 !important; }
-        .rel-chip.active-hijo { background: #66bb6a !important; color: white !important; border-color: #388e3c !important; }
-        .rel-chip.active-tio { background: #ffa726 !important; color: white !important; border-color: #f57c00 !important; }
+        .data-row { margin-bottom: 12px; display: flex; flex-direction: column; }
+        .data-row label { font-size: 0.85rem; color: #7f8c8d; font-weight: bold; margin-bottom: 4px; }
+        .data-row input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-family: inherit; font-size: 0.95rem; }
+        .data-row input:disabled { background: transparent; border: none; padding: 0; color: var(--text-color); font-weight: 500; }
 
-        /* MODAL CONFIGURACIÓN FILTROS GLOBALES */
-        #configModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 3000; justify-content: center; align-items: center; }
-        .modal-content { background: white; padding: 25px; border-radius: 8px; max-width: 500px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        .tag-manager-list { display: flex; flex-direction: column; gap: 8px; max-height: 250px; overflow-y: auto; margin: 15px 0; }
-        .tag-manager-item { display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 8px 12px; border-radius: 4px; border-left: 4px solid #f39c12; }
+        /* ACADÉMICOS Y MÓDULOS TRANSVERSALES */
+        .academic-columns { display: flex; gap: 20px; flex-wrap: wrap; }
+        .col-left { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 10px; }
+        .col-right { flex: 1; min-width: 200px; display: flex; flex-direction: column; gap: 8px; }
+        
+        .subject-card { background: var(--color-dark); color: white; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; text-align: center; box-shadow: 0 3px 6px rgba(0,0,0,0.1); transition: transform 0.2s; }
+        .subject-card:hover { transform: translateY(-2px); }
+        
+        .module-btn { background: #f9f9f9; border: 1px solid #ddd; padding: 10px; border-radius: 6px; text-align: left; font-weight: bold; color: #7f8c8d; cursor: default; display: flex; align-items: center; gap: 10px; }
+        .module-btn.active { background: #eef7f2; border-color: var(--color-success); color: var(--color-success); }
 
-        /* PREVISUALIZACIÓN INFORME / PDF */
-        #pdfPreviewModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 4000; overflow-y: auto; padding: 15px; box-sizing: border-box; }
-        .preview-top-bar { display: flex; justify-content: space-between; align-items: center; background: var(--dark-blue); color: white; padding: 10px 15px; border-radius: 6px; margin-bottom: 20px; }
-        #preview-modal-body { max-width: 850px; margin: 0 auto; background: white; }
+        /* MODOS DE EDICIÓN */
+        .edit-controls { display: none; }
+        .mode-edit .edit-controls { display: inline-flex; }
+        .mode-edit .read-controls { display: none; }
+        .mode-edit .data-row input:disabled { background: #fff; border: 1px solid #ccc; padding: 8px; pointer-events: auto; }
+        .mode-edit .module-btn { cursor: pointer; }
 
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white; padding: 0; }
-            #pdfPreviewModal { display: block !important; position: relative !important; padding: 0 !important; }
-            .preview-top-bar { display: none !important; }
-            details.student-card { border: 1px solid #333 !important; margin-bottom: 25px; page-break-inside: avoid; }
-        }
     </style>
 </head>
 <body>
 
+    <div class="tabs-header" id="tabs-container">
+        <button class="tab active">Alumnos</button>
+        <button class="tab tab-add">➕ Añadir Asignatura</button>
+    </div>
+
     <div class="container">
-        <div class="main-header no-print">
-            <div id="wrapper-mainTitle"></div>
+        <div class="banner">
+            <h1 id="app-title">Base de Datos</h1>
+            <button class="btn bg-dark" title="Galería de Fondos Temáticos">🖼️</button>
         </div>
 
-        <div class="tabs-container no-print">
-            <div id="wrapper-tabTitle"></div>
-        </div>
-
-        <div class="top-bar no-print">
-            <div class="top-bar-left">
-                <div id="wrapper-listTitle"></div>
-            </div>
-            <div>
-                <button class="btn btn-dark" onclick="abrirConfiguracion()">⚙️ Configurar Filtros</button>
-                <button class="btn btn-pdf" style="background:#8e44ad;" onclick="imprimirTodosFichas()">🖨️ Imprimir Todo</button>
-                <button class="btn btn-success" onclick="exportarBaseDatosHTML()">📥 Exportar Todo</button>
-            </div>
-        </div>
-
-        <div class="filter-panel no-print">
-            <div class="filter-grid">
-                <div class="filter-group">
-                    <label>Filtrar por Género</label>
-                    <select id="f-gender" class="filter-input" onchange="filtrarYRenderizar()">
-                        <option value="">Todos</option>
-                        <option value="Hombre">👨 Hombres</option>
-                        <option value="Mujer">👩 Mujeres</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label>Filtrar por Municipio</label>
-                    <input type="text" id="f-municipality" class="filter-input" placeholder="Ej: Las Palmas" oninput="filtrarYRenderizar()">
-                </div>
-                <div class="filter-group">
-                    <label>Filtrar por Código Postal</label>
-                    <input type="text" id="f-pc" class="filter-input" placeholder="Ej: 35001" oninput="filtrarYRenderizar()">
-                </div>
-                <div class="filter-group">
-                    <label>Filtrar por Edad Mínima</label>
-                    <input type="number" id="f-age-min" class="filter-input" placeholder="Edad mínima..." oninput="filtrarYRenderizar()">
-                </div>
-            </div>
-            
-            <div class="filter-group" style="margin-bottom: 15px;">
-                <label>Filtrar por Grupo / Filtro Asignado</label>
-                <div id="filter-tags-render" class="tag-filter-container"></div>
+        <div class="toolbar">
+            <div class="toolbar-group">
+                <button class="btn bg-dark read-controls">📝 Añadir Masivo</button>
+                <button class="btn bg-dark read-controls">🔍 Filtrar / Etiquetas</button>
+                <button class="btn bg-primary read-controls" onclick="toggleEditMode()">✏️ Modo Edición</button>
+                
+                <button class="btn bg-success edit-controls" onclick="toggleEditMode()">✅ Confirmar</button>
+                <button class="btn bg-dark edit-controls" onclick="toggleEditMode()">❌ Cancelar</button>
+                <button class="btn bg-danger edit-controls" onclick="borrarTodo()">🗑️ Borrar Todo</button>
             </div>
 
-            <div style="border-top: 1px solid #eee; padding-top: 12px; display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="btn btn-dark" id="btn-toggle-name" onclick="toggleFormatoNombre()">Formato: Nombre, Apellido</button>
+            <div class="toolbar-group">
+                <button class="btn bg-dark">🔀 Alternar Formato</button>
+                <button class="btn bg-dark">🔤 Ordenar A-Z</button>
+                <button class="btn bg-dark">⚙️ Ajustes</button>
             </div>
         </div>
 
-        <div id="students-list-container"></div>
-
-        <div style="text-align: center; margin-top: 20px;" class="no-print">
-            <button class="btn btn-orange" style="padding: 12px 35px; font-size: 1.1rem; border-radius: 6px;" onclick="crearFichaNuevoAlumno()">➕ Añadir Nuevo Alumno</button>
-        </div>
-    </div>
-
-    <div id="configModal" class="no-print">
-        <div class="modal-content">
-            <h3 style="margin-top:0; color:var(--dark-blue);">⚙️ Configuración de Filtros de la Rúbrica</h3>
-            <p style="font-size:0.85rem; color:#666;">Crea los grupos y perfiles para clasificar a los alumnos (Vivero, Vías y Obras, Educación, etc.).</p>
-            
-            <div style="display: flex; gap: 8px;">
-                <input type="text" id="new-tag-input" class="filter-input" placeholder="Nombre de filtro nuevo...">
-                <button class="btn btn-primary" onclick="crearNuevaEtiquetaGlobal()">Añadir</button>
+        <div id="students-container">
             </div>
-
-            <div id="tag-manager-list-render" class="tag-manager-list"></div>
-
-            <div style="text-align: right; margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
-                <button class="btn btn-dark" onclick="cerrarConfiguracion()">Cerrar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="pdfPreviewModal">
-        <div class="preview-top-bar">
-            <h3>👁️ Vista Previa del Informe</h3>
-            <div>
-                <button class="btn btn-success" onclick="window.print()">🖨️ Confirmar e Imprimir / Guardar PDF</button>
-                <button class="btn btn-danger" onclick="cerrarVistaPrevia()">❌ Cerrar Vista Previa</button>
-            </div>
-        </div>
-        <div id="preview-modal-body"></div>
     </div>
 
     <script>
-        let app = { config: {}, displaySettings: {}, students: [] };
-        let activeSelectedTags = [];
-        let inlineEditingKey = null;
+        // CARGA DE DATOS DESDE EL HTML
+        let state = JSON.parse(document.getElementById('app-state').textContent);
+        
+        const emojis = {
+            roles: { "Aprendiz": "🧑‍🎓", "Maestro": "📜", "Técnico": "🔧", "Técnico Administrativo": "💼", "Capataz": "🦺" },
+            areas: { "Vivero": "🌱", "Vías y Obras": "🔨", "Educación": "🖌️" }
+        };
 
-        // 18 Colores desaturados profesionales de la rúbrica original
-        const colors = [
-            "#e57373", "#f06292", "#ba68c8", "#9575cd", "#7986cb",
-            "#64b5f6", "#4fc3f7", "#4dd0e1", "#4db6ac", "#81c784",
-            "#aed581", "#dce775", "#ffd54f", "#ffb74d", "#ff8a65",
-            "#a1887f", "#90a4ae", "#546e7a"
-        ];
-
-        function init() {
-            let embedded = JSON.parse(document.getElementById('app-state').textContent);
-            let localRaw = localStorage.getItem('rubrica_database_v2');
-            if (localRaw) {
-                let local = JSON.parse(localRaw);
-                if (local.last_saved > (embedded.download_time || 0)) { app = local.data; } 
-                else { app = embedded; }
-            } else { app = embedded; }
-            filtrarYRenderizar();
+        // INICIALIZACIÓN
+        function initApp() {
+            renderStudents();
         }
 
-        function salvarMemoria() {
-            localStorage.setItem('rubrica_database_v2', JSON.stringify({ last_saved: Date.now(), data: app }));
+        // CONTROL DEL MODO EDICIÓN
+        function toggleEditMode() {
+            document.body.classList.toggle('mode-edit');
+            renderStudents(); // Refresca para activar inputs
         }
 
-        // Asignador automático de Emojis Temáticos
-        function obtenerIconoFiltro(tag) {
-            if(tag.toLowerCase().includes("vivero")) return "🌿 " + tag;
-            if(tag.toLowerCase().includes("vías") || tag.toLowerCase().includes("obras")) return "🛠️ " + tag;
-            if(tag.toLowerCase().includes("educación")) return "🎓 " + tag;
-            if(tag.toLowerCase().includes("aprendiz")) return "👶 " + tag;
-            if(tag.toLowerCase().includes("maestro")) return "👑 " + tag;
-            if(tag.toLowerCase().includes("grupo")) return "👥 " + tag;
-            return "🏷️ " + tag;
-        }
-
-        function obtenerEdad(fechaString) {
-            if(!fechaString) return "Sin fecha";
-            const hoy = new Date();
-            const cumple = new Date(fechaString);
-            let edad = hoy.getFullYear() - cumple.getFullYear();
-            const m = hoy.getMonth() - cumple.getMonth();
-            if (m < 0 || (m === 0 && hoy.getDate() < cumple.getDate())) { edad--; }
-            return isNaN(edad) || edad < 0 ? "Fecha inválida" : `${edad} años`;
-        }
-
-        function toggleFormatoNombre() {
-            app.displaySettings.nameFormat = app.displaySettings.nameFormat === 'name-surname' ? 'surname-name' : 'name-surname';
-            salvarMemoria();
-            filtrarYRenderizar();
-        }
-
-        // EDICIÓN INLINE INTERFAZ
-        function renderEdicionInline(idContenedor, keyConfig, textoDefecto, tipoH) {
-            const wrapper = document.getElementById(idContenedor);
-            const valorActual = app.config[keyConfig] || textoDefecto;
-
-            if (inlineEditingKey === keyConfig) {
-                wrapper.innerHTML = `
-                    <div class="inline-edit-box">
-                        <input type="text" id="input-${keyConfig}" class="inline-edit-input" value="${valorActual}">
-                        <button class="icon-btn" onclick="confirmarEdicionInline('${idContenedor}', '${keyConfig}')">✅</button>
-                        <button class="icon-btn" onclick="cancelarEdicionInline()">❌</button>
-                    </div>`;
-            } else {
-                if(tipoH === 'h1') wrapper.innerHTML = `<h1>${valorActual} <button class="icon-btn" onclick="activarEdicionInline('${keyConfig}')">✏️</button></h1>`;
-                if(tipoH === 'tab') wrapper.innerHTML = `<button class="tab active">${valorActual} <button class="icon-btn" style="color:white;" onclick="activarEdicionInline('${keyConfig}')">✏️</button></button>`;
-                if(tipoH === 'h2') wrapper.innerHTML = `<h2>${valorActual} <button class="icon-btn" onclick="activarEdicionInline('${keyConfig}')">✏️</button></h2>`;
+        function borrarTodo() {
+            if(confirm("⚠️ AVISO: ¿Quieres borrar todos los campos?\nSe eliminarán todos los alumnos menos el último, que quedará limpio.")) {
+                alert("Función en desarrollo para el siguiente paso.");
             }
         }
 
-        function activarEdicionInline(key) { inlineEditingKey = key; filtrarYRenderizar(); }
-        function cancelarEdicionInline() { inlineEditingKey = null; filtrarYRenderizar(); }
-        function confirmarEdicionInline(idContenedor, key) {
-            const v = document.getElementById(`input-${key}`).value.trim();
-            if(v) app.config[key] = v;
-            inlineEditingKey = null;
-            salvarMemoria();
-            filtrarYRenderizar();
-        }
+        // DIBUJAR LA LISTA
+        function renderStudents() {
+            const container = document.getElementById('students-container');
+            container.innerHTML = "";
+            const isEdit = document.body.classList.contains('mode-edit');
 
-        // CONFIGURADOR MODAL GESTIÓN DE CATEGORÍAS
-        function abrirConfiguracion() {
-            document.getElementById('configModal').style.display = 'flex';
-            renderListaGestorEtiquetas();
-        }
-        function cerrarConfiguracion() {
-            document.getElementById('configModal').style.display = 'none';
-            filtrarYRenderizar();
-        }
-        function renderListaGestorEtiquetas() {
-            const cont = document.getElementById('tag-manager-list-render');
-            cont.innerHTML = "";
-            app.config.globalTags.forEach((tag, index) => {
-                const item = document.createElement('div');
-                item.className = 'tag-manager-item';
-                item.innerHTML = `<span>${obtenerIconoFiltro(tag)}</span><button class="icon-btn" style="color:var(--danger);" onclick="eliminarEtiquetaGlobal(${index})">🗑️</button>`;
-                cont.appendChild(item);
-            });
-        }
-        function crearNuevaEtiquetaGlobal() {
-            const inp = document.getElementById('new-tag-input');
-            const v = inp.value.trim();
-            if(v && !app.config.globalTags.includes(v)) {
-                app.config.globalTags.push(v);
-                inp.value = "";
-                salvarMemoria();
-                renderListaGestorEtiquetas();
-            }
-        }
-        function eliminarEtiquetaGlobal(index) {
-            if(confirm("¿Eliminar este filtro del sistema global?")) {
-                app.config.globalTags.splice(index, 1);
-                salvarMemoria();
-                renderListaGestorEtiquetas();
-            }
-        }
-
-        // GESTIÓN REGISTROS DE ESTUDIANTES
-        function crearFichaNuevoAlumno() {
-            app.students.push({
-                name: "", surname: "", dob: "", dni: "", email: "",
-                address: "", pc: "", municipality: "", phone: "", gender: "Hombre",
-                assignedTags: [], contacts: []
-            });
-            salvarMemoria();
-            filtrarYRenderizar();
-            const cards = document.getElementsByClassName('student-card');
-            if(cards.length > 0) cards[cards.length - 1].open = true;
-        }
-
-        function eliminarAlumno(index, event) {
-            event.stopPropagation();
-            event.preventDefault();
-            if(confirm(`¿Deseas eliminar de forma definitiva este registro?`)) {
-                app.students.splice(index, 1);
-                salvarMemoria();
-                filtrarYRenderizar();
-            }
-        }
-
-        function actualizarCampoAlumno(index, campo, valor) {
-            app.students[index][campo] = valor;
-            salvarMemoria();
-            
-            // Actualización reactiva instantánea del nombre en cabecera
-            const hText = document.getElementById(`h-text-${index}`);
-            if(hText) {
-                hText.innerText = app.displaySettings.nameFormat === 'name-surname' ? 
-                    `${app.students[index].name} ${app.students[index].surname || ''}` : 
-                    `${app.students[index].surname || ''}, ${app.students[index].name}`;
-            }
-            if(campo === 'dob') {
-                const ageBox = document.getElementById(`static-age-box-${index}`);
-                if(ageBox) ageBox.innerText = obtenerEdad(valor);
-            }
-        }
-
-        function toggleGenderAlumno(index, genero) {
-            app.students[index].gender = genero;
-            salvarMemoria();
-            const btnM = document.getElementById(`gender-m-${index}`);
-            const btnF = document.getElementById(`gender-f-${index}`);
-            if(genero === 'Hombre') { btnM.classList.add('active-male'); btnF.classList.remove('active-female'); } 
-            else { btnM.classList.remove('active-male'); btnF.classList.add('active-female'); }
-        }
-
-        function conmutarEtiquetaAlumno(sIdx, tag) {
-            if(!app.students[sIdx].assignedTags) app.students[sIdx].assignedTags = [];
-            const index = app.students[sIdx].assignedTags.indexOf(tag);
-            if(index > -1) app.students[sIdx].assignedTags.splice(index, 1);
-            else app.students[sIdx].assignedTags.push(tag);
-            salvarMemoria();
-            
-            app.config.globalTags.forEach(t => {
-                const btn = document.getElementById(`s-${sIdx}-tag-${t}`);
-                if(btn) {
-                    if(app.students[sIdx].assignedTags.includes(t)) btn.classList.add('active');
-                    else btn.classList.remove('active');
-                }
-            });
-        }
-
-        // SUB-SISTEMA TUTORES / CONTACTOS CERCANOS
-        function añadirContactoCercano(sIdx) {
-            if(!app.students[sIdx].contacts) app.students[sIdx].contacts = [];
-            app.students[sIdx].contacts.push({ name: "", surname: "", rel: "amigo", phone: "" });
-            salvarMemoria();
-            renderContactosCercanos(sIdx);
-        }
-
-        function eliminarContactoCercano(sIdx, cIdx) {
-            app.students[sIdx].contacts.splice(cIdx, 1);
-            salvarMemoria();
-            renderContactosCercanos(sIdx);
-        }
-
-        function cambiarParentescoContacto(sIdx, cIdx, rel) {
-            app.students[sIdx].contacts[cIdx].rel = rel;
-            salvarMemoria();
-            parentescosValidos.forEach(p => {
-                const btn = document.getElementById(`s-${sIdx}-c-${cIdx}-r-${p}`);
-                if(btn) {
-                    if(p === rel) btn.classList.add(`active-${p}`);
-                    else btn.classList.remove(`active-${p}`);
-                }
-            });
-        }
-
-        function renderContactosCercanos(sIdx) {
-            const cont = document.getElementById(`contacts-render-container-${sIdx}`);
-            if(!cont) return;
-            cont.innerHTML = "";
-            const list = app.students[sIdx].contacts || [];
-
-            list.forEach((c, cIdx) => {
-                const row = document.createElement('div');
-                row.style.cssText = "display:grid; grid-template-columns: repeat(auto-fit,minmax(180px,1fr)) auto; gap:10px; margin-bottom:15px; background:#fff; padding:10px; border-radius:6px; border:1px solid #ddd;";
+            state.personal.forEach((p, idx) => {
+                const det = document.createElement('details');
+                det.className = 'student-detail';
                 
-                let relButtons = "";
-                parentescosValidos.forEach(p => {
-                    const activeClass = c.rel === p ? `active-${p}` : '';
-                    relButtons += `<button type="button" id="s-${sIdx}-c-${cIdx}-r-${p}" class="rel-chip ${activeClass}" onclick="cambiarParentescoContacto(${sIdx},${cIdx},'${p}')">${p.toUpperCase()}</button>`;
-                });
+                const rolEmoji = emojis.roles[p.rol] || '❓';
+                const areaEmoji = emojis.areas[p.area] || '📍';
+                const estadoTxt = p.estado === 'alta' ? '▶️ Alta' : '⏸️ Baja';
 
-                row.innerHTML = `
-                    <div class="data-field"><label>Nombre</label><input type="text" value="${c.name}" oninput="app.students[${sIdx}].contacts[${cIdx}].name=this.value; salvarMemoria();"></div>
-                    <div class="data-field"><label>Apellidos</label><input type="text" value="${c.surname}" oninput="app.students[${sIdx}].contacts[${cIdx}].surname=this.value; salvarMemoria();"></div>
-                    <div class="data-field"><label>Teléfono</label><input type="text" value="${c.phone}" oninput="app.students[${sIdx}].contacts[${cIdx}].phone=this.value; salvarMemoria();"></div>
-                    <div style="grid-column: span 3; min-width: 100%;"><label style="font-size:0.8rem; font-weight:bold; color:#7f8c8d;">Vínculo / Relación:</label><div class="relationship-selector">${relButtons}</div></div>
-                    <div style="display:flex; align-items:center; justify-content:center;"><button class="btn btn-danger" onclick="eliminarContactoCercano(${sIdx}, ${cIdx})">❌</button></div>
-                `;
-                cont.appendChild(row);
-            });
-        }
+                // BOTONES INDIVIDUALES (Solo visibles en modo edición global)
+                const actionBtns = isEdit 
+                    ? `<button class="btn bg-primary" style="padding: 6px 10px;">✏️</button>
+                       <button class="btn bg-danger" style="padding: 6px 10px; margin-left: 5px;">🗑️</button>` 
+                    : ``;
 
-        // MOTOR DE PREVISUALIZACIÓN INFORMES IMPRENSA / PDF
-        function buildStudentReportHTML(s) {
-            let tagBadges = "";
-            (s.assignedTags || []).forEach(t => tagBadges += `<span style="padding:4px 10px; background:#f39c12; color:white; border-radius:15px; font-size:0.85rem; font-weight:bold; margin-right:5px;">${obtenerIconoFiltro(t)}</span>`);
-            if(!tagBadges) tagBadges = "<em>Ninguno asignado</em>";
-
-            let contactsRows = "";
-            (s.contacts || []).forEach(c => {
-                contactsRows += `<tr>
-                    <td style="padding:8px; border:1px solid #ddd;">${c.surname || ''}, ${c.name || ''}</td>
-                    <td style="padding:8px; border:1px solid #ddd; text-align:center; font-weight:bold; text-transform:uppercase;">${c.rel}</td>
-                    <td style="padding:8px; border:1px solid #ddd; text-align:center;">${c.phone || '---'}</td>
-                </tr>`;
-            });
-            if(!contactsRows) contactsRows = `<tr><td colspan="3" style="padding:8px; text-align:center; color:#999;">Sin contactos de urgencia registrados</td></tr>`;
-
-            return `
-                <div style="font-family:'Segoe UI', Arial, sans-serif; padding:30px; border:2px solid #2c3e50; border-radius:12px; margin-bottom:35px; background:white; page-break-inside:avoid;">
-                    <div style="text-align:center; border-bottom:3px solid #e67e22; padding-bottom:10px; margin-bottom:20px;">
-                        <h2 style="margin:0; color:#e67e22;">FICHA MAESTRA DE INFORMACIÓN</h2>
-                        <h1 style="margin:5px 0; color:#2c3e50;">${s.surname || ''}, ${s.name || 'Sin Nombre'}</h1>
-                    </div>
-                    <table style="width:100%; border-collapse:collapse; font-size:1rem; margin-bottom:20px;">
-                        <tr><td style="padding:8px; border:1px solid #ddd; background:#f9f9f9; font-weight:bold; width:30%;">DNI:</td><td style="padding:8px; border:1px solid #ddd;">${s.dni || '---'}</td></tr>
-                        <tr><td style="padding:8px; border:1px solid #ddd; background:#f9f9f9; font-weight:bold;">Fecha Nacimiento:</td><td style="padding:8px; border:1px solid #ddd;">${s.dob || '---'} (${obtenerEdad(s.dob)})</td></tr>
-                        <tr><td style="padding:8px; border:1px solid #ddd; background:#f9f9f9; font-weight:bold;">Género / Sexo:</td><td style="padding:8px; border:1px solid #ddd;">${s.gender || '---'}</td></tr>
-                        <tr><td style="padding:8px; border:1px solid #ddd; background:#f9f9f9; font-weight:bold;">Teléfono:</td><td style="padding:8px; border:1px solid #ddd;">${s.phone || '---'}</td></tr>
-                        <tr><td style="padding:8px; border:1px solid #ddd; background:#f9f9f9; font-weight:bold;">Email:</td><td style="padding:8px; border:1px solid #ddd;">${s.email || '---'}</td></tr>
-                        <tr><td style="padding:8px; border:1px solid #ddd; background:#f9f9f9; font-weight:bold;">Municipio / CP:</td><td style="padding:8px; border:1px solid #ddd;">${s.municipality || '---'} / ${s.pc || '---'}</td></tr>
-                        <tr><td style="padding:8px; border:1px solid #ddd; background:#f9f9f9; font-weight:bold;">Dirección Física:</td><td style="padding:8px; border:1px solid #ddd;">${s.address || '---'}</td></tr>
-                    </table>
-                    <div style="margin-bottom:20px;"><strong>Clasificaciones Designadas:</strong> ${tagBadges}</div>
-                    <h4 style="margin:15px 0 5px 0; color:#2c3e50; border-bottom:2px solid #ccc; padding-bottom:3px;">Contactos Cercanos de Emergencia</h4>
-                    <table style="width:100%; border-collapse:collapse; font-size:0.95rem;">
-                        <thead><tr style="background:#2c3e50; color:white;"><th style="padding:8px; text-align:left;">Nombre y Apellidos</th><th style="padding:8px;">Vínculo</th><th style="padding:8px;">Teléfono</th></tr></thead>
-                        <tbody>${contactsRows}</tbody>
-                    </table>
-                </div>`;
-        }
-
-        function imprimirAlumnoPDF(index, event) {
-            event.stopPropagation();
-            const res = buildStudentReportHTML(app.students[index]);
-            abrirVistaPrevia(res);
-        }
-
-        function imprimirTodosFichas() {
-            let res = "";
-            app.students.forEach(s => res += buildStudentReportHTML(s));
-            abrirVistaPrevia(res);
-        }
-
-        function abrirVistaPrevia(html) {
-            document.getElementById('preview-modal-body').innerHTML = html;
-            document.getElementById('pdfPreviewModal').style.display = 'block';
-        }
-        function cerrarVistaPrevia() { document.getElementById('pdfPreviewModal').style.display = 'none'; }
-
-        // FILTRADO DINÁMICO Y RENDERIZADO INTERFAZ
-        function conmutarFiltroTagGlobal(tag) {
-            const idx = activeSelectedTags.indexOf(tag);
-            if(idx > -1) activeSelectedTags.splice(idx, 1);
-            else activeSelectedTags.push(tag);
-            filtrarYRenderizar();
-        }
-
-        function filtrarYRenderizar() {
-            renderEdicionInline('wrapper-mainTitle', 'mainTitle', 'Base de Datos', 'h1');
-            renderEdicionInline('wrapper-tabTitle', 'tabTitle', 'Alumnos', 'tab');
-            renderEdicionInline('wrapper-listTitle', 'listTitle', 'Listado de Alumnos', 'h2');
-
-            // Renderizado Píldoras Filtros Superiores con Emojis Automáticos
-            const tagsCont = document.getElementById('filter-tags-render');
-            tagsCont.innerHTML = "";
-            app.config.globalTags.forEach(t => {
-                const pill = document.createElement('span');
-                pill.className = `tag-pill ${activeSelectedTags.includes(t) ? 'active' : ''}`;
-                pill.innerText = obtenerIconoFiltro(t);
-                pill.onclick = () => conmutarFiltroTagGlobal(t);
-                tagsCont.appendChild(pill);
-            });
-
-            document.getElementById('btn-toggle-name').innerText = app.displaySettings.nameFormat === 'name-surname' ? "Formato: Nombre, Apellido" : "Formato: Apellido, Nombre";
-
-            const selGen = document.getElementById('f-gender').value;
-            const selMuni = document.getElementById('f-municipality').value.trim().toLowerCase();
-            const selPc = document.getElementById('f-pc').value.trim();
-            const selAgeMin = parseInt(document.getElementById('f-age-min').value) || 0;
-
-            const listCont = document.getElementById('students-list-container');
-            listCont.innerHTML = "";
-
-            app.students.forEach((s, index) => {
-                let edadNum = 0;
-                if (s.dob) {
-                    let diff = Date.now() - new Date(s.dob).getTime();
-                    edadNum = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
-                }
-
-                // Discriminación por filtros de campos de texto
-                if (selGen && s.gender !== selGen) return;
-                if (selMuni && (!s.municipality || !s.municipality.toLowerCase().includes(selMuni))) return;
-                if (selPc && (!s.pc || !s.pc.includes(selPc))) return;
-                if (selAgeMin && edadNum < selAgeMin) return;
-
-                // Discriminación por conjunto de filtros capsule
-                if (activeSelectedTags.length > 0) {
-                    const sTags = s.assignedTags || [];
-                    if (!activeSelectedTags.every(t => sTags.includes(t))) return;
-                }
-
-                const color = colors[index % colors.length];
-                const formatName = app.displaySettings.nameFormat === 'name-surname' ? 
-                    `${s.name || 'Sin Nombre'} ${s.surname || ''}` : `${s.surname || ''}, ${s.name || 'Sin Nombre'}`;
-
-                const card = document.createElement('details');
-                card.className = 'student-card';
-
-                const summary = document.createElement('summary');
-                summary.style.backgroundColor = color;
-                // NOTA: Se eliminó el texto de edad entre paréntesis de la cabecera principal externa
-                summary.innerHTML = `
-                    <div class="summary-left">
-                        <button class="btn-icon del" onclick="eliminarAlumno(${index}, event)" title="Eliminar Alumno">🗑️</button>
-                        <button class="btn-icon" onclick="imprimirAlumnoPDF(${index}, event)" title="Previsualizar Ficha">👁️ PDF</button>
-                        <span id="h-text-${index}">${formatName}</span>
-                    </div>
+                // SUMMARY: Píldoras de izquierda a derecha
+                const summaryHTML = `
+                    <summary>
+                        <div class="summary-content">
+                            <div class="student-name">👤 ${p.nombre} ${p.apellidos}</div>
+                            <span class="pill">${rolEmoji} ${p.rol}</span>
+                            <span class="pill">${areaEmoji} ${p.area}</span>
+                            <span class="pill">1️⃣ Grupo ${p.grupo}</span>
+                            <span class="pill">${estadoTxt}</span>
+                        </div>
+                        <div>${actionBtns}</div>
+                    </summary>
                 `;
 
-                let internalPillsHtml = "";
-                app.config.globalTags.forEach(t => {
-                    const sTags = s.assignedTags || [];
-                    const isAct = sTags.includes(t) ? 'active' : '';
-                    internalPillsHtml += `<span class="tag-pill ${isAct}" id="s-${index}-tag-${t}" onclick="conmutarEtiquetaAlumno(${index},'${t}')">${obtenerIconoFiltro(t)}</span>`;
-                });
+                // CONTENIDO EXPANDIDO: 4 Bloques
+                const contentHTML = `
+                    <div class="content-grid">
+                        <div class="detail-block">
+                            <h3>A. Datos Personales</h3>
+                            <div class="data-row"><label>🪪 DNI/NIE:</label><input type="text" value="${p.dni}" disabled></div>
+                            <div class="data-row"><label>🎂 Nacimiento:</label><input type="date" value="${p.dob}" disabled></div>
+                            <div class="data-row"><label>Género:</label><input type="text" value="${p.genero === 'M' ? '♂️ Hombre' : '♀️ Mujer'}" disabled></div>
+                        </div>
 
-                const body = document.createElement('div');
-                body.className = 'student-body';
-                body.innerHTML = `
-                    <div class="student-grid">
-                        <div class="data-field"><label>Nombre</label><input type="text" value="${s.name}" oninput="actualizarCampoAlumno(${index}, 'name', this.value)"></div>
-                        <div class="data-field"><label>Apellidos</label><input type="text" value="${s.surname}" oninput="actualizarCampoAlumno(${index}, 'surname', this.value)"></div>
-                        <div class="data-field"><label>DNI</label><input type="text" value="${s.dni}" oninput="actualizarCampoAlumno(${index}, 'dni', this.value)"></div>
-                        <div class="data-field"><label>Fecha Nacimiento</label><input type="date" value="${s.dob}" oninput="actualizarCampoAlumno(${index}, 'dob', this.value)"></div>
-                        <div class="data-field"><label>Edad Calculada</label><div class="static-age-display" id="static-age-box-${index}">${obtenerEdad(s.dob)}</div></div>
-                        <div class="data-field">
-                            <label>Género</label>
-                            <div class="gender-container">
-                                <button type="button" id="gender-m-${index}" class="gender-btn ${s.gender === 'Hombre' ? 'active-male':''}" onclick="toggleGenderAlumno(${index}, 'Hombre')">👨 Hombre</button>
-                                <button type="button" id="gender-f-${index}" class="gender-btn ${s.gender === 'Mujer' ? 'active-female':''}" onclick="toggleGenderAlumno(${index}, 'Mujer')">👩 Mujer</button>
+                        <div class="detail-block">
+                            <h3>B. Ubicación y Contacto</h3>
+                            <div class="data-row"><label>📞 Teléfono:</label><input type="text" value="${p.contacto.tel}" disabled></div>
+                            <div class="data-row"><label>🏠 Dirección:</label><input type="text" value="${p.contacto.dir}" disabled></div>
+                            <div class="data-row"><label>📍 CP y Barrio:</label><input type="text" value="${p.contacto.cp} - ${p.contacto.barrio}" disabled></div>
+                        </div>
+
+                        <div class="detail-block" style="grid-column: 1 / -1;">
+                            <h3>C. Gestión Académica</h3>
+                            <div class="academic-columns">
+                                <div class="col-left">
+                                    <div class="subject-card">📚 Lengua Castellana N2</div>
+                                    <div class="subject-card">📐 Matemáticas N2</div>
+                                </div>
+                                <div class="col-right">
+                                    <div class="module-btn ${p.academicos.transversales.prl ? 'active' : ''}">${p.academicos.transversales.prl ? '✅' : '🔘'} Prevención de Riesgos (PRL)</div>
+                                    <div class="module-btn ${p.academicos.transversales.medioambiente ? 'active' : ''}">${p.academicos.transversales.medioambiente ? '✅' : '🔘'} Medio Ambiente</div>
+                                    <div class="module-btn ${p.academicos.transversales.igualdad ? 'active' : ''}">${p.academicos.transversales.igualdad ? '✅' : '🔘'} Igualdad</div>
+                                    <div class="module-btn ${p.academicos.transversales.informatica ? 'active' : ''}">${p.academicos.transversales.informatica ? '✅' : '🔘'} Informática</div>
+                                    <div class="module-btn ${p.academicos.transversales.orientacion ? 'active' : ''}">${p.academicos.transversales.orientacion ? '✅' : '🔘'} Orientación Laboral</div>
+                                </div>
                             </div>
                         </div>
-                        <div class="data-field"><label>Teléfono de Contacto</label><input type="text" value="${s.phone}" oninput="actualizarCampoAlumno(${index}, 'phone', this.value)"></div>
-                        <div class="data-field"><label>Correo Electrónico</label><input type="email" value="${s.email}" oninput="actualizarCampoAlumno(${index}, 'email', this.value)"></div>
-                        <div class="data-field"><label>Dirección</label><input type="text" value="${s.address}" oninput="actualizarCampoAlumno(${index}, 'address', this.value)"></div>
-                        <div class="data-field"><label>Código Postal</label><input type="text" value="${s.pc}" oninput="actualizarCampoAlumno(${index}, 'pc', this.value)"></div>
-                        <div class="data-field"><label>Municipio</label><input type="text" value="${s.municipality}" oninput="actualizarCampoAlumno(${index}, 'municipality', this.value)"></div>
-                    </div>
 
-                    <div class="sub-section">
-                        <h4>Asignación y Filtros de Grupos Vinculados</h4>
-                        <div class="tag-filter-container">${internalPillsHtml}</div>
-                    </div>
-
-                    <div class="sub-section">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-                            <h4 style="margin:0; border:0; padding:0;">Contactos Cercanos y de Emergencia</h4>
-                            <button class="btn btn-primary" style="padding:5px 12px; font-size:0.85rem;" onclick="añadirContactoCercano(${index})">➕ Añadir Familiar / Tutor</button>
+                        <div class="detail-block">
+                            <h3>D. Emergencia</h3>
+                            <div class="data-row"><label>🚨 Contacto de aviso:</label><input type="text" value="${p.emergencia.nombre}" disabled></div>
+                            <div class="data-row"><label>Vínculo / Parentesco:</label><input type="text" value="${p.emergencia.parentesco}" disabled></div>
+                            <div class="data-row"><label>Teléfono Directo:</label><input type="text" value="${p.emergencia.tel}" disabled></div>
                         </div>
-                        <div id="contacts-render-container-${index}"></div>
                     </div>
                 `;
 
-                card.appendChild(summary);
-                card.appendChild(body);
-                listCont.appendChild(card);
-
-                renderContactosCercanos(index);
+                det.innerHTML = summaryHTML + contentHTML;
+                container.appendChild(det);
             });
         }
 
-        function exportarBaseDatosHTML() {
-            try {
-                document.getElementById('app-state').textContent = JSON.stringify({ download_time: Date.now(), ...app });
-                let html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
-                const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a'); a.style.display = 'none'; a.href = url; a.download = "BaseDatos_Alumnos_Sincronizada.html";
-                document.body.appendChild(a); a.click();
-                setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
-            } catch(e) { alert("Error al exportar."); }
-        }
-
-        init();
+        initApp();
     </script>
 </body>
 </html>
